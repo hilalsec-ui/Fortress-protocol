@@ -1,0 +1,3 @@
+# This is a backup solution if you cannot update Cargo
+# To use: mv Cargo.lock.pinned Cargo.lock
+# Then: cargo update -p anchor-lang --precise 0.29.0

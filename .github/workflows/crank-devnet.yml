@@ -1,0 +1,40 @@
+name: Devnet Crank
+
+on:
+  repository_dispatch:
+    types: [trigger-devnet-draw]
+  workflow_dispatch:
+    inputs:
+      lotteryType:
+        description: "Lottery type (LPM, DPL, WPL, MPL)"
+        required: false
+        default: ""
+      tier:
+        description: "Tier value (5, 10, 15, 20, 50)"
+        required: false
+        default: ""
+
+jobs:
+  crank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run crank
+        env:
+          CRANK_PRIVATE_KEY: ${{ secrets.CRANK_PRIVATE_KEY }}
+          RPC_URL: ${{ secrets.RPC_URL }}
+          LOTTERY_TYPE: ${{ github.event.client_payload.lotteryType || github.event.inputs.lotteryType || '' }}
+          TIER: ${{ github.event.client_payload.tier || github.event.inputs.tier || '' }}
+        run: npx ts-node --transpile-only index.ts

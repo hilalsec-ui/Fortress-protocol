@@ -1,0 +1,24 @@
+{
+  "name": "fortress-devnet-crank",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated crank for Fortress Protocol devnet lottery draws",
+  "scripts": {
+    "dev": "ts-node index.ts",
+    "start": "ts-node index.ts",
+    "watch": "nodemon --exec ts-node index.ts --watch index.ts --ext ts",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/spl-token": "^0.4.5",
+    "@solana/web3.js": "^1.95.5",
+    "@switchboard-xyz/on-demand": "^3.9.0",
+    "bs58": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

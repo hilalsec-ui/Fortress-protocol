@@ -1,0 +1,27 @@
+{
+  "network": "devnet",
+  "programId": "BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW",
+  "timestamp": "2026-02-28T00:00:00.000Z",
+  "pdas": {
+    "sol_vault": "ECx92d7Y7e6krdQzq7ALZZRpAZd41coi5q5qiYyGNP6C",
+    "treasury": "GEKTf17LBwxHHR758b1Zc2JZzmTpVeou5sfDCW1qsYgH",
+    "pricing_config": "982GraduHuXxwgoQFeecxnTR8ED9pggcHgXBotJH1dgh",
+    "global_registry": "AQDhUpLR6TeftRZvQg873cfjfx6E7C5J8M3x5KQBH6RC",
+    "vault_LPM_5": "VuoTjsotd61UUyjCWY44oTKzJKhXtLLzbPCJzbve1tw",
+    "vault_LPM_10": "ATutZXdSBNrzvXvKDLNoEcYsuSPDN7cwCT7gtremZHCK",
+    "vault_LPM_20": "6iByLa2N6sTNecWotoxEHfZ65kvBjfXXs6yVH2vurjjS",
+    "vault_LPM_50": "9PaowiapGuZw5KvKT1EDYbo5qkiBQQ8XA91z3mKb9YMd",
+    "vault_DPL_5": "7cig1GHRuR8dP2hGX7tSBQQrQ5cE56oT55eGwjecibSf",
+    "vault_DPL_10": "7jv78uCJamw5bwv1Qqip97gbtKvbFy6HdSfnwn5mHuza",
+    "vault_DPL_15": "C7Ftxs2n9RHU4N9ce2msZJcWXEfp2JuXmBkTUqVhpsAB",
+    "vault_DPL_20": "DrbrZmcykTHRX6HGSZaF7cAbo5gWJQnBZXkzaaJKaMb4",
+    "vault_WPL_5": "BUsXGuJE4tuAM4Hpwjoq2LUKWyD36GFptPgfe4FpEwMY",
+    "vault_WPL_10": "Cm9sMF3GA8zqSyzbYpeqPka9zNjg23MJaKePtZW8zdjr",
+    "vault_WPL_15": "BZ4VAFzVzUeSEPn3ntUYAa2v6Cg1N6JoD9xF9AU283Zo",
+    "vault_WPL_20": "GXh7C13VwAaUV6k887DqV8Roo1Sd8dMjJcgVt8Q3mhTG",
+    "vault_MPL_5": "F1aKgJYaeVmTqhkyNFons6g8LmcboAuGQwidbv3zQKoj",
+    "vault_MPL_10": "FJ5Bs3fzhzR9frb7cwa72fciJRqE9aw5tyaiBYKDXovz",
+    "vault_MPL_15": "FnJPKaWoxY7YQtAUgDthtxs51YYVKcqAHpSRe5oKdooq",
+    "vault_MPL_20": "Fq9RM6ay9RiWDpkEAHj12zULcsfvMMXyykDkD1C38VHX"
+  }
+}

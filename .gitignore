@@ -1,0 +1,42 @@
+# Anchor
+.anchor
+target/
+**/*.rs.bk
+node_modules
+test-ledger
+
+# IDL
+*.so
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+dist/
+build/
+
+# Environment
+.env
+.env.local
+
+# Yarn
+yarn-error.log
+
+# Zone Identifier (Windows WSL)
+*:Zone.Identifier
+
+# Wallet keypairs — NEVER commit private keys
+*.json.wallet
+crank-wallet.json
+*-wallet.json
+*-keypair.json
+keypair*.json

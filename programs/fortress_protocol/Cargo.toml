@@ -1,0 +1,38 @@
+[package]
+name = "fortress_protocol"
+version = "0.1.0"
+description = "Fortress Protocol Lottery Program"
+edition = "2021"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(solana)'] }
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "fortress_protocol"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = ["init-if-needed", "no-log-ix-name"]
+init-if-needed = ["anchor-lang/init-if-needed"]
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+token_2022 = ["anchor-spl/token_2022"]
+custom-heap = []
+custom-panic = []
+anchor-debug = []
+
+[dependencies]
+anchor-lang = "0.32.1"
+anchor-spl = { version = "0.32.1", default-features = false, features = ["token", "token_2022", "associated_token"] }
+
+# Pyth removed temporarily due to edition2024 dependency conflict
+# For randomness, we use blockhash-based pseudo-randomness instead
+# pyth-solana-receiver-sdk = "0.3.0"
+
+# Dev dependencies commented out to avoid edition2024 conflicts
+# [dev-dependencies]
+# solana-program-test = "1.18.22"
+# solana-sdk = "1.18.22"

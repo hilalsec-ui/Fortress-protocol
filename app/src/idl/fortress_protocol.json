@@ -1,0 +1,2251 @@
+{
+  "address": "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY",
+  "metadata": {
+    "name": "fortress_protocol",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Fortress Protocol Lottery Program"
+  },
+  "instructions": [
+    {
+      "name": "buy_dpl_ticket",
+      "discriminator": [
+        82,
+        70,
+        144,
+        15,
+        214,
+        119,
+        149,
+        224
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "fpt_mint"
+        },
+        {
+          "name": "buyer_token_account",
+          "writable": true
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "Vault PDA — key validated in body via stored bump (seed differs by lottery type)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "participant_page",
+          "writable": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "instructions_sysvar",
+          "docs": ["Switchboard oracle Ed25519 quote prepended by fetchManagedUpdateIxs."],
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "quantity",
+          "type": "u32"
+        },
+        {
+          "name": "fpt_per_ticket",
+          "type": "u64"
+        },
+        {
+          "name": "max_fpt_amount",
+          "type": "u64"
+        },
+        {
+          "name": "page_number",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "buy_lpm_ticket",
+      "discriminator": [
+        187,
+        114,
+        174,
+        77,
+        131,
+        100,
+        72,
+        62
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "fpt_mint"
+        },
+        {
+          "name": "buyer_token_account",
+          "writable": true
+        },
+        {
+          "name": "lottery_vault",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "participant_page",
+          "writable": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "instructions_sysvar",
+          "docs": ["Switchboard oracle Ed25519 quote prepended by fetchManagedUpdateIxs."],
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "quantity",
+          "type": "u32"
+        },
+        {
+          "name": "fpt_per_ticket",
+          "type": "u64"
+        },
+        {
+          "name": "max_fpt_amount",
+          "type": "u64"
+        },
+        {
+          "name": "page_number",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "buy_mpl_ticket",
+      "discriminator": [
+        120,
+        94,
+        142,
+        6,
+        104,
+        242,
+        96,
+        56
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "fpt_mint"
+        },
+        {
+          "name": "buyer_token_account",
+          "writable": true
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "Vault PDA — key validated in body via stored bump (seed differs by lottery type)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "participant_page",
+          "writable": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "instructions_sysvar",
+          "docs": ["Switchboard oracle Ed25519 quote prepended by fetchManagedUpdateIxs."],
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "quantity",
+          "type": "u32"
+        },
+        {
+          "name": "fpt_per_ticket",
+          "type": "u64"
+        },
+        {
+          "name": "max_fpt_amount",
+          "type": "u64"
+        },
+        {
+          "name": "page_number",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "buy_wpl_ticket",
+      "discriminator": [
+        44,
+        122,
+        251,
+        241,
+        146,
+        102,
+        41,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "fpt_mint"
+        },
+        {
+          "name": "buyer_token_account",
+          "writable": true
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "Vault PDA — key validated in body via stored bump (seed differs by lottery type)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "participant_page",
+          "writable": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "instructions_sysvar",
+          "docs": ["Switchboard oracle Ed25519 quote prepended by fetchManagedUpdateIxs."],
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "quantity",
+          "type": "u32"
+        },
+        {
+          "name": "fpt_per_ticket",
+          "type": "u64"
+        },
+        {
+          "name": "max_fpt_amount",
+          "type": "u64"
+        },
+        {
+          "name": "page_number",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "cancel_expired_draw",
+      "discriminator": [
+        158,
+        50,
+        253,
+        149,
+        187,
+        138,
+        172,
+        201
+      ],
+      "accounts": [
+        {
+          "name": "canceller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery_state",
+          "docs": [
+            "Vault PDA — receives the PendingDraw rent when it closes (not the caller).",
+            "Validated in the instruction body via stored bump."
+          ],
+          "writable": true
+        },
+        {
+          "name": "pending_draw",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "fulfill_draw_entropy",
+      "discriminator": [
+        86,
+        248,
+        44,
+        224,
+        151,
+        4,
+        167,
+        220
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "docs": [
+            "Permissionless caller"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "fpt_mint"
+        },
+        {
+          "name": "lottery_state",
+          "docs": [
+            "Vault PDA — validated in body via stored bump"
+          ],
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "lottery_state"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "fpt_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "winner"
+        },
+        {
+          "name": "winner_ata",
+          "writable": true
+        },
+        {
+          "name": "treasury_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury_fpt_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "fpt_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "authority_ata",
+          "docs": [
+            "Created by treasury via CPI if absent (idempotent)."
+          ],
+          "writable": true
+        },
+        {
+          "name": "participant_page_0"
+        },
+        {
+          "name": "winning_participant_page"
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "randomness_account",
+          "docs": [
+            "This prevents a malicious caller from substituting a different randomness account",
+            "whose revealed value maps the winning index to their own ticket."
+          ],
+          "relations": [
+            "pending_draw"
+          ]
+        },
+        {
+          "name": "winner_history",
+          "docs": [
+            "WinnerHistory PDA — validated in body"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pending_draw",
+          "docs": [
+            "PendingDraw PDA — consumed + closed here; rent returned to the vault.",
+            "`has_one = randomness_account` enforces that the caller cannot substitute a",
+            "different Switchboard account to manipulate the winner index."
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "settler_reward_fpt",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "fund_oracle_crank",
+      "docs": [
+        "Permissionless — anyone may call this to refill the oracle crank wallet from",
+        "the treasury vault.  Used in the manual-draw fallback: the user's single",
+        "wallet TX includes this instruction so the server-side crank can pay",
+        "Switchboard oracle fees without requiring additional user signatures."
+      ],
+      "discriminator": [
+        186,
+        255,
+        142,
+        234,
+        112,
+        182,
+        253,
+        50
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Any wallet may call this instruction — they only pay the tiny TX fee."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury_vault",
+          "docs": [
+            "Treasury Vault PDA — source of oracle fee funding."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "crank_wallet",
+          "docs": [
+            "Crank authority wallet that receives SOL for Switchboard oracle operations."
+          ],
+          "writable": true,
+          "address": "CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_global_registry",
+      "discriminator": [
+        191,
+        61,
+        152,
+        46,
+        44,
+        104,
+        41,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_treasury",
+      "discriminator": [
+        124,
+        186,
+        211,
+        195,
+        85,
+        165,
+        129,
+        166
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_vault",
+      "discriminator": [
+        48,
+        191,
+        163,
+        44,
+        71,
+        129,
+        63,
+        164
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery_vault",
+          "writable": true
+        },
+        {
+          "name": "winner_history",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "lazy_reset_vault",
+      "discriminator": [
+        172,
+        201,
+        205,
+        63,
+        41,
+        137,
+        113,
+        184
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "docs": [
+            "Treasury account that pays for reset gas"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "The vault to reset"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "request_draw_entropy",
+      "discriminator": [
+        236,
+        140,
+        96,
+        249,
+        85,
+        90,
+        3,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "requester",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery_state",
+          "docs": [
+            "Vault PDA — validated in body via stored bump"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pending_draw",
+          "docs": [
+            "PendingDraw PDA — created here, closed in fulfill"
+          ],
+          "writable": true
+        },
+        {
+          "name": "treasury_vault",
+          "docs": [
+            "requester's wallet shows no net SOL change (treasury is the ops fund)."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "randomness_account",
+          "docs": [
+            "Must be owned by the Switchboard On-Demand program.",
+            "randomness_commit CPI is called by the API server (route.ts) in a",
+            "separate transaction using the Switchboard SDK, so only the account",
+            "ownership check is needed here."
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_type_id",
+          "type": "u8"
+        },
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "user_commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "extra_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "rollover_dpl_tier",
+      "discriminator": [
+        95,
+        179,
+        13,
+        190,
+        73,
+        237,
+        89,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "Vault — key validated in body via stored bump (seed differs by lottery type)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tier",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "rollover_mpl_tier",
+      "discriminator": [
+        88,
+        92,
+        55,
+        142,
+        245,
+        13,
+        87,
+        208
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "Vault — key validated in body via stored bump (seed differs by lottery type)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tier",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "rollover_wpl_tier",
+      "discriminator": [
+        160,
+        241,
+        85,
+        232,
+        179,
+        60,
+        110,
+        190
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery_vault",
+          "docs": [
+            "Vault — key validated in body via stored bump (seed differs by lottery type)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tier",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "top_up_treasury_vault",
+      "discriminator": [
+        104,
+        206,
+        17,
+        19,
+        216,
+        42,
+        42,
+        52
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "unified_withdraw_from_treasury_vault",
+      "discriminator": [
+        96,
+        66,
+        218,
+        246,
+        70,
+        189,
+        92,
+        227
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury_vault",
+          "docs": [
+            "Must match TREASURY_VAULT_SEED used in draw_winner.rs so fees flow to the same account."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fpt_mint",
+          "docs": [
+            "FPT Mint (Token-2022)"
+          ]
+        },
+        {
+          "name": "treasury_fpt_ata",
+          "docs": [
+            "Treasury's FPT ATA — owned by treasury_vault (sol_vault PDA, seeds=[b\"sol_vault\"]).",
+            "draw_winner sends 5% FPT fees here; withdraw pulls from here.",
+            "init_if_needed ensures SOL withdrawals succeed even if ATA was never created yet."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "fpt_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "admin_fpt_ata",
+          "docs": [
+            "Admin's FPT ATA (destination for FPT withdrawal)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "admin"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "fpt_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": {
+              "name": "WithdrawAsset"
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GlobalRegistry",
+      "discriminator": [
+        100,
+        213,
+        140,
+        104,
+        66,
+        152,
+        15,
+        238
+      ]
+    },
+    {
+      "name": "LotteryVault",
+      "discriminator": [
+        113,
+        236,
+        25,
+        110,
+        31,
+        177,
+        53,
+        85
+      ]
+    },
+    {
+      "name": "PendingDraw",
+      "discriminator": [
+        234,
+        129,
+        254,
+        162,
+        161,
+        147,
+        255,
+        138
+      ]
+    },
+    {
+      "name": "Treasury",
+      "discriminator": [
+        238,
+        239,
+        123,
+        238,
+        89,
+        1,
+        168,
+        253
+      ]
+    },
+    {
+      "name": "WinnerHistory",
+      "discriminator": [
+        225,
+        68,
+        62,
+        105,
+        241,
+        233,
+        30,
+        57
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "LotteryNotEnded"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidWinnerATA"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidWinner"
+    },
+    {
+      "code": 6003,
+      "name": "PageFull"
+    },
+    {
+      "code": 6004,
+      "name": "UnauthorizedDraw"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidTier"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientBalance"
+    },
+    {
+      "code": 6007,
+      "name": "ParticipantThresholdNotMet"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidLotteryType"
+    },
+    {
+      "code": 6009,
+      "name": "LotteryAlreadyDrawn"
+    },
+    {
+      "code": 6010,
+      "name": "ArithmeticOverflow"
+    },
+    {
+      "code": 6011,
+      "name": "ParticipantNotFound"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidParticipantPage"
+    },
+    {
+      "code": 6013,
+      "name": "InsufficientVaultFunds"
+    },
+    {
+      "code": 6014,
+      "name": "LpmCapacityExceeded"
+    },
+    {
+      "code": 6015,
+      "name": "NoParticipants"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidQuantity"
+    },
+    {
+      "code": 6017,
+      "name": "LotteryEnded"
+    },
+    {
+      "code": 6018,
+      "name": "SlippageExceeded"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidAmount"
+    },
+    {
+      "code": 6020,
+      "name": "DrawNotYetReady"
+    },
+    {
+      "code": 6021,
+      "name": "InsufficientFptBalance"
+    },
+    {
+      "code": 6022,
+      "name": "TierNotStuck"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidOperation"
+    },
+    {
+      "code": 6024,
+      "name": "EntropyNotAvailable"
+    },
+    {
+      "code": 6025,
+      "name": "DrawExpired"
+    }
+  ],
+  "types": [
+    {
+      "name": "GlobalRegistry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_lotteries",
+            "type": "u8"
+          },
+          {
+            "name": "total_participants",
+            "type": "u64"
+          },
+          {
+            "name": "total_prizes_distributed",
+            "type": "u64"
+          },
+          {
+            "name": "lpm_rounds",
+            "type": {
+              "array": [
+                "u32",
+                4
+              ]
+            }
+          },
+          {
+            "name": "dpl_rounds",
+            "type": {
+              "array": [
+                "u32",
+                4
+              ]
+            }
+          },
+          {
+            "name": "wpl_rounds",
+            "type": {
+              "array": [
+                "u32",
+                4
+              ]
+            }
+          },
+          {
+            "name": "mpl_rounds",
+            "type": {
+              "array": [
+                "u32",
+                4
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LotteryType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LPM"
+          },
+          {
+            "name": "DPL"
+          },
+          {
+            "name": "WPL"
+          },
+          {
+            "name": "MPL"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LotteryVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lottery_type",
+            "type": {
+              "defined": {
+                "name": "LotteryType"
+              }
+            }
+          },
+          {
+            "name": "tier",
+            "type": "u8"
+          },
+          {
+            "name": "round_number",
+            "type": "u32"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "participant_count",
+            "type": "u32"
+          },
+          {
+            "name": "current_page",
+            "type": "u32"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "last_winner",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "last_prize",
+            "type": "u64"
+          },
+          {
+            "name": "is_drawn",
+            "type": "bool"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "VaultState"
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PendingDraw",
+      "docs": [
+        "Stores draw state between the two-step request/fulfill cycle.",
+        "",
+        "Seeds: `[b\"pending_draw\", &[lottery_type_id], &[tier]]`",
+        "Only one pending draw per (lottery_type, tier) at a time."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lottery_type_id",
+            "docs": [
+              "0=LPM, 1=DPL, 2=WPL, 3=MPL"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "tier",
+            "docs": [
+              "$-value tier (5, 10, 20, 50)"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "randomness_account",
+            "docs": [
+              "Switchboard V3 RandomnessAccount created for this draw request.",
+              "Filled in by request_draw_entropy after the randomness_commit CPI."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "user_commitment",
+            "docs": [
+              "User-supplied randomness commitment (mixed with SB VRF value at fulfill)"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "requester",
+            "docs": [
+              "Wallet that called request_draw (receives rent refund at fulfill)"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "requested_at",
+            "docs": [
+              "Unix timestamp of request (for expiry checks)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "request_reveal_slot",
+            "docs": [
+              "The oracle's reveal_slot at request time — used to ensure the oracle",
+              "reveals AFTER this draw was requested, preventing reuse of old SB values.",
+              "At request, we record the current reveal_slot (0 or any previous value).",
+              "At fulfill, we require reveal_slot > request_reveal_slot."
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Treasury",
+      "docs": [
+        "Treasury PDA - Automated fund manager for the lottery system",
+        "",
+        "This account holds SOL used to:",
+        "1. Pay for vault initialization rent",
+        "2. Pay Pyth oracle fees",
+        "3. Cover ATA creation costs during winner draws",
+        "4. Pay priority tips to validators (0.05 SOL per draw)",
+        "",
+        "Seeds: [b\"treasury\"]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "docs": [
+              "The admin authority (EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg)"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "total_deposited",
+            "docs": [
+              "Total SOL deposited to this treasury"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "docs": [
+              "Total SOL withdrawn from this treasury"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_init_fees",
+            "docs": [
+              "Total SOL spent on vault initializations"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_oracle_fees",
+            "docs": [
+              "Total SOL spent on Pyth oracle fees"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_priority_tips",
+            "docs": [
+              "Total SOL spent on validator priority tips"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_bounties_paid",
+            "docs": [
+              "NEW: Total SOL paid to keepers as bounties (0.005 SOL per draw)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bounty_reserve",
+            "docs": [
+              "NEW: Bounty reserve fund (allocated but not spent yet)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "last_warning_timestamp",
+            "docs": [
+              "NEW: Last time a low treasury warning was emitted"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultState",
+      "docs": [
+        "Vault state machine for draw lifecycle management"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "ReadyToWithdraw"
+          },
+          {
+            "name": "Claimed"
+          },
+          {
+            "name": "Ready"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WinnerHistory",
+      "docs": [
+        "Per-tier on-chain winner history — stores the last MAX_WINNER_HISTORY draws.",
+        "Seeds: [b\"winner_history\", &[lottery_type_index], &[tier]]",
+        "One account per (lottery_type, tier) → 16 accounts total."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lottery_type_index",
+            "docs": [
+              "LotteryType as u8: LPM=0, DPL=1, WPL=2, MPL=3"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "tier",
+            "docs": [
+              "Tier value (e.g. 5, 10, 20, 50)"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "records",
+            "docs": [
+              "Ordered list of draw results — oldest first, newest last.",
+              "Capped at MAX_WINNER_HISTORY (ring-buffer: oldest evicted when full)."
+            ],
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "WinnerRecord"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WinnerRecord",
+      "docs": [
+        "A single draw result stored permanently on-chain."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "winner",
+            "docs": [
+              "The winner's wallet public key"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "round",
+            "docs": [
+              "The round number that was drawn (round_number BEFORE increment)"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "prize",
+            "docs": [
+              "Prize paid to winner in FPT base units (6 decimals)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "docs": [
+              "Unix timestamp of the draw (from Clock::get())"
+            ],
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawAsset",
+      "docs": [
+        "Asset type for treasury withdrawal"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "FPT"
+          }
+        ]
+      }
+    }
+  ]
+}

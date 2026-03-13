@@ -1,0 +1,27 @@
+export const SB_ORACLE_DEVNET = "11111111111111111111111111111111";
+export const SB_RANDOMNESS_ACCOUNTS: Record<string, Record<number, string>> = {
+  LPM: {
+    5: "4dqvnPSuq9PEZaGojLke2oe3zd3q26iS7wBYEhQSkWC3",
+    10: "DiUXBnxQ4W8S5Uju8ywDFE8bw16qHdQrE4LvxUn8sD5T",
+    20: "FWiMmuF3czX4LgPnhiPWaDKdZjRi8H785i8anZd48DLm",
+    50: "AvWpxsjHn1v58ePcnbmHDvetbxx9auzYCzmghjei3zYp",
+  },
+  DPL: {
+    5: "3oNWPLHkAJei4MabFMPQDgodmS2Mibnbta1iwfZiAf6f",
+    10: "Gm1BtE59Fw7DHDdZuDqBTe8JZ1kQs7SRV5vmYmGjo2yZ",
+    15: "hwj1KUgefucngy3AN5hTGdpRoMygQXvMFT4WQRCiDSz",
+    20: "7a4HjALuoHA5qDjkojQc1PAqwdoNnWWUGGHN6KjEaqT1",
+  },
+  WPL: {
+    5: "7fvZk8c3KRo4XKyp5zNaPCJE6HNxd4qMEBpYB1pzzAMh",
+    10: "2iZfPqLRPqWLVySAHdUhiFsUNqNvbXkyW4Kj2BkmhNcE",
+    15: "6Dg6rzvNH7e2TyYw2f9dL667huFGCUezm2gt8KiRQNZr",
+    20: "FaczR2KXcXZnssATJV7kdUzYoR5kTMdwcUuK4ex1HuxW",
+  },
+  MPL: {
+    5: "8YGt9xBM7Tj48qw5kAyckL79QELVh9FY9f6iMbNLLLHS",
+    10: "3esBq8zn1ipfCbxTomvXLVH6RiGXkhStNkrTvddAX5F2",
+    15: "Gmd4vuqn2YTpTBzz1Z8ERF1Cd5EySDszEb3Xuv7WNU8p",
+    20: "57L4DcSCYj6qqoYEY1wovvTgL7JecbAmQS2QkCELpJt",
+  },
+};

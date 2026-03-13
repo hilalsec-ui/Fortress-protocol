@@ -1,0 +1,6 @@
+[net]
+git-fetch-with-cli = true
+
+[build]
+jobs = 4
+rustflags = ["-W", "unexpected_cfgs"]

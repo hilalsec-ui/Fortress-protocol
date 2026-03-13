@@ -1,0 +1,42 @@
+{
+  "name": "fortress-lottery",
+  "version": "1.0.0",
+  "description": "Fortress Protocol Lottery - Solana Program",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd app && npm run dev",
+    "build": "anchor build",
+    "test": "anchor test",
+    "deploy": "anchor deploy",
+    "deploy:devnet": "anchor deploy --provider.cluster devnet",
+    "init-lotteries": "ts-node scripts/initialize-lotteries.ts",
+    "setup-clockwork": "ts-node scripts/setup-clockwork.ts",
+    "sync-idl": "anchor idl init --filepath target/idl/fortress_lottery.json HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb",
+    "update-idl": "anchor idl upgrade --filepath target/idl/fortress_lottery.json HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
+  },
+  "dependencies": {
+    "@clockwork-xyz/sdk": "^0.3.4",
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/spl-token": "^0.4.5",
+    "@solana/web3.js": "^1.95.5",
+    "@switchboard-xyz/on-demand": "^3.9.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.14.0",
+    "chai": "^6.2.2",
+    "mocha": "^11.7.5",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "solana",
+    "anchor",
+    "lottery",
+    "blockchain"
+  ],
+  "author": "Fortress Protocol",
+  "license": "MIT"
+}

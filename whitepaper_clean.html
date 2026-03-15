@@ -396,9 +396,10 @@
     <div style="font-size:9pt; color:var(--gray-400); line-height:2;">
       <div><span class="text-cyan">06</span> · Draw Trigger System</div>
       <div><span class="text-cyan">07</span> · Prize Distribution &amp; Economics</div>
-      <div><span class="text-cyan">08</span> · Participant &amp; Data Dashboard</div>
-      <div><span class="text-cyan">09</span> · Technical Architecture</div>
-      <div><span class="text-cyan">10</span> · Closing Statement</div>
+      <div><span class="text-cyan">08</span> · FPT Token — The Protocol Currency</div>
+      <div><span class="text-cyan">09</span> · Participant &amp; Data Dashboard</div>
+      <div><span class="text-cyan">10</span> · Technical Architecture</div>
+      <div><span class="text-cyan">11</span> · Closing Statement</div>
     </div>
   </div>
 </div>
@@ -945,9 +946,85 @@
   </div>
 </div>
 
-<!-- ══ SECTION 8 — DASHBOARD ═════════════════════════════════════════════ -->
+<!-- ══ SECTION 8 — FPT TOKEN ════════════════════════════════════════════ -->
 <div class="section">
-  <div class="section-label"><span class="num">08</span><span class="lbl">Participant &amp; Data Dashboard</span></div>
+  <div class="section-label"><span class="num">08</span><span class="lbl">FPT Token — The Protocol Currency</span></div>
+  <h2 class="grad-cyan-purple">$FPT — Fortress Protocol Token</h2>
+
+  <div style="text-align:center; margin:16px 0 24px;">
+    <div class="mint-pill" style="font-size:9.5pt; padding:10px 22px; display:inline-block; word-break:break-all; max-width:600px;">
+      ◈ &nbsp;Mint Address &nbsp;·&nbsp; <strong>3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</strong>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div>
+      <p><strong>Fortress Protocol Token (FPT)</strong> is the exclusive utility currency powering every economic interaction within the Fortress Protocol ecosystem. FPT is not a speculative asset or governance token — it is the cryptographic access key to all 16 lottery tiers across all four lottery types.</p>
+      <p>Every ticket purchase, every prize payout, every community draw bounty, and every treasury operation is denominated exclusively in FPT. This creates a unified, fully auditable economic layer with no hidden currencies or off-chain settlements.</p>
+      <div class="code-block" style="margin-top:14px;">
+        <div class="comment">// Token Specification</div>
+        <div><span class="cyan">Standard    </span><span style="color:var(--gray-400);">Token-2022 (SPL Token Extensions Program)</span></div>
+        <div><span class="cyan">Mint        </span><span style="color:var(--gray-400);">3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</span></div>
+        <div><span class="cyan">Decimals    </span><span style="color:var(--gray-400);">6 &nbsp;(1 FPT = 1,000,000 base units)</span></div>
+        <div><span class="cyan">Network     </span><span style="color:var(--gray-400);">Solana Mainnet-Beta</span></div>
+        <div><span class="cyan">Program     </span><span style="color:var(--gray-400);">2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="feature-item feature-cyan-light" style="margin-bottom:8px;">
+        <div class="icon">🎟️</div>
+        <div>
+          <div class="title">Ticket Purchase — Universal Entry</div>
+          <div class="desc">All 16 lottery tiers across LPM, DPL, WPL, and MPL are exclusively priced in FPT. Entry tiers begin at 5 FPT; premium tiers reach 50 FPT. No SOL is accepted directly as ticket payment.</div>
+        </div>
+      </div>
+      <div class="feature-item feature-green" style="margin-bottom:8px;">
+        <div class="icon">🏆</div>
+        <div>
+          <div class="title">Prize Settlement — 95% of Every Pool</div>
+          <div class="desc">When a draw completes, 95% of the pool is transferred atomically to the winner's wallet in FPT — within the same transaction block as the draw. Instant. On-chain. Verifiable.</div>
+        </div>
+      </div>
+      <div class="feature-item feature-yellow" style="margin-bottom:8px;">
+        <div class="icon">⚡</div>
+        <div>
+          <div class="title">Community Draw Bounty</div>
+          <div class="desc">Community members who trigger eligible draws via the fallback flow receive a protocol-funded FPT bounty from the treasury — a permissionless economic incentive for decentralised operation.</div>
+        </div>
+      </div>
+      <div class="feature-item feature-purple">
+        <div class="icon">⚙️</div>
+        <div>
+          <div class="title">Treasury &amp; Operations</div>
+          <div class="desc">The 5% sustainability fee is collected in FPT. The protocol auto-converts FPT reserves to SOL as needed to cover Switchboard oracle fees, on-chain rent, and transaction gas.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="border:1px solid rgba(34,211,238,0.2); background:rgba(0,0,0,0.3); border-radius:10px; padding:16px;">
+    <div style="font-size:8pt; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:12px;">// FPT Lifecycle — From Acquisition to Prize</div>
+    <div class="grid-3">
+      <div class="addr-card" style="text-align:center; padding:14px;">
+        <div class="key" style="margin-bottom:8px; color:var(--cyan);">01 · Acquire</div>
+        <div class="val text-cyan">Swap SOL → FPT<br/>via Liquidity Gateway<br/><span style="color:var(--gray-500); font-size:7.5pt;">Jupiter-integrated swap</span></div>
+      </div>
+      <div class="addr-card" style="text-align:center; padding:14px;">
+        <div class="key" style="margin-bottom:8px; color:var(--purple);">02 · Participate</div>
+        <div class="val text-purple">FPT locked in PDA Vault<br/>per tier · per round<br/><span style="color:var(--gray-500); font-size:7.5pt;">on-chain escrow — no custody</span></div>
+      </div>
+      <div class="addr-card" style="text-align:center; padding:14px;">
+        <div class="key" style="margin-bottom:8px; color:var(--green);">03 · Win</div>
+        <div class="val text-green">95% FPT → Winner<br/>5% FPT → Treasury<br/><span style="color:var(--gray-500); font-size:7.5pt;">same transaction block</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 9 — DASHBOARD ═════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">09</span><span class="lbl">Participant &amp; Data Dashboard</span></div>
   <h2 class="text-white">Bird's Eye View — Your Decentralised Portfolio</h2>
 
   <div class="grid-2">
@@ -1037,9 +1114,9 @@
 
 <div class="page-break"></div>
 
-<!-- ══ SECTION 9 — ARCHITECTURE ══════════════════════════════════════════ -->
+<!-- ══ SECTION 10 — ARCHITECTURE ═════════════════════════════════════════ -->
 <div class="section">
-  <div class="section-label"><span class="num">09</span><span class="lbl">Technical Architecture</span></div>
+  <div class="section-label"><span class="num">10</span><span class="lbl">Technical Architecture</span></div>
   <h2 class="text-white" style="text-align:center;">How the Protocol Fits Together</h2>
   <p style="text-align:center; color:var(--gray-500); font-size:9pt; margin-bottom:20px;">A system diagram of the Fortress Protocol component interaction on Solana.</p>
 
@@ -1178,9 +1255,9 @@
   </div>
 </div>
 
-<!-- ══ SECTION 10 — CLOSING ══════════════════════════════════════════════ -->
+<!-- ══ SECTION 11 — CLOSING ══════════════════════════════════════════════ -->
 <div class="section">
-  <div class="section-label"><span class="num">10</span><span class="lbl">Closing Statement</span></div>
+  <div class="section-label"><span class="num">11</span><span class="lbl">Closing Statement</span></div>
   <div class="cta-section">
     <h2 class="grad-final" style="font-size:26pt; margin-bottom:14px;">Four Lottery Types.<br/>Sixteen Active Tiers.<br/>Zero Trust Required.</h2>
     <p style="max-width:580px; margin:0 auto 14px;">Fortress Protocol is not a product — it is a <strong>living ecosystem</strong>. A self-sustaining, transparent, cryptographically fair system where four distinct lottery types run in parallel, every draw is verifiable on Solscan, and every winner is paid in the same block as the draw. You are not playing a lottery. You are entering a decentralised gaming portfolio.</p>
@@ -1188,6 +1265,18 @@
     <blockquote style="max-width:520px; margin:0 auto 16px; text-align:left;">
       "We are building the first ecosystem where the house cannot cheat — because the house is the blockchain."
     </blockquote>
+
+    <!-- Open Source Block -->
+    <div style="margin:20px auto 24px; max-width:580px; border:1px solid rgba(34,211,238,0.3); background:rgba(34,211,238,0.04); border-radius:12px; padding:18px 22px; text-align:left;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+        <span class="badge badge-cyan" style="margin:0;">&lt;/&gt; Open Source</span>
+        <span class="badge badge-purple" style="margin:0;">⚖️ MIT Licensed</span>
+      </div>
+      <p style="font-size:9pt; color:var(--gray-400); margin-bottom:10px;">Fortress Protocol is <strong style="color:#e5e7eb;">fully open source</strong>. The on-chain Anchor program, keeper bot, and Next.js frontend are all publicly available on GitHub and auditable by anyone. Contributions, independent audits, and forks are actively encouraged.</p>
+      <div class="kv-row"><span class="k text-cyan" style="width:90px;">Repository</span><span class="v"><a href="https://github.com/hilalsec-ui/Fortress-protocol" style="color:var(--cyan);" target="_blank">github.com/hilalsec-ui/Fortress-protocol</a></span></div>
+      <div class="kv-row"><span class="k text-cyan" style="width:90px;">License</span><span class="v">MIT — free to use, modify, and distribute with attribution</span></div>
+      <div class="kv-row"><span class="k text-cyan" style="width:90px;">Scope</span><span class="v">Anchor smart contract · Keeper crank bot · Next.js frontend</span></div>
+    </div>
 
     <div class="cta-tagline">Connect. Choose your tier. Win.</div>
     <div class="cta-sub">Audited for 2026 · All 16 tiers live.</div>
@@ -1204,6 +1293,8 @@
   <div class="footer-mono">
     <div>Fortress Protocol &nbsp;·&nbsp; Solana Mainnet &nbsp;·&nbsp; 2026</div>
     <div>Program: 2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY</div>
+    <div>FPT Mint: 3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</div>
+    <div><a href="https://github.com/hilalsec-ui/Fortress-protocol" style="color:var(--cyan);" target="_blank">github.com/hilalsec-ui/Fortress-protocol</a> &nbsp;·&nbsp; MIT License</div>
     <div style="color:var(--gray-600);">This document is provided for informational purposes only.</div>
   </div>
 </div>

@@ -681,9 +681,10 @@ export default function WhitepaperPage() {
             ['#s5', '05 · Provably Fair'],
             ['#s6', '06 · Draw Trigger'],
             ['#s7', '07 · Economics'],
-            ['#s8', '08 · Dashboard'],
-            ['#s9', '09 · Architecture'],
-            ['#s10', '10 · Closing'],
+            ['#sfpt', '08 · FPT Token'],
+            ['#s8', '09 · Dashboard'],
+            ['#s9', '10 · Architecture'],
+            ['#s10', '11 · Closing'],
           ].map(([href, label]) => (
             <a key={href} href={href} className="block text-gray-500 hover:text-cyan-400 transition-colors leading-tight">{label}</a>
           ))}
@@ -1191,6 +1192,84 @@ export default function WhitepaperPage() {
         </Section>
 
         {/* ══════════════════════════════════════════════════════════════════════
+            SECTION FPT — TOKEN & OPEN SOURCE
+        ══════════════════════════════════════════════════════════════════════ */}
+        <Section id="sfpt" className="border-t border-cyan-500/10 pt-16">
+          <motion.div variants={fadeUp} className="text-center mb-10">
+            <SectionLabel n="08" label="FPT Token — The Protocol Currency" />
+            <h2 className="text-3xl font-black mb-4"
+              style={{ fontFamily: '"Poppins", sans-serif', background: 'linear-gradient(90deg,#22d3ee,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              $FPT — Fortress Protocol Token
+            </h2>
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-yellow-500/40 bg-yellow-500/5 hover:bg-yellow-500/10 text-yellow-400 text-sm font-mono mb-2 transition-all group cursor-pointer"
+            >
+              <span className="text-yellow-500 font-bold">Mint:</span>
+              <span className="opacity-80 break-all">{FPT_MINT}</span>
+              {copied ? <Check className="w-4 h-4 text-green-400 shrink-0" /> : <Copy className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity shrink-0" />}
+            </button>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-10 mb-10">
+            <motion.div variants={fadeRight}>
+              <p className="text-gray-400 text-sm leading-loose mb-4">
+                <strong className="text-white">Fortress Protocol Token (FPT)</strong> is the exclusive utility currency powering every economic interaction within the Fortress Protocol ecosystem. FPT is not a speculative asset or governance token — it is the cryptographic access key to all 16 lottery tiers across all four lottery types.
+              </p>
+              <p className="text-gray-400 text-sm leading-loose mb-4">
+                Every ticket purchase, every prize payout, every community draw bounty, and every treasury operation is denominated exclusively in FPT. This creates a unified, fully auditable economic layer with no hidden currencies or off-chain settlements.
+              </p>
+              <div className="rounded-xl bg-black/50 border border-purple-500/20 p-4 font-mono text-xs leading-loose">
+                <div className="text-gray-600 mb-1">{'// Token Specification'}</div>
+                <div><span className="text-cyan-300">Standard</span><span className="text-gray-400 ml-3">Token-2022 (SPL Token Extensions)</span></div>
+                <div><span className="text-cyan-300">Mint</span><span className="text-gray-400 ml-3 break-all">{FPT_MINT}</span></div>
+                <div><span className="text-cyan-300">Decimals</span><span className="text-gray-400 ml-3">6 &mdash; 1 FPT = 1,000,000 base units</span></div>
+                <div><span className="text-cyan-300">Network</span><span className="text-gray-400 ml-3">Solana Mainnet-Beta</span></div>
+                <div><span className="text-cyan-300">Program</span><span className="text-gray-400 ml-3 break-all">{PROGRAM_ID}</span></div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeLeft} className="space-y-3">
+              {[
+                ['\ud83c\udf9f\ufe0f', 'Ticket Purchase — Universal Entry', 'border-cyan-500/15 bg-cyan-500/5', 'text-cyan-400', 'All 16 lottery tiers across LPM, DPL, WPL, and MPL are exclusively priced in FPT. Entry tiers begin at 5 FPT; premium tiers reach 50 FPT. No SOL is accepted directly as ticket payment.'],
+                ['\ud83c\udfc6', 'Prize Settlement — 95% of Every Pool', 'border-green-500/15 bg-green-500/5', 'text-green-400', "When a draw completes, 95% of the pool is transferred atomically to the winner's wallet in FPT — within the same transaction block. Instant, on-chain, verifiable."],
+                ['\u26a1', 'Community Draw Bounty', 'border-yellow-500/15 bg-yellow-500/5', 'text-yellow-400', 'Community members who trigger eligible draws via the fallback flow receive a protocol-funded FPT bounty from the treasury — a permissionless economic incentive for decentralised operation.'],
+                ['\u2699\ufe0f', 'Treasury & Operations', 'border-purple-500/15 bg-purple-500/5', 'text-purple-400', 'The 5% sustainability fee is collected in FPT. The protocol auto-converts FPT reserves to SOL as needed to cover Switchboard oracle fees, on-chain rent, and transaction gas.'],
+              ].map(([icon, title, border, color, desc]) => (
+                <div key={title} className={`flex gap-3 p-4 rounded-xl border ${border}`}>
+                  <span className="text-xl shrink-0">{icon}</span>
+                  <div>
+                    <div className={`text-sm font-bold ${color} mb-1`}>{title}</div>
+                    <div className="text-xs text-gray-400 leading-relaxed">{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* FPT Lifecycle */}
+          <motion.div variants={fadeUp}>
+            <div className="rounded-xl border border-cyan-500/20 bg-black/30 p-6">
+              <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-5">{'// FPT Lifecycle — From Acquisition to Prize'}</div>
+              <div className="grid sm:grid-cols-3 gap-4 text-center">
+                {[
+                  { label: '01 · Acquire', color: 'text-cyan-400', border: 'border-cyan-500/30', lines: ['Swap SOL \u2192 FPT', 'via Liquidity Gateway', 'Jupiter-integrated'] },
+                  { label: '02 · Participate', color: 'text-purple-400', border: 'border-purple-500/30', lines: ['FPT locked in PDA Vault', 'per tier \u00b7 per round', 'on-chain escrow'] },
+                  { label: '03 · Win', color: 'text-green-400', border: 'border-green-500/30', lines: ['95% FPT \u2192 Winner', '5% FPT \u2192 Treasury', 'same block always'] },
+                ].map(({ label, color, border, lines }) => (
+                  <div key={label} className={`rounded-lg border ${border} bg-black/30 p-4`}>
+                    <div className={`font-mono font-bold text-sm ${color} mb-3`}>{label}</div>
+                    {lines.map((l, i) => (
+                      <div key={i} className={`text-xs ${i === 0 ? color : 'text-gray-500'} leading-relaxed`}>{l}</div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </Section>
+
+        {/* ══════════════════════════════════════════════════════════════════════
             SECTION 8 — DASHBOARD
         ══════════════════════════════════════════════════════════════════════ */}
         <Section id="s8" className="border-t border-cyan-500/10 pt-16">
@@ -1203,7 +1282,7 @@ export default function WhitepaperPage() {
             </motion.div>
             {/* RIGHT text */}
             <motion.div variants={fadeLeft}>
-              <SectionLabel n="08" label="Participant & Data Dashboard" />
+              <SectionLabel n="09" label="Participant & Data Dashboard" />
               <h2 className="text-3xl font-black text-white mb-4" style={{ fontFamily: '"Poppins", sans-serif' }}>
                 Bird’s Eye View—<br />Your Decentralised Portfolio
               </h2>
@@ -1238,7 +1317,7 @@ export default function WhitepaperPage() {
         ══════════════════════════════════════════════════════════════════════ */}
         <Section id="s9" className="border-t border-cyan-500/10 pt-16">
           <motion.div variants={fadeUp} className="text-center mb-8">
-            <SectionLabel n="09" label="Technical Architecture" />
+            <SectionLabel n="10" label="Technical Architecture" />
             <h2 className="text-3xl font-black text-white" style={{ fontFamily: '"Poppins", sans-serif' }}>
               How the Protocol Fits Together
             </h2>
@@ -1310,7 +1389,7 @@ export default function WhitepaperPage() {
         ══════════════════════════════════════════════════════════════════════ */}
         <Section id="s10" className="border-t border-cyan-500/10 pt-16">
           <motion.div variants={fadeUp} className="text-center max-w-2xl mx-auto">
-            <SectionLabel n="10" label="Closing Statement" />
+            <SectionLabel n="11" label="Closing Statement" />
             <h2 className="text-4xl font-black mb-6 leading-tight"
               style={{ fontFamily: '"Poppins", sans-serif', background: 'linear-gradient(135deg,#22d3ee,#a78bfa,#34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Four Lottery Types.<br />Sixteen Active Tiers.<br />Zero Trust Required.
@@ -1321,6 +1400,35 @@ export default function WhitepaperPage() {
             <blockquote className="border-l-4 border-cyan-500 pl-4 text-left text-gray-400 text-sm italic mb-8">
               "We are building the first ecosystem where the house cannot cheat — because the house is the blockchain."
             </blockquote>
+
+            {/* Open Source Block */}
+            <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/5 p-6 mb-8 text-left max-w-xl mx-auto">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 text-xs font-mono">&lt;/&gt; Open Source</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-purple-500/40 bg-purple-500/10 text-purple-400 text-xs font-mono">⚖️ MIT Licensed</span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                Fortress Protocol is <strong className="text-white">fully open source</strong>. The on-chain Anchor program, keeper bot, and Next.js frontend are all publicly available on GitHub and auditable by anyone. Independent audits, contributions, and forks are actively encouraged.
+              </p>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex gap-3">
+                  <span className="text-cyan-400 font-bold w-24 shrink-0">Repository</span>
+                  <a href="https://github.com/hilalsec-ui/Fortress-protocol" target="_blank" rel="noopener noreferrer"
+                    className="text-cyan-300 hover:text-cyan-200 transition-colors break-all">
+                    github.com/hilalsec-ui/Fortress-protocol <ExternalLink className="inline w-3 h-3" />
+                  </a>
+                </div>
+                <div className="flex gap-3">
+                  <span className="text-cyan-400 font-bold w-24 shrink-0">License</span>
+                  <span className="text-gray-400">MIT — free to use, modify, and distribute with attribution</span>
+                </div>
+                <div className="flex gap-3">
+                  <span className="text-cyan-400 font-bold w-24 shrink-0">Scope</span>
+                  <span className="text-gray-400">Anchor smart contract · Keeper crank bot · Next.js frontend</span>
+                </div>
+              </div>
+            </div>
+
             <p className="text-lg font-mono font-bold text-white mb-8">
               Connect. Choose your tier. Win.<br />
               <span className="text-cyan-400">Audited for 2026 · All 16 tiers live.</span>
@@ -1353,6 +1461,13 @@ export default function WhitepaperPage() {
             <div className={`mt-12 font-mono text-xs space-y-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               <div>Fortress Protocol · Solana Mainnet · 2026</div>
               <div>Program: {PROGRAM_ID}</div>
+              <div>FPT Mint: {FPT_MINT}</div>
+              <div>
+                <a href="https://github.com/hilalsec-ui/Fortress-protocol" target="_blank" rel="noopener noreferrer"
+                  className="text-cyan-500 hover:text-cyan-400 transition-colors">
+                  github.com/hilalsec-ui/Fortress-protocol
+                </a> &nbsp;·&nbsp; MIT License
+              </div>
               <div className={isDarkMode ? 'text-gray-500' : 'text-gray-500'}>This document is provided for informational purposes only.</div>
             </div>
           </motion.div>

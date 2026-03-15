@@ -40,3 +40,5 @@ crank-wallet.json
 *-wallet.json
 *-keypair.json
 keypair*.json
+scripts/keys/*.json
+scripts/keys-crank/*.json

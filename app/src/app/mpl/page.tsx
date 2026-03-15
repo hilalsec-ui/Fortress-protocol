@@ -749,6 +749,9 @@ const MPLPage: React.FC = () => {
             <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               Enter anytime this month — $5 · $10 · $15 · $20
             </p>
+            <p className={`text-sm mt-2 ${isDarkMode ? 'text-indigo-400/70' : 'text-indigo-500/80'}`}>
+              Each tier's countdown begins the moment its first ticket is purchased.
+            </p>
           </motion.div>
 
           <div className="relative mb-12">

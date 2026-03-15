@@ -47,7 +47,7 @@ pub struct LazyResetVault<'info> {
 pub fn lazy_reset_vault(
     ctx: Context<LazyResetVault>,
     lottery_type: u8,
-    tier: u8,
+    _tier: u8,
 ) -> Result<()> {
     let vault = &mut ctx.accounts.lottery_vault;
     let current_time = Clock::get()?.unix_timestamp;

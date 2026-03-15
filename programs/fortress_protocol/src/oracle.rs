@@ -24,9 +24,6 @@ pub const ED25519_PROGRAM_ID: Pubkey = pubkey!("Ed25519SigVerify1111111111111111
 /// Must match the constant used in switchboardPriceService.ts.
 pub const DEFAULT_FPT_PER_SOL: u64 = 1_000;
 
-/// Minimum USD entry fee (base tier).
-pub const ENTRY_FEE_USD_BASE: u64 = 5;
-
 /// Maximum oracle quote age in slots before it is considered stale (~12 s on Solana).
 pub const MAX_FEED_STALENESS_SLOTS: u64 = 30;
 

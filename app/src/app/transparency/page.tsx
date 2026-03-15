@@ -9,7 +9,7 @@ import { extractRecentWinnersFromVaults, RecentWinner } from "@/services/winnerS
 import { getWinnerHistory } from "@/services/participantsService";
 import { fetchAllWinnerHistories } from "@/services/winnerHistoryService";
 import { ShieldCheck, ExternalLink, Copy, CheckCheck, Cpu, Hash, Layers, AlertTriangle, Eye, ArrowRight } from "lucide-react";
-import { PROGRAM_ID, FPT_MINT, ADMIN_WALLET, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM, SB_MAINNET_QUEUE } from "@/utils/constants";
+import { PROGRAM_ID, FPT_MINT, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM, SB_MAINNET_QUEUE } from "@/utils/constants";
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
 const SB_PROGRAM_ID = SB_ON_DEMAND_PROGRAM;
@@ -20,7 +20,6 @@ const SOLSCAN_ACCOUNT = (addr: string) => `https://solscan.io/account/${addr}`;
 const CONTRACT_ADDRESSES = [
   { label: "Fortress Program (mainnet)", value: PROGRAM_ID },
   { label: "FPT Token Mint (mainnet)", value: FPT_MINT },
-  { label: "Admin Authority (mainnet)", value: ADMIN_WALLET },
   { label: "Crank Wallet (mainnet)", value: CRANK_AUTHORITY },
   { label: "Switchboard Queue (mainnet)", value: SB_MAINNET_QUEUE },
 ];

@@ -16,7 +16,7 @@ import { triggerCrank } from '@/utils/triggerCrank';
 import { useSettlementTrigger } from '@/hooks/useSettlementTrigger';
 import { usePendingDraws, DrawPhase } from '@/hooks/usePendingDraw';
 import { useChainData } from '@/contexts/ChainDataContext';
-import { LPM_TIERS, SB_RANDOMNESS_ACCOUNTS, PROGRAM_ID, PRIZE_WINNER_PCT, FPT_MINT, ADMIN_WALLET, CRANK_AUTHORITY } from '@/utils/constants';
+import { LPM_TIERS, SB_RANDOMNESS_ACCOUNTS, PROGRAM_ID, PRIZE_WINNER_PCT, FPT_MINT, CRANK_AUTHORITY } from '@/utils/constants';
 
 
 const LPLPage: React.FC = () => {
@@ -784,7 +784,6 @@ const LPLPage: React.FC = () => {
             {[
               { label: 'Program', val: PROGRAM_ID },
               { label: 'FPT Mint', val: FPT_MINT },
-              { label: 'Admin', val: ADMIN_WALLET },
               { label: 'Crank', val: CRANK_AUTHORITY },
             ].map(({ label, val }) => (
               <a key={label} href={`https://solscan.io/account/${val}`} target="_blank" rel="noopener noreferrer"

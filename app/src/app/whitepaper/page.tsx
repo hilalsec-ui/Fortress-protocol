@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import Link from 'next/link';
 import { ExternalLink, FileText, Zap, Shield, Copy, Check } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { FPT_MINT, PROGRAM_ID, IDL_ACCOUNT, DEPLOY_TX, DEPLOYED_AT, ADMIN_WALLET, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM } from '@/utils/constants';
+import { FPT_MINT, PROGRAM_ID, IDL_ACCOUNT, DEPLOY_TX, DEPLOYED_AT, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM } from '@/utils/constants';
 
 // ─── Framer variants ──────────────────────────────────────────────────────────
 const fadeUp = { hidden: { opacity: 0, y: 32 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
@@ -1335,7 +1335,6 @@ export default function WhitepaperPage() {
               { key: 'Program ID (mainnet)', val: PROGRAM_ID, color: 'text-cyan-400' },
               { key: 'FPT Mint (mainnet)', val: FPT_MINT, color: 'text-purple-400' },
               { key: 'SB On-Demand (mainnet)', val: SB_ON_DEMAND_PROGRAM, color: 'text-yellow-400' },
-              { key: 'Admin Authority (mainnet)', val: ADMIN_WALLET, color: 'text-emerald-400' },
               { key: 'Crank Wallet (mainnet)', val: CRANK_AUTHORITY, color: 'text-pink-400' },
             ].map(item => (
               <div key={item.key} className="rounded-lg border border-gray-800 bg-black/30 p-3">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useAnchorProgram } from '@/utils/anchor';
-import { PROGRAM_ID, PRIZE_WINNER_PCT, PRIZE_TREASURY_PCT, FPT_MINT, ADMIN_WALLET, CRANK_AUTHORITY } from '@/utils/constants';
+import { PROGRAM_ID, PRIZE_WINNER_PCT, PRIZE_TREASURY_PCT, FPT_MINT, CRANK_AUTHORITY } from '@/utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, Shield, RefreshCw, TrendingUp, ExternalLink } from 'lucide-react';
 import DrawStepTracker from '@/components/DrawStepTracker';
@@ -888,7 +888,6 @@ const WPLPage: React.FC = () => {
             {[
               { label: 'Program', val: PROGRAM_ID },
               { label: 'FPT Mint', val: FPT_MINT },
-              { label: 'Admin', val: ADMIN_WALLET },
               { label: 'Crank', val: CRANK_AUTHORITY },
             ].map(({ label, val }) => (
               <a key={label} href={`https://solscan.io/account/${val}`} target="_blank" rel="noopener noreferrer"

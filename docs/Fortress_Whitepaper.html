@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fortress Protocol — Official Whitepaper</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cyan: #22d3ee;
+    --purple: #a78bfa;
+    --green: #34d399;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --gray-900: #111827;
+    --gray-800: #1f2937;
+    --gray-700: #374151;
+    --gray-600: #4b5563;
+    --gray-500: #6b7280;
+    --gray-400: #9ca3af;
+    --gray-300: #d1d5db;
+    --bg: #050d1a;
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.07);
+  }
+
+  html, body {
+    background: var(--bg);
+    color: #e5e7eb;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 11pt;
+    line-height: 1.6;
+  }
+
+  body {
+    background-color: #050d1a;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    padding: 24px;
+  }
+
+  .page-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* ── Typography ── */
+  h1 { font-family: 'Poppins', sans-serif; font-size: 40pt; font-weight: 900; line-height: 1.1; }
+  h2 { font-family: 'Poppins', sans-serif; font-size: 22pt; font-weight: 900; line-height: 1.2; margin-bottom: 10px; }
+  h3 { font-family: 'Poppins', sans-serif; font-size: 15pt; font-weight: 900; margin-bottom: 8px; }
+  p { margin-bottom: 10px; color: var(--gray-400); font-size: 9.5pt; line-height: 1.7; }
+  strong { color: #e5e7eb; }
+  code { color: var(--purple); font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; }
+
+  /* ── Card / Section ── */
+  .section {
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 36px;
+    page-break-inside: avoid;
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .section-label .num {
+    font-size: 8pt;
+    color: var(--cyan);
+    border: 1px solid rgba(34,211,238,0.4);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .section-label .lbl {
+    font-size: 7.5pt;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    text-align: center;
+    padding: 40px 24px 32px;
+    border-bottom: 1px solid rgba(34,211,238,0.1);
+    margin-bottom: 40px;
+    page-break-after: always;
+  }
+  .cover h1 {
+    background: linear-gradient(135deg, #22d3ee 0%, #a78bfa 50%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .cover .subtitle { font-size: 14pt; color: var(--gray-400); margin-bottom: 16px; }
+  .cover .tagline { font-size: 9pt; color: var(--gray-500); max-width: 500px; margin: 0 auto; }
+  .mint-pill {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(245,158,11,0.4);
+    background: rgba(245,158,11,0.05);
+    color: var(--yellow);
+    font-size: 8.5pt;
+    margin-bottom: 20px;
+  }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  .divider-line { height: 1px; width: 80px; background: linear-gradient(to right, transparent, rgba(34,211,238,0.5)); }
+  .divider-line.right { background: linear-gradient(to left, transparent, rgba(34,211,238,0.5)); }
+  .divider-icon { color: rgba(34,211,238,0.5); font-size: 13pt; }
+
+  /* ── Grid layouts ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* ── Feature item ── */
+  .feature-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-800);
+    background: rgba(0,0,0,0.2);
+    margin-bottom: 8px;
+  }
+  .feature-item .icon { font-size: 14pt; flex-shrink: 0; }
+  .feature-item .title { font-size: 9pt; font-weight: bold; color: #e5e7eb; }
+  .feature-item .desc { font-size: 8pt; color: var(--gray-500); line-height: 1.5; }
+
+  .feature-cyan { border-color: rgba(34,211,238,0.15); background: rgba(34,211,238,0.05); }
+  .feature-green { border-color: rgba(52,211,153,0.25); background: rgba(52,211,153,0.05); }
+  .feature-yellow { border-color: rgba(245,158,11,0.25); background: rgba(245,158,11,0.05); }
+  .feature-purple { border-color: rgba(167,139,250,0.25); background: rgba(167,139,250,0.05); }
+  .feature-cyan-light { border-color: rgba(34,211,238,0.3); background: rgba(34,211,238,0.05); }
+
+  /* ── Code block ── */
+  .code-block {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 8pt;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.7;
+    margin: 10px 0;
+  }
+  .code-block .comment { color: var(--gray-600); }
+  .code-block .purple { color: var(--purple); }
+  .code-block .cyan { color: var(--cyan); }
+  .code-block .green { color: var(--green); }
+  .code-formula {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 8pt;
+    color: var(--yellow);
+    margin: 8px 0;
+  }
+  .code-green { border-color: rgba(52,211,153,0.2); color: var(--green); }
+  .code-cyan { border-color: rgba(34,211,238,0.2); color: var(--cyan); }
+
+  /* ── KV row ── */
+  .kv-row {
+    display: flex;
+    gap: 12px;
+    font-size: 8.5pt;
+    margin-bottom: 6px;
+  }
+  .kv-row .k { color: var(--cyan); font-weight: bold; flex-shrink: 0; width: 110px; }
+  .kv-row .v { color: var(--gray-400); }
+  .kv-yellow .k { color: var(--yellow); }
+  .kv-green .k { color: var(--green); }
+
+  /* ── Pill badge ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 8pt;
+    margin-bottom: 12px;
+  }
+  .badge-yellow { border: 1px solid rgba(245,158,11,0.4); background: rgba(245,158,11,0.1); color: var(--yellow); }
+  .badge-cyan { border: 1px solid rgba(34,211,238,0.4); background: rgba(34,211,238,0.1); color: var(--cyan); }
+  .badge-green { border: 1px solid rgba(52,211,153,0.4); background: rgba(52,211,153,0.1); color: var(--green); }
+  .badge-purple { border: 1px solid rgba(167,139,250,0.4); background: rgba(167,139,250,0.1); color: var(--purple); }
+
+  /* ── Gradient heading ── */
+  .grad-cyan-purple {
+    background: linear-gradient(90deg, #22d3ee, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .grad-purple-cyan {
+    background: linear-gradient(90deg, #a78bfa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .grad-green-cyan {
+    background: linear-gradient(90deg, #34d399, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .grad-final {
+    background: linear-gradient(135deg, #22d3ee, #a78bfa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-white { color: #e5e7eb; }
+  .text-cyan { color: var(--cyan); }
+  .text-green { color: var(--green); }
+  .text-yellow { color: var(--yellow); }
+  .text-purple { color: var(--purple); }
+  .text-red { color: var(--red); }
+  .text-gray { color: var(--gray-400); }
+
+  /* ── House edge table ── */
+  .compare-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .compare-row .label { font-size: 8.5pt; }
+  .compare-row .sub { font-size: 8pt; color: var(--gray-500); }
+  .compare-row .pct { font-size: 18pt; font-weight: 900; }
+  .compare-red { border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); }
+  .compare-red .pct { color: var(--red); }
+  .compare-green { border: 1px solid rgba(52,211,153,0.4); background: rgba(52,211,153,0.1); }
+  .compare-green .pct { color: var(--green); }
+
+  /* ── Appendix table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+  th { text-align: left; padding: 8px 12px; color: var(--gray-600); font-weight: 600; border-bottom: 1px solid var(--gray-800); }
+  td { padding: 7px 12px; color: var(--gray-400); }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.01); }
+  td.red { color: var(--red); }
+
+  /* ── Address cards ── */
+  .addr-card {
+    border: 1px solid var(--gray-800);
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 8pt;
+  }
+  .addr-card .key { color: var(--gray-600); margin-bottom: 4px; }
+  .addr-card .val { word-break: break-all; line-height: 1.4; }
+
+  /* ── Blockquote ── */
+  blockquote {
+    border-left: 4px solid var(--cyan);
+    padding-left: 14px;
+    color: var(--gray-400);
+    font-style: italic;
+    font-size: 9.5pt;
+    margin: 14px 0;
+  }
+
+  /* ── CTA footer ── */
+  .cta-section { text-align: center; padding: 20px 0 10px; }
+  .cta-section .cta-tagline { font-size: 11pt; font-weight: bold; color: #e5e7eb; margin-bottom: 6px; }
+  .cta-section .cta-sub { font-size: 9pt; color: var(--cyan); margin-bottom: 16px; }
+  .cta-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .cta-btn {
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 9pt;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+  .cta-lpm { background: linear-gradient(90deg, #fbbf24, #fde68a); color: #111; }
+  .cta-dpl { background: rgba(8,145,178,0.8); color: #fff; }
+  .cta-wpl { background: rgba(109,40,217,0.8); color: #fff; }
+  .cta-mpl { background: rgba(4,120,87,0.8); color: #fff; }
+  .cta-trust { background: transparent; border: 1px solid rgba(167,139,250,0.4); color: var(--purple); }
+
+  .footer-mono { font-size: 8pt; color: var(--gray-500); margin-top: 20px; line-height: 1.8; text-align: center; }
+
+  /* ── SVG diagrams ── */
+  .diagram-box {
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.07);
+    text-align: center;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+
+  /* ── Tier card ── */
+  .tier-card {
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .tier-card .tier-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .tier-card .tier-name { font-size: 9pt; font-weight: bold; }
+  .tier-card .tier-cycle { font-size: 8pt; opacity: 0.7; }
+  .tier-card p { font-size: 8pt; margin: 0; }
+
+  /* ── Step item ── */
+  .step-item {
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .step-item .step-header { display: flex; gap: 10px; align-items: flex-start; }
+  .step-item .step-icon { font-size: 13pt; flex-shrink: 0; }
+  .step-item .step-num { font-size: 8pt; color: var(--gray-600); font-family: 'JetBrains Mono', monospace; }
+  .step-item .step-title { font-size: 9.5pt; font-weight: bold; color: #e5e7eb; }
+  .step-item .step-body { font-size: 8pt; color: var(--gray-400); line-height: 1.6; margin-top: 4px; }
+
+  /* ── Trigger col ── */
+  .trigger-col {
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  /* page breaks */
+  .page-break { page-break-after: always; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page-break { page-break-after: always; }
+    .section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ══ COVER ══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="mint-pill">$FPT · 3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</div>
+  <h1>Fortress Protocol</h1>
+  <p class="subtitle">Official Protocol Whitepaper</p>
+  <p class="tagline">
+    A Multi-Tiered, 100% On-Chain, Provably Fair Gaming Ecosystem<br/>
+    Powered by Solana · Switchboard VRF V3 · FPT Token · 16 Active Tiers
+  </p>
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-icon">[Shield]</div>
+    <div class="divider-line right"></div>
+  </div>
+</div>
+
+<!-- ══ TABLE OF CONTENTS ══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">TOC</span><span class="lbl">Table of Contents</span></div>
+  <h2 class="text-white" style="margin-bottom:16px;">Contents</h2>
+  <div class="grid-2" style="row-gap:8px;">
+    <div style="font-size:9pt; color:var(--gray-400); line-height:2;">
+      <div><span class="text-cyan">01</span> · The Vision &amp; Problem</div>
+      <div><span class="text-cyan">02</span> · The Philosophy</div>
+      <div><span class="text-cyan">03</span> · User Journey</div>
+      <div><span class="text-cyan">04</span> · The Four Pillars</div>
+      <div><span class="text-cyan">05</span> · Provably Fair Engine</div>
+    </div>
+    <div style="font-size:9pt; color:var(--gray-400); line-height:2;">
+      <div><span class="text-cyan">06</span> · Draw Trigger System</div>
+      <div><span class="text-cyan">07</span> · Prize Distribution &amp; Economics</div>
+      <div><span class="text-cyan">08</span> · FPT Token — The Protocol Currency</div>
+      <div><span class="text-cyan">09</span> · Participant &amp; Data Dashboard</div>
+      <div><span class="text-cyan">10</span> · Technical Architecture</div>
+      <div><span class="text-cyan">11</span> · Closing Statement</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 1 — VISION ════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">01</span><span class="lbl">The Vision &amp; Problem</span></div>
+  <h2 class="text-white">The Problem with<br/>Traditional Lotteries</h2>
+  <p>The global lottery industry moves trillions in ticket sales annually — yet the mechanism by which winners are selected is almost universally a black box. Players deposit funds into an opaque server. A private algorithm draws a result. No participant can verify the process was fair.</p>
+
+  <div class="grid-2" style="margin-top:18px;">
+    <div>
+      <div class="feature-item">
+        <div class="icon">[Lock]</div>
+        <div>
+          <div class="title">Centralised Control</div>
+          <div class="desc">A single party controls prize selection with no external audit trail.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">[Cut]</div>
+        <div>
+          <div class="title">Opaque Raking</div>
+          <div class="desc">House edges of 30–50% are standard; fees are buried in fine print.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">[X]</div>
+        <div>
+          <div class="title">Unverifiable Outcome</div>
+          <div class="desc">You must trust the operator. There is no cryptographic proof.</div>
+        </div>
+      </div>
+    </div>
+    <!-- Black Box SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 240" width="100%" style="max-height:220px;">
+        <defs>
+          <marker id="arr-gold" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#f59e0b"/>
+          </marker>
+          <marker id="arr-red" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/>
+          </marker>
+        </defs>
+        <line x1="20" y1="30" x2="300" y2="30" stroke="#22d3ee" stroke-width="0.4" stroke-dasharray="6 4"/>
+        <line x1="20" y1="210" x2="300" y2="210" stroke="#22d3ee" stroke-width="0.4" stroke-dasharray="6 4"/>
+        <rect x="60" y="50" width="200" height="140" rx="4" fill="#0a0a0a" stroke="#6b7280" stroke-width="2.5"/>
+        <rect x="130" y="105" width="60" height="44" rx="4" fill="#1f2937" stroke="#6b7280" stroke-width="2"/>
+        <path d="M148 105 Q148 88 160 88 Q172 88 172 105" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+        <circle cx="160" cy="122" r="5" fill="#6b7280"/>
+        <line x1="160" y1="127" x2="160" y2="136" stroke="#6b7280" stroke-width="2"/>
+        <text x="160" y="82" text-anchor="middle" font-size="18" fill="#9ca3af" font-family="monospace">?</text>
+        <path d="M10 120 L55 120" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr-gold)"/>
+        <text x="4" y="110" font-size="9" fill="#f59e0b" font-family="monospace">FUNDS</text>
+        <path d="M265 120 L310 120" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-red)"/>
+        <text x="268" y="110" font-size="9" fill="#ef4444" font-family="monospace">RESULT?</text>
+        <rect x="62" y="192" width="196" height="16" rx="2" fill="#111827"/>
+        <text x="160" y="204" text-anchor="middle" font-size="9" fill="#9ca3af" font-family="monospace">Traditional Lottery — Centralised, Opaque</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2 — PHILOSOPHY ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">02</span><span class="lbl">The Philosophy</span></div>
+  <h2 class="grad-cyan-purple">Fortress Protocol:<br/>The Glass Box Ecosystem</h2>
+  <div class="grid-2">
+    <div>
+      <p>Fortress Protocol is not a single lottery — it is a <strong>multi-tiered, on-chain gaming ecosystem</strong> where every draw, every ticket, and every prize transfer is cryptographically verifiable by any person on Earth. Four distinct lottery types, 16 active tiers, one shared philosophy: radical transparency.</p>
+      <div class="feature-item feature-cyan">
+        <div class="icon">[Flash]</div>
+        <div><div class="title">Solana-native Speed</div><div class="desc">Transactions confirm in ~400 ms. Prize payouts are instant.</div></div>
+      </div>
+      <div class="feature-item feature-cyan">
+        <div class="icon">[Oracle]</div>
+        <div><div class="title">Switchboard V3 TEE VRF</div><div class="desc">Winner selection uses a hardware-secured Intel SGX enclave oracle — cryptographically proven, zero-knowledge verifiable randomness.</div></div>
+      </div>
+      <div class="feature-item feature-cyan">
+        <div class="icon">[Trophy]</div>
+        <div><div class="title">95% Prize Payout</div><div class="desc">Only 5% goes to the protocol treasury. The rest is yours.</div></div>
+      </div>
+      <div class="feature-item feature-cyan">
+        <div class="icon">[Globe]</div>
+        <div><div class="title">Permissionless</div><div class="desc">Anyone with a Solana wallet can participate. No KYC. No geo-blocks.</div></div>
+      </div>
+    </div>
+
+    <!-- Glass Box SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 240" width="100%" style="max-height:220px;">
+        <defs>
+          <marker id="arr-c" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#22d3ee"/>
+          </marker>
+          <marker id="arr-e" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#34d399"/>
+          </marker>
+        </defs>
+        <line x1="20" y1="30" x2="300" y2="30" stroke="#22d3ee" stroke-width="0.4" stroke-dasharray="6 4"/>
+        <line x1="20" y1="210" x2="300" y2="210" stroke="#22d3ee" stroke-width="0.4" stroke-dasharray="6 4"/>
+        <rect x="70" y="50" width="180" height="140" rx="6" fill="rgba(34,211,238,0.04)" stroke="#22d3ee" stroke-width="2" stroke-dasharray="8 3"/>
+        <circle cx="160" cy="120" r="30" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text x="160" y="115" text-anchor="middle" font-size="11" fill="#22d3ee" font-family="monospace">SOL</text>
+        <text x="160" y="128" text-anchor="middle" font-size="9" fill="#34d399" font-family="monospace">Contract</text>
+        <path d="M10 90 L65 90" stroke="#22d3ee" stroke-width="1.8" marker-end="url(#arr-c)"/>
+        <text x="4" y="82" font-size="8" fill="#22d3ee" font-family="monospace">BUY</text>
+        <path d="M10 150 L65 150" stroke="#22d3ee" stroke-width="1.8" marker-end="url(#arr-c)"/>
+        <text x="4" y="142" font-size="8" fill="#22d3ee" font-family="monospace">FPT</text>
+        <path d="M255 90 L310 90" stroke="#34d399" stroke-width="1.8" marker-end="url(#arr-e)"/>
+        <text x="258" y="82" font-size="8" fill="#34d399" font-family="monospace">95%</text>
+        <path d="M255 150 L310 150" stroke="#f59e0b" stroke-width="1.8" marker-end="url(#arr-e)"/>
+        <text x="257" y="142" font-size="8" fill="#f59e0b" font-family="monospace">5%(DAO)</text>
+        <text x="160" y="208" text-anchor="middle" font-size="9" fill="#22d3ee" font-family="monospace">Lightning Pool — Fully On-Chain, Verifiable</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ══ SECTION 3 — USER JOURNEY ══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">03</span><span class="lbl">User Journey</span></div>
+  <h2 class="text-white">From Zero to Player in Four Steps</h2>
+
+  <div class="grid-2" style="margin-top:16px;">
+    <!-- Journey SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 340 180" width="100%" style="max-height:170px;">
+        <defs>
+          <marker id="arr-j" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#4b5563"/>
+          </marker>
+        </defs>
+        <line x1="40" y1="90" x2="300" y2="90" stroke="#374151" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- Step 1 -->
+        <circle cx="40" cy="90" r="28" fill="rgba(17,24,39,0.8)" stroke="#f59e0b" stroke-width="2"/>
+        <text x="29" y="87" text-anchor="middle" font-size="13" fill="#f59e0b">$</text>
+        <text x="40" y="87" text-anchor="middle" font-size="13" fill="#a3e635">¤</text>
+        <text x="51" y="87" text-anchor="middle" font-size="13" fill="#22d3ee">₿</text>
+        <text x="40" y="97" text-anchor="middle" font-size="7" fill="#f59e0b" font-family="monospace">→FPT</text>
+        <text x="40" y="130" text-anchor="middle" font-size="9" fill="#f59e0b" font-family="monospace">Liquidity</text>
+        <text x="40" y="143" text-anchor="middle" font-size="9" fill="#f59e0b" font-family="monospace">Gateway</text>
+        <text x="40" y="52" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">step.01</text>
+        <!-- Step 2 -->
+        <circle cx="127" cy="90" r="28" fill="rgba(17,24,39,0.8)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="127" y="88" text-anchor="middle" font-size="18">[Wallet]</text>
+        <text x="127" y="130" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="monospace">Connect</text>
+        <text x="127" y="143" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="monospace">Phantom</text>
+        <text x="127" y="52" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">step.02</text>
+        <path d="M70 90 L97 90" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#arr-j)" opacity="0.6"/>
+        <!-- Step 3 -->
+        <circle cx="214" cy="90" r="28" fill="rgba(17,24,39,0.8)" stroke="#22d3ee" stroke-width="2"/>
+        <text x="214" y="88" text-anchor="middle" font-size="18">[Ticket]</text>
+        <text x="214" y="130" text-anchor="middle" font-size="9" fill="#22d3ee" font-family="monospace">Buy</text>
+        <text x="214" y="143" text-anchor="middle" font-size="9" fill="#22d3ee" font-family="monospace">Ticket</text>
+        <text x="214" y="52" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">step.03</text>
+        <path d="M157 90 L184 90" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#arr-j)" opacity="0.6"/>
+        <!-- Step 4 -->
+        <circle cx="301" cy="90" r="28" fill="rgba(17,24,39,0.8)" stroke="#34d399" stroke-width="2"/>
+        <text x="301" y="88" text-anchor="middle" font-size="18">[Trophy]</text>
+        <text x="301" y="130" text-anchor="middle" font-size="9" fill="#34d399" font-family="monospace">Win</text>
+        <text x="301" y="143" text-anchor="middle" font-size="9" fill="#34d399" font-family="monospace">Instantly</text>
+        <text x="301" y="52" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">step.04</text>
+        <path d="M244 90 L271 90" stroke="#22d3ee" stroke-width="1.2" marker-end="url(#arr-j)" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <div>
+      <div class="step-item feature-yellow" style="margin-bottom:8px;">
+        <div class="step-header">
+          <div class="step-icon">[Swap]</div>
+          <div>
+            <div class="step-num">step.01</div>
+            <div class="step-title">Liquidity Gateway</div>
+            <div class="step-body">Convert your SOL into Fortress Protocol Token (FPT) — the universal key to all 16 lottery tiers. FPT is Token-2022 standard, 6 decimal precision.</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-item feature-purple" style="margin-bottom:8px;">
+        <div class="step-header">
+          <div class="step-icon">[Wallet]</div>
+          <div>
+            <div class="step-num">step.02</div>
+            <div class="step-title">Connect Your Wallet</div>
+            <div class="step-body">Use any Solana-compatible wallet: Phantom, Solflare, Backpack, or Ledger. The protocol is non-custodial.</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-item feature-cyan-light" style="margin-bottom:8px;">
+        <div class="step-header">
+          <div class="step-icon">[Ticket]</div>
+          <div>
+            <div class="step-num">step.03</div>
+            <div class="step-title">Buy a Ticket</div>
+            <div class="step-body">Select a tier matching your risk appetite. LPM: $5/$10/$20/$50 FPT (capacity-based, 100 players). DPL/WPL/MPL: $5/$10/$15/$20 FPT (time-based draws).</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-item feature-green">
+        <div class="step-header">
+          <div class="step-icon">[Trophy]</div>
+          <div>
+            <div class="step-num">step.04</div>
+            <div class="step-title">Win Instantly</div>
+            <div class="step-body">When the draw triggers, the smart contract computes the winning index and sends 95% of the pool directly to the winner's wallet in the same transaction block.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 4 — FOUR PILLARS ══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">04</span><span class="lbl">The Four Pillars</span></div>
+  <h2 class="text-white" style="text-align:center;">One Ecosystem. Four Lottery Types. Sixteen Active Tiers.</h2>
+  <p style="text-align:center; max-width:640px; margin:0 auto 24px;">You are not playing a single game — you are entering a <strong>multi-tiered decentralised gaming portfolio</strong>. Each lottery type runs independently, with its own rhythm, prize pools, and risk profile. All four share one smart contract, one randomness source, and one rule: <span class="text-cyan">the house cannot cheat.</span></p>
+
+  <!-- LPM -->
+  <div class="grid-2" style="margin-bottom:24px; align-items:center;">
+    <div>
+      <div class="badge badge-yellow">[Flash] PILLAR 1 · CHAIN-BASED</div>
+      <h3 class="text-white">LPM — Lightning Pool</h3>
+      <p>The flagship model. The draw triggers the instant exactly <strong>100 participants</strong> purchase tickets in a tier — no timer, no delay. Pool size is perfectly predictable, prize payout is atomic.</p>
+      <div class="kv-row kv-yellow"><span class="k">4 Tiers</span><span class="v">$5 · $10 · $20 · $50 FPT per ticket</span></div>
+      <div class="kv-row kv-yellow"><span class="k">100 players</span><span class="v">Fixed pool size — fills, draws, resets</span></div>
+      <div class="kv-row kv-yellow"><span class="k">Instant payout</span><span class="v">95% to winner in the same transaction block</span></div>
+      <div class="kv-row kv-yellow"><span class="k">No expiry</span><span class="v">The pool never expires — it just keeps filling</span></div>
+      <div class="code-formula">participants == 100 → execute_draw() → 95% → winner</div>
+    </div>
+    <!-- Chain Fill SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 220" width="100%" style="max-height:200px;">
+        <text x="160" y="22" text-anchor="middle" font-size="9" fill="#f59e0b" font-family="monospace">[Flash] LPM — CHAIN-REACTION TRIGGER</text>
+        <!-- Grid 10x10: rows 0-7 filled (80 participants) -->
+        <!-- Row 0 -->
+        <rect x="24" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="35" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="52" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="63" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="80" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="91" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="108" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="119" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="136" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="147" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="164" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="175" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="192" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="203" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="220" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="231" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="248" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="259" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <rect x="276" y="38" width="22" height="11" rx="2" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="287" y="46.5" text-anchor="middle" font-size="6" fill="#f59e0b" font-family="monospace">v</text>
+        <!-- Rows 1-7: filled (abbreviated) -->
+        <rect x="24" y="53" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <text x="161" y="61.5" text-anchor="middle" font-size="7" fill="#f59e0b" font-family="monospace">ROW 2 — 10 participants v</text>
+        <rect x="24" y="68" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <text x="161" y="76.5" text-anchor="middle" font-size="7" fill="#f59e0b" font-family="monospace">ROW 3 — 10 participants v</text>
+        <rect x="24" y="83" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <rect x="24" y="98" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <rect x="24" y="113" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <rect x="24" y="128" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <rect x="24" y="143" width="274" height="11" rx="2" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="0.8"/>
+        <!-- Empty rows -->
+        <rect x="24" y="158" width="274" height="11" rx="2" fill="rgba(255,255,255,0.03)" stroke="#374151" stroke-width="0.6"/>
+        <rect x="24" y="173" width="274" height="11" rx="2" fill="rgba(255,255,255,0.03)" stroke="#374151" stroke-width="0.6"/>
+        <!-- Progress bar -->
+        <rect x="20" y="192" width="280" height="10" rx="3" fill="#1f2937"/>
+        <rect x="20" y="192" width="224" height="10" rx="3" fill="#f59e0b" opacity="0.8"/>
+        <text x="160" y="201" text-anchor="middle" font-size="7" fill="#0d1117" font-family="monospace" font-weight="bold">80 / 100 participants</text>
+        <text x="160" y="213" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">@ 100 → execute_draw() fires instantly [Flash]</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Time-based pillars -->
+  <div class="grid-2" style="align-items:start;">
+    <!-- Clock SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 200" width="100%" style="max-height:190px;">
+        <line x1="10" y1="10" x2="310" y2="10" stroke="#22d3ee" stroke-width="0.3" stroke-dasharray="5 4"/>
+        <line x1="10" y1="185" x2="310" y2="185" stroke="#22d3ee" stroke-width="0.3" stroke-dasharray="5 4"/>
+        <!-- DPL Clock -->
+        <circle cx="55" cy="100" r="44" fill="rgba(0,0,0,0.4)" stroke="#22d3ee" stroke-width="2"/>
+        <line x1="55" y1="100" x2="30" y2="76" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="55" y1="100" x2="72" y2="117" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="55" cy="100" r="3" fill="#22d3ee"/>
+        <text x="55" y="155" text-anchor="middle" font-size="11" font-weight="bold" fill="#22d3ee" font-family="monospace">DPL</text>
+        <text x="55" y="167" text-anchor="middle" font-size="9" fill="#6b7280" font-family="monospace">24 h cycle</text>
+        <rect x="33" y="20" width="44" height="13" rx="2" fill="rgba(34,211,238,0.1)" stroke="#22d3ee" stroke-width="0.8"/>
+        <text x="55" y="30" text-anchor="middle" font-size="7" fill="#22d3ee" font-family="monospace">[Timer] ACTIVE</text>
+        <!-- WPL Clock -->
+        <circle cx="160" cy="100" r="44" fill="rgba(0,0,0,0.4)" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="160" y1="100" x2="135" y2="76" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="160" y1="100" x2="177" y2="117" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="160" cy="100" r="3" fill="#a78bfa"/>
+        <text x="160" y="155" text-anchor="middle" font-size="11" font-weight="bold" fill="#a78bfa" font-family="monospace">WPL</text>
+        <text x="160" y="167" text-anchor="middle" font-size="9" fill="#6b7280" font-family="monospace">7 d cycle</text>
+        <rect x="138" y="20" width="44" height="13" rx="2" fill="rgba(167,139,250,0.1)" stroke="#a78bfa" stroke-width="0.8"/>
+        <text x="160" y="30" text-anchor="middle" font-size="7" fill="#a78bfa" font-family="monospace">[Timer] ACTIVE</text>
+        <!-- MPL Clock -->
+        <circle cx="265" cy="100" r="44" fill="rgba(0,0,0,0.4)" stroke="#34d399" stroke-width="2"/>
+        <line x1="265" y1="100" x2="240" y2="76" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="265" y1="100" x2="282" y2="117" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="265" cy="100" r="3" fill="#34d399"/>
+        <text x="265" y="155" text-anchor="middle" font-size="11" font-weight="bold" fill="#34d399" font-family="monospace">MPL</text>
+        <text x="265" y="167" text-anchor="middle" font-size="9" fill="#6b7280" font-family="monospace">30 d cycle</text>
+        <rect x="243" y="20" width="44" height="13" rx="2" fill="rgba(52,211,153,0.1)" stroke="#34d399" stroke-width="0.8"/>
+        <text x="265" y="30" text-anchor="middle" font-size="7" fill="#34d399" font-family="monospace">[Timer] ACTIVE</text>
+        <text x="160" y="193" text-anchor="middle" font-size="8" fill="#4b5563" font-family="monospace">Time-Based Draws — DPL · WPL · MPL</text>
+      </svg>
+    </div>
+
+    <div>
+      <div class="badge badge-cyan">[Timer] PILLARS 2–4 · TIME-BASED</div>
+      <h3 class="text-white">DPL · WPL · MPL — The Time Tiers</h3>
+      <p>These three lottery types run on fixed schedules. The longer the cycle, the larger the potential jackpot. Any community member can trigger settlement once a round expires, earning an <strong>FPT bounty</strong> directly from the protocol's treasury.</p>
+
+      <div class="tier-card feature-cyan-light">
+        <div class="tier-head"><span class="tier-name text-cyan">[Cal] DPL · Daily Pool</span><span class="tier-cycle text-cyan">24-hour cycle</span></div>
+        <p>Fresh draws every day. 4 tiers ($5 · $10 · $15 · $20 FPT). The smallest cycle with the fastest turnaround.</p>
+      </div>
+      <div class="tier-card feature-purple">
+        <div class="tier-head"><span class="tier-name text-purple">[Week] WPL · Weekly Pool</span><span class="tier-cycle text-purple">7-day accumulation</span></div>
+        <p>Seven days compound into a larger prize pool. 4 tiers ($5 · $10 · $15 · $20 FPT). The sweet spot between frequency and reward size.</p>
+      </div>
+      <div class="tier-card feature-green">
+        <div class="tier-head"><span class="tier-name text-green">[Trophy] MPL · Monthly Pool</span><span class="tier-cycle text-green">30-day Grand Draw</span></div>
+        <p>The highest-stakes event. A full month of accumulation creates the largest jackpots. 4 tiers ($5 · $10 · $15 · $20 FPT).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ══ SECTION 5 — PROVABLY FAIR ═════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">05</span><span class="lbl">Provably Fair Engine</span></div>
+  <h2 class="grad-purple-cyan">Switchboard V3 TEE<br/>On-Chain Randomness</h2>
+
+  <div class="grid-2">
+    <!-- Entropy SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 220" width="100%" style="max-height:210px;">
+        <defs>
+          <marker id="arr-p" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#a78bfa"/>
+          </marker>
+        </defs>
+        <text x="14" y="26" font-size="8" fill="#22d3ee" font-family="monospace">SB ON-DEMAND</text>
+        <text x="14" y="38" font-size="8" fill="#22d3ee" font-family="monospace">VRF TEE ORACLE</text>
+        <rect x="10" y="50" width="85" height="14" rx="2" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="0.8"/>
+        <text x="16" y="61" font-size="7" fill="#22d3ee" font-family="monospace">slot: 447178409</text>
+        <path d="M97 57 L120 57" stroke="#22d3ee" stroke-width="0.8" marker-end="url(#arr-p)"/>
+        <rect x="10" y="74" width="85" height="14" rx="2" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="0.8"/>
+        <text x="16" y="85" font-size="7" fill="#22d3ee" font-family="monospace">sb_value[0..7]</text>
+        <path d="M97 81 L120 81" stroke="#22d3ee" stroke-width="0.8" marker-end="url(#arr-p)"/>
+        <rect x="10" y="98" width="85" height="14" rx="2" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="0.8"/>
+        <text x="16" y="109" font-size="7" fill="#22d3ee" font-family="monospace">sb_value[8..15]</text>
+        <path d="M97 105 L120 105" stroke="#22d3ee" stroke-width="0.8" marker-end="url(#arr-p)"/>
+        <rect x="10" y="122" width="85" height="14" rx="2" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="0.8"/>
+        <text x="16" y="133" font-size="7" fill="#22d3ee" font-family="monospace">reveal_slot↑: ...</text>
+        <path d="M97 129 L120 129" stroke="#22d3ee" stroke-width="0.8" marker-end="url(#arr-p)"/>
+        <rect x="10" y="146" width="85" height="14" rx="2" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="0.8"/>
+        <text x="16" y="157" font-size="7" fill="#22d3ee" font-family="monospace">commit: 0xB3F9</text>
+        <path d="M97 153 L120 153" stroke="#22d3ee" stroke-width="0.8" marker-end="url(#arr-p)"/>
+        <!-- XOR circle -->
+        <circle cx="155" cy="110" r="35" fill="rgba(167,139,250,0.08)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="155" y="105" text-anchor="middle" font-size="16" fill="#a78bfa" font-family="monospace">⊕</text>
+        <text x="155" y="118" text-anchor="middle" font-size="7" fill="#a78bfa" font-family="monospace">XOR</text>
+        <text x="155" y="130" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">vault_seed</text>
+        <!-- Cards -->
+        <rect x="210" y="78" width="52" height="72" rx="4" fill="#111827" stroke="#a78bfa" stroke-width="1.5" opacity="1"/>
+        <rect x="216" y="84" width="52" height="72" rx="4" fill="#111827" stroke="#a78bfa" stroke-width="1.5" opacity="0.8"/>
+        <rect x="222" y="90" width="52" height="72" rx="4" fill="#111827" stroke="#a78bfa" stroke-width="1.5" opacity="0.6"/>
+        <text x="248" y="132" text-anchor="middle" font-size="13" fill="#a78bfa">[Card]</text>
+        <text x="248" y="145" text-anchor="middle" font-size="8" fill="#a78bfa" font-family="monospace">Participants</text>
+        <!-- Arrows -->
+        <path d="M191 110 L208 110" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr-p)"/>
+        <path d="M274 114 L296 114" stroke="#34d399" stroke-width="2" marker-end="url(#arr-p)"/>
+        <text x="282" y="107" font-size="8" fill="#34d399" font-family="monospace">index</text>
+        <text x="300" y="117" font-size="11">[Trophy]</text>
+        <text x="155" y="195" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">entropy = (sb_value ⊕ commitment) XOR vault_seed → winner</text>
+        <line x1="10" y1="200" x2="310" y2="200" stroke="#22d3ee" stroke-width="0.3" stroke-dasharray="4 3"/>
+      </svg>
+      <div style="margin-top:8px; border:1px solid rgba(34,211,238,0.2); border-radius:8px; padding:8px; font-size:8pt;">
+        <span style="color:var(--gray-600);">SB On-Demand Program (mainnet): </span>
+        <span class="text-cyan">Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2</span>
+      </div>
+    </div>
+
+    <div>
+      <p>Instead of a private RNG, <strong>every lottery type</strong> in Fortress Protocol uses <strong>Switchboard V3 On-Demand VRF</strong> — a Trusted Execution Environment oracle running inside a hardware-secured <strong>Intel SGX enclave</strong>. The enclave generates a 32-byte verifiable random value that even the oracle operator cannot bias, inspect, or predict.</p>
+      <p>Each draw is a two-step commit-reveal protocol:</p>
+      <ul style="font-size:8.5pt; color:var(--gray-400); line-height:1.8; margin-bottom:10px; padding-left:16px;">
+        <li><code>sb_value[0..31]</code> — the 32-byte VRF output written by the SGX enclave after commit</li>
+        <li><code>reveal_slot</code> — Solana slot when the oracle revealed; must be strictly greater than request slot (anti-replay)</li>
+        <li><code>user_commitment</code> — a 32-byte user-supplied commitment XOR'd in at fulfillment; neither party can bias outcome alone</li>
+      </ul>
+      <div class="code-block">
+        <div class="comment">// Winner derivation (oracle.rs — create_lottery_entropy_from_slot)</div>
+        <div class="purple">s0..s3  = sb_value split into four u64s <span style="color:var(--gray-500);">(Xoshiro256++)</span></div>
+        <div class="purple">a0 = s0 XOR s2 &nbsp;&nbsp; a1 = s1 XOR s3</div>
+        <div class="cyan" style="margin-top:4px;">final   = a0 XOR a1 XOR (commitment ⊕ vault_seed)</div>
+        <div class="green">winner  = final % participant_count</div>
+      </div>
+      <p style="font-size:8pt; margin-top:8px;">The <code>vault_seed</code> encodes the lottery type, tier number, and round number — guaranteeing that two draws at the exact same slot still produce different winners. If <code>reveal_slot == 0</code>, or the revealed slot is not strictly greater than the request slot, <code>fulfill_draw_entropy</code> rejects with <code style="color:var(--red);">DrawNotYetReady</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 6 — DRAW TRIGGER ══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">06</span><span class="lbl">Draw Trigger System</span></div>
+  <h2 style="text-align:center;" class="grad-green-cyan">How Draws Get Triggered</h2>
+  <p style="text-align:center; max-width:600px; margin:0 auto 20px;">Fortress Protocol supports <strong>two trigger methods</strong> that work together as a resilient dual-path system.</p>
+
+  <div class="grid-2">
+    <!-- Auto-trigger -->
+    <div class="trigger-col" style="border:1px solid rgba(52,211,153,0.25);">
+      <div class="badge badge-green">[Bot] AUTO-TRIGGER (ON-HOUSE)</div>
+      <h3 class="text-white">Crank Bot — Fully Automated</h3>
+      <p>The protocol runs a <strong>keeper bot (crank)</strong> that monitors all 16 tiers continuously. The moment a tier becomes eligible for a draw, the crank automatically initiates the full draw sequence with zero human intervention.</p>
+      <div class="kv-row kv-green"><span class="k">Detection</span><span class="v">Polls on-chain vault state every few seconds</span></div>
+      <div class="kv-row kv-green"><span class="k">Step 1</span><span class="v">Creates Switchboard randomness account, submits request_draw_entropy + commit in one transaction</span></div>
+      <div class="kv-row kv-green"><span class="k">Oracle Wait</span><span class="v">Waits ~2.5 seconds for SGX enclave oracle to produce verifiable random value</span></div>
+      <div class="kv-row kv-green"><span class="k">Step 2</span><span class="v">Submits reveal transaction — derives winner index and pays out 95% of the pool instantly</span></div>
+      <div class="kv-row kv-green"><span class="k">Cost</span><span class="v">All Switchboard oracle fees, rent, and gas paid by protocol treasury — users pay nothing</span></div>
+      <div class="code-formula code-green" style="margin-top:10px;">crank detects → commit → oracle TEE → reveal → winner paid</div>
+    </div>
+
+    <!-- Fallback trigger -->
+    <div class="trigger-col" style="border:1px solid rgba(34,211,238,0.25);">
+      <div class="badge badge-cyan">[Wrench] FALLBACK TRIGGER (COMMUNITY)</div>
+      <h3 class="text-white">Automatic-First — Community Fallback</h3>
+      <p>If automation is temporarily unavailable, any connected wallet can step in. This <strong>3-click fallback flow</strong> ensures the protocol is fully <strong>permissionless</strong>: no single point of failure.</p>
+      <div class="kv-row"><span class="k">Step 1</span><span class="v">Click Request Draw — wallet signs a tx creating an ephemeral SB randomness account, commits randomness, creates PendingDraw PDA on-chain</span></div>
+      <div class="kv-row"><span class="k">Oracle Wait</span><span class="v">SGX enclave oracle processes the commitment (~5-10 seconds)</span></div>
+      <div class="kv-row"><span class="k">Step 2</span><span class="v">Click Oracle Reveal — wallet signs the reveal transaction confirming the oracle output on-chain</span></div>
+      <div class="kv-row"><span class="k">Step 3</span><span class="v">Click Finalize Draw — program verifies oracle output, derives winner, pays prize pool in same block</span></div>
+      <div class="kv-row"><span class="k">Cost</span><span class="v">Treasury reimburses all SB oracle fees — settler pays only standard Solana gas (~0.000005 SOL)</span></div>
+      <div class="kv-row"><span class="k">Bounty</span><span class="v">Settler earns an FPT bounty from the treasury for finalizing the draw</span></div>
+      <div class="code-formula code-cyan" style="margin-top:10px;">user fallback step 1 → oracle TEE → step 2 → step 3 → winner paid + FPT bounty</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ══ SECTION 7 — ECONOMICS ═════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">07</span><span class="lbl">Prize Distribution &amp; Protocol Economics</span></div>
+  <h2 class="text-white">Where Every FPT Goes</h2>
+
+  <div class="grid-2">
+    <div>
+      <p style="font-size:8.5pt;">The same fee model applies universally across <strong>all 16 tiers</strong> — LPM, DPL, WPL, and MPL. No exceptions, no VIP fee structures, no hidden costs.</p>
+
+      <div class="feature-item feature-green" style="margin:10px 0;">
+        <div class="icon">[Trophy]</div>
+        <div>
+          <div class="title">The Winner — 95%</div>
+          <div class="desc">The entire 95% is transferred on-chain, atomically, within the draw transaction. No withdrawal delay, no pending period, no admin approval.</div>
+        </div>
+      </div>
+
+      <div class="feature-item feature-yellow" style="margin-bottom:10px;">
+        <div class="icon">[Gear]</div>
+        <div>
+          <div class="title">Protocol Treasury — 5%</div>
+          <div class="desc">Sustainability fee funds: Community Draw Bounty (FPT bounty to any community member who triggers a ready draw), FPT→SOL Auto-Conversion (for reserves), and SB Oracle / Rent / Gas operating costs.</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid rgba(34,211,238,0.2); background:rgba(0,0,0,0.3); border-radius:10px; padding:16px;">
+        <div style="font-size:8pt; color:var(--gray-500); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.1em;">// House Edge Comparison</div>
+        <div class="compare-row compare-red">
+          <div><div class="label" style="color:#f87171;">Traditional Lottery</div><div class="sub">Centralised, opaque rake</div></div>
+          <div class="pct">30–50%</div>
+        </div>
+        <div class="compare-row compare-green">
+          <div><div class="label text-green">Fortress Protocol</div><div class="sub">Sustainability fee — on-chain, auditable</div></div>
+          <div class="pct">5%</div>
+        </div>
+        <div style="text-align:center; font-size:8pt; color:var(--gray-600); margin-top:8px;">95% of every pool goes directly to the winner -></div>
+      </div>
+    </div>
+
+    <!-- Treasury SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 260" width="100%" style="max-height:260px;">
+        <defs>
+          <marker id="arr-t" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
+          </marker>
+          <marker id="arr-tg" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#34d399"/>
+          </marker>
+        </defs>
+        <!-- Pool -->
+        <rect x="85" y="10" width="150" height="32" rx="6" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="2"/>
+        <text x="160" y="26" text-anchor="middle" font-size="9" fill="#f59e0b" font-family="monospace">[Bank] Pool: 1,000 FPT</text>
+        <text x="160" y="36" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">(example round)</text>
+        <!-- Split lines -->
+        <line x1="160" y1="42" x2="160" y2="68" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="80" y1="68" x2="240" y2="68" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="80" y1="68" x2="80" y2="88" stroke="#34d399" stroke-width="1.5" marker-end="url(#arr-tg)"/>
+        <line x1="240" y1="68" x2="240" y2="88" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr-t)"/>
+        <!-- Winner -->
+        <rect x="20" y="88" width="120" height="32" rx="6" fill="rgba(52,211,153,0.1)" stroke="#34d399" stroke-width="2"/>
+        <text x="80" y="104" text-anchor="middle" font-size="10" fill="#34d399" font-family="monospace">[Trophy] 950 FPT</text>
+        <text x="80" y="114" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">Winner (95%)</text>
+        <!-- Treasury -->
+        <rect x="180" y="88" width="120" height="32" rx="6" fill="rgba(245,158,11,0.1)" stroke="#f59e0b" stroke-width="2"/>
+        <text x="240" y="104" text-anchor="middle" font-size="10" fill="#f59e0b" font-family="monospace">[Gear] 50 FPT</text>
+        <text x="240" y="114" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">Treasury (5%)</text>
+        <!-- Treasury splits -->
+        <line x1="240" y1="120" x2="240" y2="145" stroke="#f59e0b" stroke-width="1.2"/>
+        <line x1="190" y1="145" x2="290" y2="145" stroke="#f59e0b" stroke-width="1.2"/>
+        <line x1="190" y1="145" x2="190" y2="165" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#arr-t)"/>
+        <line x1="290" y1="145" x2="290" y2="165" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#arr-t)"/>
+        <!-- Bounty -->
+        <rect x="135" y="165" width="112" height="32" rx="4" fill="rgba(245,158,11,0.08)" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="191" y="180" text-anchor="middle" font-size="9" fill="#f59e0b" font-family="monospace">[Bot] SOL Bounty</text>
+        <text x="191" y="191" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">Keeper Settlement</text>
+        <!-- FPT conversion -->
+        <rect x="252" y="165" width="62" height="32" rx="4" fill="rgba(167,139,250,0.08)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="283" y="180" text-anchor="middle" font-size="8" fill="#a78bfa" font-family="monospace">[Cycle] FPT</text>
+        <text x="283" y="191" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">→SOL Auto</text>
+        <!-- Operating costs -->
+        <line x1="283" y1="197" x2="283" y2="218" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#arr-t)"/>
+        <rect x="200" y="218" width="158" height="32" rx="4" fill="rgba(167,139,250,0.06)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="279" y="233" text-anchor="middle" font-size="8" fill="#a78bfa" font-family="monospace">[Gas] SB + Rent + Gas</text>
+        <text x="279" y="244" text-anchor="middle" font-size="7" fill="#6b7280" font-family="monospace">Protocol Operating Costs</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 8 — FPT TOKEN ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">08</span><span class="lbl">FPT Token — The Protocol Currency</span></div>
+  <h2 class="grad-cyan-purple">$FPT — Fortress Protocol Token</h2>
+
+  <div style="text-align:center; margin:16px 0 24px;">
+    <div class="mint-pill" style="font-size:9.5pt; padding:10px 22px; display:inline-block; word-break:break-all; max-width:600px;">
+      ◈ &nbsp;Mint Address &nbsp;·&nbsp; <strong>3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</strong>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div>
+      <p><strong>Fortress Protocol Token (FPT)</strong> is the exclusive utility currency powering every economic interaction within the Fortress Protocol ecosystem. FPT is not a speculative asset or governance token — it is the cryptographic access key to all 16 lottery tiers across all four lottery types.</p>
+      <p>Every ticket purchase, every prize payout, every community draw bounty, and every treasury operation is denominated exclusively in FPT. This creates a unified, fully auditable economic layer with no hidden currencies or off-chain settlements.</p>
+      <div class="code-block" style="margin-top:14px;">
+        <div class="comment">// Token Specification</div>
+        <div><span class="cyan">Standard    </span><span style="color:var(--gray-400);">Token-2022 (SPL Token Extensions Program)</span></div>
+        <div><span class="cyan">Mint        </span><span style="color:var(--gray-400);">3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</span></div>
+        <div><span class="cyan">Decimals    </span><span style="color:var(--gray-400);">6 &nbsp;(1 FPT = 1,000,000 base units)</span></div>
+        <div><span class="cyan">Network     </span><span style="color:var(--gray-400);">Solana Mainnet-Beta</span></div>
+        <div><span class="cyan">Program     </span><span style="color:var(--gray-400);">EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="feature-item feature-cyan-light" style="margin-bottom:8px;">
+        <div class="icon">🎟️</div>
+        <div>
+          <div class="title">Ticket Purchase — Universal Entry</div>
+          <div class="desc">All 16 lottery tiers across LPM, DPL, WPL, and MPL are exclusively priced in FPT. Entry tiers begin at 5 FPT; premium tiers reach 50 FPT. No SOL is accepted directly as ticket payment.</div>
+        </div>
+      </div>
+      <div class="feature-item feature-green" style="margin-bottom:8px;">
+        <div class="icon">🏆</div>
+        <div>
+          <div class="title">Prize Settlement — 95% of Every Pool</div>
+          <div class="desc">When a draw completes, 95% of the pool is transferred atomically to the winner's wallet in FPT — within the same transaction block as the draw. Instant. On-chain. Verifiable.</div>
+        </div>
+      </div>
+      <div class="feature-item feature-yellow" style="margin-bottom:8px;">
+        <div class="icon">⚡</div>
+        <div>
+          <div class="title">Community Draw Bounty</div>
+          <div class="desc">Community members who trigger eligible draws via the fallback flow receive a protocol-funded FPT bounty from the treasury — a permissionless economic incentive for decentralised operation.</div>
+        </div>
+      </div>
+      <div class="feature-item feature-purple">
+        <div class="icon">⚙️</div>
+        <div>
+          <div class="title">Treasury &amp; Operations</div>
+          <div class="desc">The 5% sustainability fee is collected in FPT. The protocol auto-converts FPT reserves to SOL as needed to cover Switchboard oracle fees, on-chain rent, and transaction gas.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="border:1px solid rgba(34,211,238,0.2); background:rgba(0,0,0,0.3); border-radius:10px; padding:16px;">
+    <div style="font-size:8pt; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:12px;">// FPT Lifecycle — From Acquisition to Prize</div>
+    <div class="grid-3">
+      <div class="addr-card" style="text-align:center; padding:14px;">
+        <div class="key" style="margin-bottom:8px; color:var(--cyan);">01 · Acquire</div>
+        <div class="val text-cyan">Swap SOL → FPT<br/>via Liquidity Gateway<br/><span style="color:var(--gray-500); font-size:7.5pt;">Jupiter-integrated swap</span></div>
+      </div>
+      <div class="addr-card" style="text-align:center; padding:14px;">
+        <div class="key" style="margin-bottom:8px; color:var(--purple);">02 · Participate</div>
+        <div class="val text-purple">FPT locked in PDA Vault<br/>per tier · per round<br/><span style="color:var(--gray-500); font-size:7.5pt;">on-chain escrow — no custody</span></div>
+      </div>
+      <div class="addr-card" style="text-align:center; padding:14px;">
+        <div class="key" style="margin-bottom:8px; color:var(--green);">03 · Win</div>
+        <div class="val text-green">95% FPT → Winner<br/>5% FPT → Treasury<br/><span style="color:var(--gray-500); font-size:7.5pt;">same transaction block</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 9 — DASHBOARD ═════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">09</span><span class="lbl">Participant &amp; Data Dashboard</span></div>
+  <h2 class="text-white">Bird's Eye View — Your Decentralised Portfolio</h2>
+
+  <div class="grid-2">
+    <!-- Dashboard mockup SVG -->
+    <div class="diagram-box">
+      <svg viewBox="0 0 320 230" width="100%" style="max-height:220px;">
+        <!-- Browser frame -->
+        <rect x="8" y="8" width="304" height="214" rx="8" fill="#0d1117" stroke="#22d3ee" stroke-width="1.5"/>
+        <rect x="8" y="8" width="304" height="24" rx="8" fill="#111827"/>
+        <circle cx="24" cy="20" r="4" fill="#ef4444"/>
+        <circle cx="38" cy="20" r="4" fill="#f59e0b"/>
+        <circle cx="52" cy="20" r="4" fill="#34d399"/>
+        <text x="160" y="24" text-anchor="middle" font-size="8" fill="#6b7280" font-family="monospace">fptpool.com/participants-data</text>
+        <!-- Stat chips -->
+        <rect x="18" y="38" width="94" height="20" rx="3" fill="rgba(255,255,255,0.04)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="65" y="52" text-anchor="middle" font-size="7.5" fill="#22d3ee" font-family="monospace">Active Tiers: 12</text>
+        <rect x="118" y="38" width="94" height="20" rx="3" fill="rgba(255,255,255,0.04)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="165" y="52" text-anchor="middle" font-size="7.5" fill="#a78bfa" font-family="monospace">My Tickets: 3</text>
+        <rect x="218" y="38" width="94" height="20" rx="3" fill="rgba(255,255,255,0.04)" stroke="#34d399" stroke-width="1"/>
+        <text x="265" y="52" text-anchor="middle" font-size="7.5" fill="#34d399" font-family="monospace">Total Won: 47 FPT</text>
+        <!-- Winners card -->
+        <rect x="18" y="66" width="284" height="148" rx="6" fill="rgba(34,211,238,0.04)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="30" y="82" font-size="9" fill="#22d3ee" font-family="monospace">[List] Recent Winners</text>
+        <line x1="18" y1="88" x2="302" y2="88" stroke="#374151" stroke-width="0.8"/>
+        <text x="28" y="100" font-size="7" fill="#6b7280" font-family="monospace">#</text>
+        <text x="55" y="100" font-size="7" fill="#6b7280" font-family="monospace">Winner</text>
+        <text x="155" y="100" font-size="7" fill="#6b7280" font-family="monospace">Type</text>
+        <text x="220" y="100" font-size="7" fill="#6b7280" font-family="monospace">Prize</text>
+        <text x="270" y="100" font-size="7" fill="#6b7280" font-family="monospace">TX</text>
+        <!-- Row 1 -->
+        <rect x="18" y="106" width="284" height="20" rx="2" fill="rgba(255,255,255,0.02)"/>
+        <text x="28" y="119" font-size="7.5" fill="#9ca3af" font-family="monospace">[1st]</text>
+        <text x="55" y="119" font-size="7.5" fill="#9ca3af" font-family="monospace">7Xk3...mR9a</text>
+        <text x="155" y="119" font-size="7.5" fill="#9ca3af" font-family="monospace">DPL $1</text>
+        <text x="220" y="119" font-size="7.5" fill="#9ca3af" font-family="monospace">950 FPT</text>
+        <text x="270" y="119" font-size="7.5" fill="#22d3ee" font-family="monospace">-></text>
+        <!-- Row 2 -->
+        <text x="28" y="139" font-size="7.5" fill="#9ca3af" font-family="monospace">[2nd]</text>
+        <text x="55" y="139" font-size="7.5" fill="#9ca3af" font-family="monospace">B9nY...pL2c</text>
+        <text x="155" y="139" font-size="7.5" fill="#9ca3af" font-family="monospace">WPL $5</text>
+        <text x="220" y="139" font-size="7.5" fill="#9ca3af" font-family="monospace">4,750 FPT</text>
+        <text x="270" y="139" font-size="7.5" fill="#22d3ee" font-family="monospace">-></text>
+        <!-- Row 3 -->
+        <rect x="18" y="146" width="284" height="20" rx="2" fill="rgba(255,255,255,0.02)"/>
+        <text x="28" y="159" font-size="7.5" fill="#9ca3af" font-family="monospace">[3rd]</text>
+        <text x="55" y="159" font-size="7.5" fill="#9ca3af" font-family="monospace">Fp2M...jA7b</text>
+        <text x="155" y="159" font-size="7.5" fill="#9ca3af" font-family="monospace">LPM $10</text>
+        <text x="220" y="159" font-size="7.5" fill="#9ca3af" font-family="monospace">9.5k FPT</text>
+        <text x="270" y="159" font-size="7.5" fill="#22d3ee" font-family="monospace">-></text>
+        <!-- Row 4 -->
+        <text x="28" y="179" font-size="7.5" fill="#9ca3af" font-family="monospace">4</text>
+        <text x="55" y="179" font-size="7.5" fill="#9ca3af" font-family="monospace">Qd4Z...wN6m</text>
+        <text x="155" y="179" font-size="7.5" fill="#9ca3af" font-family="monospace">MPL $25</text>
+        <text x="220" y="179" font-size="7.5" fill="#9ca3af" font-family="monospace">23.7k</text>
+        <text x="270" y="179" font-size="7.5" fill="#22d3ee" font-family="monospace">-></text>
+        <!-- Row 5 -->
+        <rect x="18" y="186" width="284" height="20" rx="2" fill="rgba(255,255,255,0.02)"/>
+        <text x="28" y="199" font-size="7.5" fill="#9ca3af" font-family="monospace">5</text>
+        <text x="55" y="199" font-size="7.5" fill="#9ca3af" font-family="monospace">Hn7J...eK1p</text>
+        <text x="155" y="199" font-size="7.5" fill="#9ca3af" font-family="monospace">DPL $2</text>
+        <text x="220" y="199" font-size="7.5" fill="#9ca3af" font-family="monospace">1,900 FPT</text>
+        <text x="270" y="199" font-size="7.5" fill="#22d3ee" font-family="monospace">-></text>
+      </svg>
+    </div>
+
+    <div>
+      <p>Because Fortress Protocol runs <strong>16 tiers simultaneously</strong>, tracking positions manually would be impossible. The <strong>Participants Data dashboard</strong> surfaces your full cross-tier history — active tickets, past draws, wins, and live prize pool sizes — all fetched in real-time from on-chain state.</p>
+      <div class="feature-item" style="margin-bottom:8px;">
+        <div class="icon">[List]</div>
+        <div><div class="title">Recent Winners</div><div class="desc">Last 10 draw winners across all 4 lottery types fetched live from Solana program logs with Solscan proof links.</div></div>
+      </div>
+      <div class="feature-item" style="margin-bottom:8px;">
+        <div class="icon">[Ticket]</div>
+        <div><div class="title">My Tickets</div><div class="desc">Active ticket positions across all sixteen tiers — LPM, DPL, WPL, and MPL — in a single view.</div></div>
+      </div>
+      <div class="feature-item" style="margin-bottom:8px;">
+        <div class="icon">[Chart]</div>
+        <div><div class="title">Live Tier Status</div><div class="desc">Real-time participant counts, prize pools, and countdown timers for every active tier.</div></div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">[Wallet]</div>
+        <div><div class="title">Wallet History</div><div class="desc">Filterable ledger of your 50 most recent participations and draw outcomes, filterable by lottery type.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ══ SECTION 10 — ARCHITECTURE ═════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">10</span><span class="lbl">Technical Architecture</span></div>
+  <h2 class="text-white" style="text-align:center;">How the Protocol Fits Together</h2>
+  <p style="text-align:center; color:var(--gray-500); font-size:9pt; margin-bottom:20px;">A system diagram of the Fortress Protocol component interaction on Solana.</p>
+
+  <div class="diagram-box" style="padding:24px;">
+    <svg viewBox="0 0 490 242" width="100%" style="max-height:260px;">
+      <defs>
+        <marker id="a-c" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#22d3ee"/>
+        </marker>
+        <marker id="a-a" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
+        </marker>
+        <marker id="a-p" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#818cf8"/>
+        </marker>
+        <marker id="a-g" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#34d399"/>
+        </marker>
+      </defs>
+      <!-- Grid -->
+      <line x1="0" y1="56" x2="490" y2="56" stroke="#1f2937" stroke-width="0.5"/>
+      <line x1="0" y1="104" x2="490" y2="104" stroke="#1f2937" stroke-width="0.5"/>
+      <line x1="0" y1="152" x2="490" y2="152" stroke="#1f2937" stroke-width="0.5"/>
+      <line x1="0" y1="200" x2="490" y2="200" stroke="#1f2937" stroke-width="0.5"/>
+      <!-- Arrow 1: User → Fortress (buy_ticket) -->
+      <path d="M83 106 L138 106" stroke="#22d3ee" stroke-width="1.6" marker-end="url(#a-c)"/>
+      <text x="110" y="100" text-anchor="middle" font-size="7" fill="#22d3ee" font-family="monospace">buy_ticket</text>
+      <text x="110" y="120" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">(FPT → vault)</text>
+      <!-- Arrow 2: Fortress → Oracle -->
+      <path d="M183 88 L258 26" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#a-a)"/>
+      <text x="215" y="50" text-anchor="middle" font-size="7" fill="#f59e0b" font-family="monospace">request_entropy</text>
+      <!-- Arrow 3: Oracle → Fortress (dashed) -->
+      <path d="M258 35 L225 88" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="4 2" marker-end="url(#a-a)"/>
+      <text x="252" y="68" text-anchor="start" font-size="7" fill="#d97706" font-family="monospace">VRF reveal</text>
+      <text x="252" y="78" text-anchor="start" font-size="6.5" fill="#6b7280" font-family="monospace">(~2s SGX TEE)</text>
+      <!-- Arrow 4: Fortress → PDA Vault -->
+      <path d="M228 106 L258 106" stroke="#818cf8" stroke-width="1.4" marker-end="url(#a-p)"/>
+      <text x="243" y="100" text-anchor="middle" font-size="6.5" fill="#818cf8" font-family="monospace">controls</text>
+      <!-- Arrow 5: PDA Vault → Winner -->
+      <path d="M344 96 L396 64" stroke="#34d399" stroke-width="2" marker-end="url(#a-g)"/>
+      <text x="366" y="73" text-anchor="middle" font-size="7.5" fill="#34d399" font-family="monospace" font-weight="700">95% prize</text>
+      <!-- Arrow 6: PDA Vault → Treasury -->
+      <path d="M344 116 L396 174" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#a-a)"/>
+      <text x="366" y="152" text-anchor="middle" font-size="7" fill="#f59e0b" font-family="monospace">5% fee</text>
+      <!-- User node -->
+      <rect x="5" y="88" width="78" height="36" rx="6" fill="rgba(17,24,39,0.95)" stroke="#22d3ee" stroke-width="1.8"/>
+      <text x="44" y="104" text-anchor="middle" font-size="8" fill="#22d3ee" font-family="monospace" font-weight="bold">[User] User</text>
+      <text x="44" y="116" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">any SPL wallet</text>
+      <!-- Fortress node -->
+      <rect x="138" y="88" width="90" height="36" rx="6" fill="rgba(17,24,39,0.95)" stroke="#a78bfa" stroke-width="1.8"/>
+      <text x="183" y="104" text-anchor="middle" font-size="8" fill="#a78bfa" font-family="monospace" font-weight="bold">[Contract] Fortress</text>
+      <text x="183" y="116" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">Anchor Program</text>
+      <!-- SB Oracle node -->
+      <rect x="258" y="8" width="86" height="36" rx="6" fill="rgba(17,24,39,0.95)" stroke="#f59e0b" stroke-width="1.8"/>
+      <text x="301" y="24" text-anchor="middle" font-size="8" fill="#f59e0b" font-family="monospace" font-weight="bold">[Oracle] SB Oracle</text>
+      <text x="301" y="36" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">SGX TEE Enclave</text>
+      <!-- PDA Vault node -->
+      <rect x="258" y="88" width="86" height="36" rx="6" fill="rgba(17,24,39,0.95)" stroke="#818cf8" stroke-width="1.8"/>
+      <text x="301" y="104" text-anchor="middle" font-size="8" fill="#818cf8" font-family="monospace" font-weight="bold">[Bank] PDA Vault</text>
+      <text x="301" y="116" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">FPT locked</text>
+      <!-- Winner node -->
+      <rect x="396" y="46" width="85" height="36" rx="6" fill="rgba(17,24,39,0.95)" stroke="#34d399" stroke-width="2"/>
+      <text x="438" y="62" text-anchor="middle" font-size="8" fill="#34d399" font-family="monospace" font-weight="bold">[Trophy] Winner</text>
+      <text x="438" y="74" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">95% wins wallet</text>
+      <!-- Treasury node -->
+      <rect x="396" y="156" width="85" height="36" rx="6" fill="rgba(17,24,39,0.95)" stroke="#f59e0b" stroke-width="1.8"/>
+      <text x="438" y="172" text-anchor="middle" font-size="8" fill="#f59e0b" font-family="monospace" font-weight="bold">[Gear] Treasury</text>
+      <text x="438" y="184" text-anchor="middle" font-size="6.5" fill="#6b7280" font-family="monospace">ops &amp; bounty</text>
+      <text x="245" y="234" text-anchor="middle" font-size="7.5" fill="#4b5563" font-family="monospace">Fortress Protocol — Component Interaction on Solana</text>
+    </svg>
+  </div>
+
+  <!-- Contract addresses -->
+  <div class="grid-3" style="margin-top:16px;">
+    <div class="addr-card">
+      <div class="key">Program ID (mainnet)</div>
+      <div class="val text-cyan">EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3</div>
+    </div>
+    <div class="addr-card">
+      <div class="key">FPT Mint (mainnet)</div>
+      <div class="val text-purple">3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</div>
+    </div>
+    <div class="addr-card">
+      <div class="key">SB On-Demand (mainnet)</div>
+      <div class="val text-yellow">Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2</div>
+    </div>
+    <div class="addr-card">
+      <div class="key">Admin Authority (mainnet)</div>
+      <div class="val" style="color:#34d399;">EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv</div>
+    </div>
+    <div class="addr-card">
+      <div class="key">Crank Wallet (mainnet)</div>
+      <div class="val" style="color:#f472b6;">BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5</div>
+    </div>
+    <div class="addr-card" style="grid-column: 1/-1;">
+      <div class="key">&#x2705; Deployed — 2026-03-16</div>
+      <div class="val text-cyan" style="font-size:7pt; word-break:break-all;">IDL Account: BDNQMd2XwvAhmMB8wCzxzajQEF3Ky5h5krpWg1dZ17iG</div>
+      <div class="val" style="font-size:6.5pt; color:var(--gray-500); word-break:break-all; margin-top:4px;">Deploy TX: 3yrt41a5PsNC3q2V2xiLeD6r7BNQz1TvQV9RkSeWnymsTRfGjbCBA1kvKz1Jq99ThRLT4LkKujowi1ed5woNGgWN</div>
+    </div>
+  </div>
+
+  <!-- Appendix table -->
+  <div style="margin-top:20px;">
+    <div style="font-size:8pt; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:8px;">Appendix A — Validation Rules</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Check</th>
+          <th>Condition</th>
+          <th>Failure Behaviour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SB Program Owner</td>
+          <td><code>account.owner == SB_ON_DEMAND_PROGRAM</code></td>
+          <td class="red">InvalidLotteryType → tx rejected</td>
+        </tr>
+        <tr>
+          <td>Oracle Reveal</td>
+          <td><code>reveal_slot &gt; 0</code> (oracle has committed)</td>
+          <td class="red">DrawNotYetReady → settlement blocked</td>
+        </tr>
+        <tr>
+          <td>Anti-Replay</td>
+          <td><code>reveal_slot &gt; request_reveal_slot</code></td>
+          <td class="red">DrawNotYetReady → tx rejected</td>
+        </tr>
+        <tr>
+          <td>Commitment Binding</td>
+          <td><code>has_one = randomness_account</code> (Anchor)</td>
+          <td class="red">InvalidLotteryType → substitution blocked</td>
+        </tr>
+        <tr>
+          <td>Modulo Fairness</td>
+          <td><code>entropy % participant_count</code></td>
+          <td>Uniform distribution guaranteed</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ SECTION 11 — CLOSING ══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label"><span class="num">11</span><span class="lbl">Closing Statement</span></div>
+  <div class="cta-section">
+    <h2 class="grad-final" style="font-size:26pt; margin-bottom:14px;">Four Lottery Types.<br/>Sixteen Active Tiers.<br/>Zero Trust Required.</h2>
+    <p style="max-width:580px; margin:0 auto 14px;">Fortress Protocol is not a product — it is a <strong>living ecosystem</strong>. A self-sustaining, transparent, cryptographically fair system where four distinct lottery types run in parallel, every draw is verifiable on Solscan, and every winner is paid in the same block as the draw. You are not playing a lottery. You are entering a decentralised gaming portfolio.</p>
+
+    <blockquote style="max-width:520px; margin:0 auto 16px; text-align:left;">
+      "We are building the first ecosystem where the house cannot cheat — because the house is the blockchain."
+    </blockquote>
+
+    <!-- Open Source Block -->
+    <div style="margin:20px auto 24px; max-width:580px; border:1px solid rgba(34,211,238,0.3); background:rgba(34,211,238,0.04); border-radius:12px; padding:18px 22px; text-align:left;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+        <span class="badge badge-cyan" style="margin:0;">&lt;/&gt; Open Source</span>
+        <span class="badge badge-purple" style="margin:0;">⚖️ MIT Licensed</span>
+      </div>
+      <p style="font-size:9pt; color:var(--gray-400); margin-bottom:10px;">Fortress Protocol is <strong style="color:#e5e7eb;">fully open source</strong>. The on-chain Anchor program, keeper bot, and Next.js frontend are all publicly available on GitHub and auditable by anyone. Contributions, independent audits, and forks are actively encouraged.</p>
+      <div class="kv-row"><span class="k text-cyan" style="width:90px;">Repository</span><span class="v"><a href="https://github.com/hilalsec-ui/Fortress-protocol" style="color:var(--cyan);" target="_blank">github.com/hilalsec-ui/Fortress-protocol</a></span></div>
+      <div class="kv-row"><span class="k text-cyan" style="width:90px;">License</span><span class="v">MIT — free to use, modify, and distribute with attribution</span></div>
+      <div class="kv-row"><span class="k text-cyan" style="width:90px;">Scope</span><span class="v">Anchor smart contract · Keeper crank bot · Next.js frontend</span></div>
+    </div>
+
+    <div class="cta-tagline">Connect. Choose your tier. Win.</div>
+    <div class="cta-sub">Audited for 2026 · All 16 tiers live.</div>
+
+    <div class="cta-buttons">
+      <div class="cta-btn cta-lpm">[Flash] Lightning Pool · LPM</div>
+      <div class="cta-btn cta-dpl">[Cal] Daily Pool · DPL</div>
+      <div class="cta-btn cta-wpl">[Week] Weekly Pool · WPL</div>
+      <div class="cta-btn cta-mpl">[Trophy] Monthly Pool · MPL</div>
+      <div class="cta-btn cta-trust">[Shield] Verify Fairness</div>
+    </div>
+  </div>
+
+  <div class="footer-mono">
+    <div>Fortress Protocol &nbsp;·&nbsp; Solana Mainnet &nbsp;·&nbsp; 2026</div>
+    <div>Program: EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3</div>
+    <div>FPT Mint: 3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj</div>
+    <div><a href="https://github.com/hilalsec-ui/Fortress-protocol" style="color:var(--cyan);" target="_blank">github.com/hilalsec-ui/Fortress-protocol</a> &nbsp;·&nbsp; MIT License</div>
+    <div style="color:var(--gray-600);">This document is provided for informational purposes only.</div>
+  </div>
+</div>
+
+</div><!-- end page-wrap -->
+</body>
+</html>

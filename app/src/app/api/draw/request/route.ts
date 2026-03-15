@@ -33,9 +33,9 @@ const IDL = require('@/idl/fortress_protocol.json');
 // ─── Constants (server-safe copies — no "use client" import) ────────────────
 const PROGRAM_ID    = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
 // Server-side RPC: prefer unpublished env var to avoid leaking API keys in client bundle
-const RPC_ENDPOINT  = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.devnet.solana.com';
-const SB_DEVNET_QUEUE = new PublicKey('EYiAmGSdsQTuCw413V5BzaruWuCCSDgTPtBGvLkXHbe7');
-const CRANK_AUTHORITY = new PublicKey('CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz');
+const RPC_ENDPOINT  = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_URL ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.mainnet-beta.solana.com';
+const SB_MAINNET_QUEUE = new PublicKey('3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1');
+const CRANK_AUTHORITY = new PublicKey('BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5');
 
 const LOTTERY_TYPE_ID: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };
 
@@ -334,7 +334,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
 
   let commitOk = false;
   try {
-    const commitIx = await rnd.commitIx(SB_DEVNET_QUEUE);
+    const commitIx = await rnd.commitIx(SB_MAINNET_QUEUE);
     const commitTx = new Transaction().add(commitIx);
     const commitSig = await provider.sendAndConfirm(commitTx, [], {
       skipPreflight: true,

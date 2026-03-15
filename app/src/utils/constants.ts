@@ -2,10 +2,10 @@
 
 // Program Configuration
 export const PROGRAM_ID = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY";
-export const RPC_ENDPOINT = "https://api.devnet.solana.com";
+export const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
 
 // Crank wallet public key — server-side only; used for house-sponsored draw triggers
-export const CRANK_AUTHORITY = 'CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz';
+export const CRANK_AUTHORITY = 'BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5';
 
 // Lottery Configuration
 export const LOTTERY_TYPES = ["LPM", "DPL", "WPL", "MPL"] as const;
@@ -42,7 +42,7 @@ export const BRANDS = [
 ] as const;
 
 // Token Configuration - FPT Token (6 decimals)
-export const FPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
+export const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 export const FPT_TOKEN_ICON = "https://raw.githubusercontent.com/hilalsec-ui/DPLS-Decentralized-Protocol-Lottery-System/refs/heads/main/icon%20fpt.png";
 
 // Token Program IDs
@@ -55,7 +55,7 @@ export const FPT_DECIMALS = 6;
 
 // Admin Configuration
 // TODO: Move to environment variable for production
-export const ADMIN_WALLET = "EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg";
+export const ADMIN_WALLET = "EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv";
 
 // Draw Bounty — settler reward is computed live at ~$0.50 USD worth of FPT.
 // The actual amount is passed as a parameter to fulfillDrawEntropy (min 0.1, max 100 FPT).
@@ -67,7 +67,7 @@ export const PRIZE_TREASURY_PCT = 5;
 
 // Switchboard V3 On-Demand Configuration
 export const SB_ON_DEMAND_PROGRAM = "Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2";
-export const SB_DEVNET_QUEUE = "EYiAmGSdsQTuCw413V5BzaruWuCCSDgTPtBGvLkXHbe7";
+export const SB_MAINNET_QUEUE = "3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1";
 // Switchboard Quote Program — used by fetchManagedUpdateIxs to write verified prices
 export const QUOTE_PROGRAM_ID = "orac1eFjzWL5R3RbbdMV68K9H6TaCVVcL6LjvQQWAbz";
 // SOL/USD feed hash for fetchManagedUpdateIxs (Coinbase + Binance aggregate).
@@ -75,7 +75,7 @@ export const QUOTE_PROGRAM_ID = "orac1eFjzWL5R3RbbdMV68K9H6TaCVVcL6LjvQQWAbz";
 // A fresh value can be obtained by running: crossbar.simulateJobs({jobs: [...]}).
 export const SB_SOL_USD_FEED_HASH = ""; // TODO: set once, e.g. "0xef0d8b6fcd..."
 // Legacy placeholder kept for reference — on-chain account is now the instructions sysvar.
-export const SB_SOL_USD_FEED_DEVNET = ""; // no longer used as feed pubkey
+export const SB_SOL_USD_FEED_MAINNET = ""; // no longer used as feed pubkey
 export const DEFAULT_FPT_PER_SOL = 1000; // 1 SOL = 1000 FPT (Pool_Ratio constant)
 // SRS oracle reveal poll timeout (ms) — oracle typically reveals in 1-5 seconds
 export const SRS_POLL_TIMEOUT_MS = 90_000; // 90s — mainnet oracle can be slow

@@ -5,8 +5,8 @@ import fs from "fs";
 
 // Load program IDL
 const IDL_PATH = "./target/idl/fortress_protocol.json";
-const PROGRAM_ID = new PublicKey("BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW");
-const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"); // FPT token
+const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"); // FPT token
 const TOKEN_2022_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
 
@@ -49,7 +49,7 @@ async function initializeLotteries() {
     );
     console.log("Derived Treasury PDA:", treasuryPDA.toBase58(), "Bump:", treasuryBump);
     // For debugging: print the expected admin authority from the Anchor program
-    console.log("Expected Admin Authority (from Anchor): EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg");
+    console.log("Expected Admin Authority (from Anchor): EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv");
 
     try {
       await program.methods

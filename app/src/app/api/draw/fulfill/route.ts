@@ -38,10 +38,10 @@ const IDL = require('@/idl/fortress_protocol.json');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PROGRAM_ID   = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
-const FPT_MINT     = new PublicKey('7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2');
+const FPT_MINT     = new PublicKey('3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj');
 const RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT
   ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT
-  ?? 'https://api.devnet.solana.com';
+  ?? 'https://api.mainnet-beta.solana.com';
 
 const LOTTERY_TYPE_ID: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };
 

@@ -24,7 +24,7 @@ const TransactionSuccess: React.FC<TransactionSuccessProps> = ({
 
   // Generate Solana Explorer URL
   const explorerUrl = transactionSignature
-    ? `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+    ? `https://explorer.solana.com/tx/${transactionSignature}`
     : '#';
 
   return (

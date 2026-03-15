@@ -18,7 +18,7 @@ pub struct BuyLpmTicket<'info> {
     pub buyer: Signer<'info>,
 
     #[account(
-        address = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2".parse::<Pubkey>().unwrap()
+        address = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj".parse::<Pubkey>().unwrap()
     )]
     pub fpt_mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -284,7 +284,7 @@ pub struct BuyTimedTicket<'info> {
     pub buyer: Signer<'info>,
 
     #[account(
-        address = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2".parse::<Pubkey>().unwrap()
+        address = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj".parse::<Pubkey>().unwrap()
     )]
     pub fpt_mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -606,7 +606,7 @@ pub fn buy_mpl_ticket(ctx: Context<BuyTimedTicket>, lottery_type_id: u8, tier: u
 //   4. Enforces `fpt_per_ticket >= oracle_fpt` (no under-payment).
 //
 // If no oracle quote is found the check is bypassed with a warning log.
-// On devnet/testing, remove the bypass and uncomment the hard-reject line.
+// For a stricter production setting, remove the bypass and uncomment the hard-reject line.
 fn verify_oracle_price_and_fpt(
     instructions_sysvar: &anchor_lang::prelude::AccountInfo,
     tier: u8,
@@ -651,9 +651,7 @@ fn verify_oracle_price_and_fpt(
         );
     } else {
         // No SB oracle quote found in this transaction.
-        // Mainnet fallback: warn and proceed. Consider enabling hard-reject in production:
-        //   return Err(LotteryError::StalePriceFeed.into());
-        msg!("[Fortress] No SB oracle quote — accepting client-provided rate (devnet fallback)");
+        // Mainnet fallback: proceed with client-provided rate.
     }
     Ok(())
 }

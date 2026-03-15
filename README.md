@@ -53,7 +53,7 @@ A high-scale, production-ready lottery system built on Solana with Anchor 0.30.0
 ✅ **Token-2022 Integration** - Uses FPT mint on Token Extensions program
 ✅ **Blockhash Randomness** - Deterministic winner selection using blockhash + slot
 ✅ **Automatic ATA Creation** - Winners' token accounts created via `init_if_needed`
-✅ **95/5 Fee Split** - 95% to winner, 5% to admin wallet (EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg)
+✅ **95/5 Fee Split** - 95% to winner, 5% to admin wallet (EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv)
 ✅ **Frontend Compatible** - Matches exact instruction signatures from Next.js app
 
 ## 📋 Prerequisites
@@ -193,7 +193,7 @@ draw_ypl_winner(tier: u8)  // Time-based
 3. Generate random winner index (Pyth Entropy for LPM, blockhash for others)
 4. Calculate prizes: 95% winner, 5% admin
 5. Create winner ATA if needed (`init_if_needed`, payer=authority)
-6. Transfer 95% to winner, 5% to admin (`EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`)
+6. Transfer 95% to winner, 5% to admin (`EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`)
 7. Mark lottery as drawn, reset state
 
 #### Initialize
@@ -226,9 +226,9 @@ Ensure these match in `app/src/utils/constants.ts`:
 
 ```typescript
 PROGRAM_ID = 'Ft3s4d2kqTcJR8f5pXt2i8m3uzdJzq1LkX5Hjw3z4Y5Z'
-FPT_MINT = '7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2'
+FPT_MINT = '3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj'
 TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-ADMIN_WALLET = 'EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg'
+ADMIN_WALLET = 'EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv'
 ```
 
 ### Example: Buy LPM Ticket (Frontend)

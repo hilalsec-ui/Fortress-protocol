@@ -5,9 +5,9 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const PROGRAM_ID = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb";
-const DPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
-const RPC = "https://api.devnet.solana.com";
+const PROGRAM_ID = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY";
+const DPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
+const RPC = "https://api.mainnet-beta.solana.com";
 const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJsyFbPVwwQW3bLvyS46Q8YVgJ4";
 const ATA_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 

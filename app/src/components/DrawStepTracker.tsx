@@ -101,13 +101,11 @@ export default function DrawStepTracker({
     actionType = 'processing';
     actionLabel = 'Oracle processing…';
     actionDisabled = true;
-  } else if (s1 === 'pending' && (phase === 'fallback_needed' || phase === 'idle')) {
-    if (phase === 'fallback_needed') {
-      actionType = 'trigger';
-      actionLabel = connected ? '🔧 Fallback Trigger (Step 1)' : '🔒 Connect Wallet';
-      actionCallback = connected ? onManualTrigger : onConnect;
-    }
-    // idle: auto-trigger will fire — no manual button
+  } else if (s1 === 'pending' && phase === 'fallback_needed') {
+    actionType = 'trigger';
+    actionLabel = connected ? '🔧 Trigger Draw (Step 1)' : '🔒 Connect Wallet';
+    actionCallback = connected ? onManualTrigger : onConnect;
+    // idle: auto-trigger fires automatically — no manual button
   } else if (s1 === 'signed' && s2 === 'pending') {
     actionType = 'trigger';
     actionLabel = connected ? '🔮 Complete Oracle Reveal (Step 2)' : '🔒 Connect Wallet';

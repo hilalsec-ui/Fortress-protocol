@@ -13,7 +13,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 
-const FPT_MINT_STR = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
+const FPT_MINT_STR = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 
 async function main() {
   const provider = anchor.AnchorProvider.env();

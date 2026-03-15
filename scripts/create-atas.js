@@ -7,11 +7,11 @@ const {
 } = require('@solana/spl-token');
 const fs = require('fs');
 
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 const walletRaw = JSON.parse(fs.readFileSync('/home/dev/my-wallet.json', 'utf8'));
 const admin = Keypair.fromSecretKey(Uint8Array.from(walletRaw));
 
-const FPT_MINT    = new PublicKey('7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2');
+const FPT_MINT    = new PublicKey('3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj');
 const SOL_VAULT   = new PublicKey('ECx92d7Y7e6krdQzq7ALZZRpAZd41coi5q5qiYyGNP6C'); // sol_vault PDA
 
 async function createAtaIfMissing(owner, allowOffCurve, label) {

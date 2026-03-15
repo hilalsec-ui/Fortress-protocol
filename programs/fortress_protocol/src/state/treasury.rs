@@ -11,7 +11,7 @@ use anchor_lang::prelude::*;
 /// Seeds: [b"treasury"]
 #[account]
 pub struct Treasury {
-    /// The admin authority (EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg)
+    /// The admin authority (EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv)
     pub authority: Pubkey,
     
     /// Total SOL deposited to this treasury

@@ -106,7 +106,7 @@ G9Txe8edHEeR1zjC7VvS9fQja43z7ww3V7r7R8yjC7Ca
 ## 📝 Configuration Details
 
 ### FPT Token (Token-2022)
-- **Mint:** `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2`
+- **Mint:** `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`
 - **Decimals:** 6
 - **Program:** Token-2022 (SPL Token Extensions)
 
@@ -116,7 +116,7 @@ G9Txe8edHEeR1zjC7VvS9fQja43z7ww3V7r7R8yjC7Ca
 - **Oracle:** Disabled (using fixed rate)
 
 ### Admin Authority
-- **Wallet:** `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- **Wallet:** `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 
 ---
 
@@ -224,6 +224,6 @@ solana balance FLvbZWgmj8tJ4Gj8wuZfbKFPTViFdJ2UYV1DKZvdEvtW --url devnet
 ---
 
 **Deployment Date:** February 4, 2026  
-**Deployed By:** Admin (EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg)  
+**Deployed By:** Admin (EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv)  
 **Network:** Solana Devnet  
 **Status:** ✅ PRODUCTION READY (after treasury vault funding)

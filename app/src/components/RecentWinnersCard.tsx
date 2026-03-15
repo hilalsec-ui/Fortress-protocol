@@ -389,7 +389,7 @@ export default function RecentWinnersCard({ isDarkMode }: { isDarkMode: boolean 
               <div className="flex items-center gap-1 shrink-0">
                 <CopyButton value={w.winner} />
                 <a
-                  href={`https://solscan.io/account/${w.winner}?cluster=devnet`}
+                  href={`https://solscan.io/account/${w.winner}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1 rounded transition-colors hover:bg-white/10"

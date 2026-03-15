@@ -123,7 +123,7 @@ required_fpt = tier_price_usdc / pyth_dpt_usd_price
 ## 🔒 Security Features
 
 ### Admin Verification
-- Hardcoded admin wallet: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- Hardcoded admin wallet: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 - All admin instructions validate via `constraint` checks
 - Non-admin transactions will fail with `InvalidAdminWallet`
 
@@ -197,8 +197,8 @@ validate_slippage(required_fpt, max_dpt_amount)?;
 ## 📞 Support Constants
 
 ```rust
-ADMIN_WALLET: "EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg"
-FPT_MINT: "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"
+ADMIN_WALLET: "EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv"
+FPT_MINT: "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"
 PROGRAM_ID: "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
 DPT_DECIMALS: 6
 USDC_DECIMALS: 6

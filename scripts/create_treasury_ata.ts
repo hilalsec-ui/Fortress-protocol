@@ -9,12 +9,12 @@ import {
 } from '@solana/spl-token';
 
 // Config
-const PROGRAM_ID = new PublicKey('BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW');
-const FPT_MINT = new PublicKey('7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2');
+const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const FPT_MINT = new PublicKey('3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj');
 
 async function main() {
   const ADMIN_KEYPAIR_PATH = process.env.ADMIN_KEYPAIR_PATH;
-  const RPC_ENDPOINT = process.env.RPC_ENDPOINT || 'https://api.devnet.solana.com';
+  const RPC_ENDPOINT = process.env.RPC_ENDPOINT || 'https://api.mainnet-beta.solana.com';
 
   if (!ADMIN_KEYPAIR_PATH) {
     console.error('ADMIN_KEYPAIR_PATH env var is required');

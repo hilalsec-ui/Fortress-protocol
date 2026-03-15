@@ -15,7 +15,7 @@ async function main() {
   console.log("=====================================");
   console.log("Program ID:", program.programId.toBase58());
 
-  const fptMint = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+  const fptMint = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
   
   const [treasuryPda] = PublicKey.findProgramAddressSync(
     [Buffer.from("treasury")],

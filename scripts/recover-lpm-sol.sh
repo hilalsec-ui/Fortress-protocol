@@ -12,7 +12,7 @@
 #
 # Prerequisites:
 # - Need ~6 SOL to deploy (wallet + program accounts need this)
-# - Admin wallet: EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg
+# - Admin wallet: EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv
 #
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -20,7 +20,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-PROGRAM_ID="HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
+PROGRAM_ID="2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
 
 # Colors
 RED='\033[0;31m'

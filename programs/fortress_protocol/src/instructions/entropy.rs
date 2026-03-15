@@ -155,13 +155,6 @@ pub fn request_draw_entropy(
     };
     pd.request_reveal_slot = request_reveal_slot;
 
-    msg!(
-        "[REQUEST_DRAW] type={} tier={} crank={} randomness={}",
-        lottery_type_id, tier,
-        ctx.accounts.requester.key(),
-        pd.randomness_account,
-    );
-
     // Treasury covers: pd_rent (PendingDraw init) + extra_lamports (SB account
     // rent + oracle commit fee), so the requester's wallet shows no net SOL
     // change. extra_lamports is computed by the server via TX simulation and
@@ -282,7 +275,7 @@ pub fn fulfill_draw_entropy(
     );
     require_keys_eq!(
         ctx.accounts.fpt_mint.key(),
-        pubkey!("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"),
+        pubkey!("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"),
         LotteryError::InvalidLotteryType,
     );
 
@@ -399,7 +392,6 @@ pub fn fulfill_draw_entropy(
         );
         let sb_value: [u8; 32] = rnd_data[152..184].try_into().unwrap();
         let commitment = ctx.accounts.pending_draw.user_commitment;
-        msg!("[ENTROPY] SB reveal_slot={} — VRF-secured draw", reveal_slot);
         create_lottery_entropy_from_slot(
             &sb_value,
             &commitment,
@@ -517,7 +509,6 @@ pub fn fulfill_draw_entropy(
             settler_reward_fpt,
             6,
         )?;
-        msg!("[COMMUNITY_REWARD] {} µFPT (~$0.50) paid to {}", settler_reward_fpt, ctx.accounts.authority.key());
     }
 
     // State reset, round counter update, winner history — shared helper
@@ -533,11 +524,6 @@ pub fn fulfill_draw_entropy(
         duration,
         now,
     )?;
-
-    msg!(
-        "[FULFILL_DRAW] type={} tier={} winner={} prize={}",
-        lottery_type_id, tier, winner_pubkey, winner_prize,
-    );
 
     Ok(())
 }

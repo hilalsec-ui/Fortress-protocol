@@ -142,7 +142,7 @@ cd app && npm run build
 ### Program Configuration:
 - **Program ID:** HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb
 - **Network:** Devnet
-- **FPT Token:** 7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2 (Token-2022, 6 decimals)
+- **FPT Token:** 3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj (Token-2022, 6 decimals)
 - **Treasury Vault:** BN5CKV4yA95RNQsid5GPRwiRTgVcXTYpKCzbqdzEP68G
 
 ---

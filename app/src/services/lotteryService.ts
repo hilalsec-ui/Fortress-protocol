@@ -36,10 +36,8 @@ import {
   LOTTERY_TYPES,
   BRANDS,
   FPT_MINT as FPT_MINT_STRING,
-  SB_SOL_USD_FEED_DEVNET,
   SB_RANDOMNESS_ACCOUNTS,
   SRS_POLL_TIMEOUT_MS,
-  SB_SOL_USD_FEED_HASH,
 } from "../utils/constants";
 import { saveParticipant, saveWinnerToHistory } from "./participantsService";
 import { useTimeOffsetStore } from '@/stores/timeOffsetStore';
@@ -205,14 +203,10 @@ export async function fetchVaultExpiryTimestamp(
     // Extract endTime: handles both 'endTime' and 'end_time' naming conventions
     const endTime = vault.endTime?.toNumber?.() || vault.end_time?.toNumber?.() || vault.endTime || vault.end_time || 0;
 
-    console.debug(
-      `[Vault] ${lotteryType} tier $${tier}: endTime = ${endTime}${endTime > 0 ? ` (expires in ${Math.max(0, endTime - Math.floor(Date.now() / 1000))}s)` : ""}`
-    );
 
     return endTime;
   } catch (error) {
     // Vault might not be initialized yet
-    console.debug(`[Vault] ${lotteryType} tier $${tier} not initialized`);
     return 0;
   }
 }
@@ -284,13 +278,6 @@ export async function buyTicketWithProgram(
   // and eliminates the "no balance changes found" warning on Token-2022 transfers.
   sendTransactionFn?: (tx: Transaction, connection: Connection, opts?: { skipPreflight?: boolean; maxRetries?: number }) => Promise<string>,
 ) {
-  console.log("🎫 Buy Ticket Called:", {
-    lotteryType,
-    tier,
-    participantId,
-    quantity,
-    hasWallet: !!walletPublicKey,
-  });
 
   // [FIX] Validate wallet is connected BEFORE program check
   if (!walletPublicKey) {
@@ -307,19 +294,8 @@ export async function buyTicketWithProgram(
     );
   }
 
-  console.log("✅ Program available:", {
-    hasProgram: !!program,
-    programId: (program as any).programId?.toString(),
-  });
 
   // Log program and provider info for debugging
-  console.log("📋 Program Info:", {
-    programId: program.programId?.toString(),
-    provider: !!program.provider,
-    providerPublicKey: (program.provider as any).publicKey?.toString(),
-    walletParam: walletPublicKey?.toString(),
-    hasConnection: !!program.provider?.connection,
-  });
 
   // Validate inputs
   if (!LOTTERY_TYPES.includes(lotteryType as any)) {
@@ -354,7 +330,6 @@ export async function buyTicketWithProgram(
 
     // Ensure the provider's wallet is set for transaction signing
     if ((program.provider as any).wallet) {
-      console.log("✅ Provider has wallet configured for signing");
     }
 
     const connection = program.provider.connection;
@@ -386,10 +361,6 @@ export async function buyTicketWithProgram(
     const { fptPerUsd6dec } = priceResult.status === 'fulfilled' ? priceResult.value : await fetchFptUsdPrice();
     const fptPerTicketRaw = computeFptPerTicket(tier, fptPerUsd6dec);
     const fptAmountHuman = formatFPT(fptPerTicketRaw * quantity);
-    console.log(
-      "💳 Initiating bulk FPT payment:",
-      fptAmountHuman, "FPT for", quantity, "ticket(s) at tier", tier, "USD",
-    );
 
     // [SOL_PRE_CHECK] Verify buyer has enough SOL for tx fees (min ~5000 lamports)
     {
@@ -397,7 +368,7 @@ export async function buyTicketWithProgram(
       const MIN_SOL_LAMPORTS = 5_000; // ~0.000005 SOL — enough for priority tip + fee
       if (solBalance < MIN_SOL_LAMPORTS) {
         throw new Error(
-          `Insufficient SOL. You need at least 0.000005 SOL for transaction fees. Please add SOL to your devnet wallet (use a devnet faucet).`
+          `Insufficient SOL. You need at least 0.000005 SOL for transaction fees. Please add SOL to your wallet.`
         );
       }
     }
@@ -409,7 +380,6 @@ export async function buyTicketWithProgram(
       if (balanceResult.status === 'fulfilled') {
         buyerBalance = BigInt(balanceResult.value.value.amount);
       } else {
-        console.log('ℹ️ Buyer FPT ATA does not exist yet — on-chain program will auto-create it (treasury pays)');
       }
       const requiredAmount = BigInt(totalRequiredFptBN.toString());
       if (buyerBalance < requiredAmount) {
@@ -461,19 +431,10 @@ export async function buyTicketWithProgram(
               systemProgram: SystemProgram.programId,
             })
             .instruction();
-          console.log(`🔄 [BUNDLED RESET] ${lotteryType} Tier $${tier} — reset+buy in ONE tx (skipPreflight: true)`);
         }
       }
       
-      console.log("📋 Page calculation:", {
-        lotteryType,
-        participantCount,
-        pageNumber,
-        entriesOnCurrentPage,
-        remainingPageCapacity,
-      });
     } catch (err) {
-      console.log("📋 Vault not initialized yet, using page 0");
       pageNumber = 0;
       participantCount = 0;
       remainingPageCapacity = 50;
@@ -504,7 +465,6 @@ export async function buyTicketWithProgram(
       _pc += chunkQty;
       _rpc = _pc % 50 === 0 ? 50 : 50 - (_pc % 50);
     }
-    console.log(`📋 Purchase plan: ${chunks.length} TX(s) for ${quantity} ticket(s)`, chunks);
 
     // Derive registry PDA
     let registryPDA: PublicKey;
@@ -516,14 +476,6 @@ export async function buyTicketWithProgram(
     }
 
     // Validate all derived accounts
-    console.log("📋 Validating accounts:", {
-      wallet: wallet?.toString() || "UNDEFINED",
-      FPT_MINT: FPT_MINT?.toString() || "UNDEFINED",
-      userFptAccount: userFptAccount?.toString() || "UNDEFINED",
-      vaultTokenAccount: vaultTokenAccount?.toString() || "UNDEFINED",
-      vaultPDA: vaultPDA?.toString() || "UNDEFINED",
-      registryPDA: registryPDA?.toString() || "UNDEFINED",
-    });
 
     // Check for undefined accounts
     if (!wallet) throw new Error("Wallet is undefined");
@@ -545,49 +497,21 @@ export async function buyTicketWithProgram(
       throw new Error(`No method found for lottery type: ${lotteryType}`);
     }
 
-    console.log(
-      `📤 Calling ${methodName}(tier=${tier}, quantity=${quantity})...`,
-    );
 
     // Log wallet and provider info before signing
-    console.log("🔑 Transaction signing info:", {
-      buyerWallet: wallet.toString(),
-      hasProviderWallet: !!(program.provider as any).wallet,
-      hasSignTransaction: !!(program.provider as any).wallet?.signTransaction,
-      providerType: program.provider?.constructor?.name,
-    });
 
     // Call Anchor program method with (tier, quantity)
 
-    console.log("🔧 Building transactions with contract-derived PDAs:", {
-      buyer: wallet.toString(),
-      fptMint: FPT_MINT.toString(),
-      buyerTokenAccount: userFptAccount.toString(),
-      lotteryVault: vaultPDA.toString(),
-      vaultTokenAccount: vaultTokenAccount.toString(),
-      registry: registryPDA.toString(),
-      tokenProgram: TOKEN_2022_PROGRAM_ID.toString(),
-      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID.toString(),
-      systemProgram: SystemProgram.programId.toString(),
-    });
 
     // Check if method exists on program
     if (!(program.methods as any)[methodName]) {
       console.error("❌ Method not found:", methodName);
-      console.log("📋 Available methods:", Object.keys(program.methods as any));
       throw new Error(
         `Method ${methodName} does not exist on program. Check IDL and instruction names.`,
       );
     }
 
-    console.log(`✅ Method ${methodName} found on program`);
 
-    console.log("� Program object:", {
-      hasProgram: !!program,
-      programId: (program as any).programId?.toString(),
-      methodExists: !!(program.methods as any)[methodName],
-      methodType: typeof (program.methods as any)[methodName],
-    });
 
     // Ensure method exists and is callable
     if (typeof (program.methods as any)[methodName] !== "function") {
@@ -609,7 +533,6 @@ export async function buyTicketWithProgram(
         const chunkPagePDA = deriveParticipantPagePDA(lotteryType, tier, chunk.pageNumber);
         const chunkFptPerTicket = computeFptPerTicket(tier, fptPerUsd6dec);
         const chunkMaxFptAmountBN = computeMaxFptAmount(chunkFptPerTicket, chunk.qty, 1000);
-        console.log(`🔧 Building instruction for chunk: page=${chunk.pageNumber}, qty=${chunk.qty}`);
         // DPL/WPL/MPL now require lottery_type_id as the first arg for participant_page PDA derivation
         const lotteryTypeIdMap: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };
         const methodArgs = lotteryType === "LPM"
@@ -638,12 +561,12 @@ export async function buyTicketWithProgram(
     );
 
     // ── Switchboard On-Demand oracle price update instructions ─────────────
-    // Oracle update instructions are intentionally disabled on devnet.
+    // Oracle update instructions are intentionally disabled for initial testing.
     // When included, the Switchboard Ed25519 oracle quote can be stale (>30 slots)
     // by the time Phantom runs its internal pre-approval simulation, causing a
     // StalePriceFeed error that surfaces as "Transaction simulation failed".
     // The on-chain program already handles the no-oracle case gracefully:
-    //   msg!("[Fortress] No SB oracle quote — accepting client-provided rate (devnet fallback)")
+    //   msg!("[Fortress] No SB oracle quote — accepting client-provided rate (mainnet fallback)")
     // FPT pricing is still computed from the live Crossbar SOL/USD feed above.
 
     // Collect all instructions for the batch transaction.
@@ -658,7 +581,6 @@ export async function buyTicketWithProgram(
       ...chunkInstructions,
     ];
 
-    console.log(`📤 Sending ${chunks.length} instruction(s) in ONE transaction — ${quantity} ticket(s) total`);
 
     const anchorProvider = program.provider as AnchorProvider;
 
@@ -676,8 +598,8 @@ export async function buyTicketWithProgram(
 
         if (sendTransactionFn) {
           // Use wallet signTransaction (pure crypto — cluster-independent) then submit via
-          // our devnet connection. This avoids Phantom using its own RPC cluster (e.g. mainnet)
-          // which would cause "invalid account" errors when accounts only exist on devnet.
+          // our configured RPC connection. This avoids Phantom using its own RPC cluster
+          // which would cause "invalid account" errors if clusters mismatch.
           const signedTx = await anchorProvider.wallet.signTransaction(versionedTx);
           txSignature = await connection.sendRawTransaction(signedTx.serialize(), {
             skipPreflight: true,
@@ -705,7 +627,6 @@ export async function buyTicketWithProgram(
             throw new Error(`Transaction failed on-chain: ${JSON.stringify(confirmResult.value.err)}`);
           }
         }
-        console.log(`✅ Batch TX confirmed (${chunks.length} chunks, ${quantity} tickets):`, txSignature);
         break;
 
       } catch (sendErr: any) {
@@ -721,7 +642,6 @@ export async function buyTicketWithProgram(
           sendErr?.txSignature;
 
         if (maybeSig) {
-          console.log(`[BuyTicket] Checking if ${maybeSig.slice(0, 8)}... already landed...`);
           try {
             const [status] = (await connection.getSignatureStatuses([maybeSig])).value;
             if (
@@ -730,14 +650,12 @@ export async function buyTicketWithProgram(
               (status.confirmationStatus === "confirmed" ||
                status.confirmationStatus === "finalized")
             ) {
-              console.log(`✅ Tx confirmed on-chain despite timeout: ${maybeSig}`);
               txSignature = maybeSig;
               break;
             }
             if (status?.err) {
               console.warn(`[BuyTicket] Previous tx failed on-chain, safe to retry:`, status.err);
             } else {
-              console.log(`[BuyTicket] Tx not yet landed — will retry.`);
             }
           } catch (statusErr) {
             console.warn(`[BuyTicket] Could not check sig status, will retry:`, statusErr);
@@ -835,7 +753,7 @@ export async function buyTicketWithProgram(
       );
     } else if (errorMsg.toLowerCase().includes("invalid account") || errorMsg.includes("AccountNotFound") || errorMsg.includes("account not found")) {
       throw new Error(
-        "❌ Account Error\\n\\nYour wallet account was not found on Solana devnet.\\n\\nPossible fixes:\\n1. Make sure Phantom is set to Devnet (Settings → Developer Settings → Testnet Mode)\\n2. Get devnet SOL from https://faucet.solana.com\\n3. Reconnect your wallet and try again."
+        "❌ Account Error\\n\\nYour wallet account was not found on Solana Mainnet.\\n\\nPossible fixes:\\n1. Make sure Phantom is set to Mainnet-Beta (Settings → Developer Settings)\\n2. Ensure you have SOL in your mainnet wallet\\n3. Reconnect your wallet and try again."
       );
     } else if (errorMsg.includes("Could not find your FPT token account")) {
       throw error; // Re-throw FPT account errors
@@ -899,7 +817,7 @@ async function triggerSilentResetBeforeBuy(
     programId,
   );
 
-  const FPT_MINT_PK       = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+  const FPT_MINT_PK       = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
   const TOKEN22           = TOKEN_2022_PROGRAM_ID;
   const ASSOC_TOKEN       = ASSOCIATED_TOKEN_PROGRAM_ID;
 
@@ -913,7 +831,6 @@ async function triggerSilentResetBeforeBuy(
 
   const [solVaultPDA2] = PublicKey.findProgramAddressSync([Buffer.from("sol_vault")], programId);
 
-  console.log(`🔄 [SILENT RESET] Vault expired with 0 participants — resetting ${lotteryType}-T${tier} via lazy_reset_vault`);
 
   const tx = await (program.methods as any).lazyResetVault(typeNum2, tier)
     .accountsStrict({
@@ -924,7 +841,6 @@ async function triggerSilentResetBeforeBuy(
     })
     .rpc({ commitment: "confirmed" });
 
-  console.log(`✅ [SILENT RESET] Vault reset — tx: ${tx}. Proceeding with ticket purchase...`);
 }
 
 /**
@@ -1010,11 +926,9 @@ export async function buyTicketsWithAutoBatch(
   participantId: number,
   quantity: number,
 ) {
-  console.log(`🎫 Auto-batch buy requested: ${quantity} tickets`);
 
   if (quantity <= 50) {
     // Single transaction
-    console.log("✅ Single transaction (≤50 tickets)");
     return buyTicketWithProgram(
       program,
       lotteryType,
@@ -1029,11 +943,9 @@ export async function buyTicketsWithAutoBatch(
   const numBatches = Math.ceil(quantity / batchSize);
   const results = [];
 
-  console.log(`📦 Auto-batching into ${numBatches} transaction(s)...`);
 
   for (let i = 0; i < numBatches; i++) {
     const batchQuantity = Math.min(batchSize, quantity - i * batchSize);
-    console.log(`📦 Batch ${i + 1} of ${numBatches}: ${batchQuantity} tickets`);
 
     try {
       const result = await buyTicketWithProgram(
@@ -1047,7 +959,6 @@ export async function buyTicketsWithAutoBatch(
 
       // Add small delay between batches to avoid rate limiting
       if (i < numBatches - 1) {
-        console.log("⏳ Waiting 1s before next batch...");
         await new Promise((r) => setTimeout(r, 1000));
       }
     } catch (error) {
@@ -1175,21 +1086,12 @@ export async function resolveLotteryRound(
 
     // Process each tier
     for (const currentTier of tiersToProcess) {
-      console.log(`🎯 Drawing winner for ${lotteryType} - Tier $${currentTier}...`);
 
       try {
         // 1. Get vault PDA and fetch vault data
         const [vaultPDA] = getVaultPDA(program.programId, lotteryType, currentTier);
-        console.log(`   Vault PDA: ${vaultPDA.toBase58()}`);
         
         const vault = await (program.account as any).lotteryVault.fetch(vaultPDA);
-        console.log(`   Vault fetched successfully`);
-        console.log(`   Raw vault data:`, {
-          participant_count: vault.participantCount || vault.participant_count,
-          is_drawn: vault.isDrawn || vault.is_drawn,
-          balance: vault.balance,
-          round: vault.round
-        });
         
         const participantCount = typeof vault.participantCount === 'object' && vault.participantCount.toNumber 
           ? vault.participantCount.toNumber() 
@@ -1200,30 +1102,24 @@ export async function resolveLotteryRound(
           ? vault.roundNumber.toNumber()
           : (vault.roundNumber || 0);
         
-        console.log(`   Parsed participant count: ${participantCount}`);
-        console.log(`   Current round: ${currentRound}`);
         
         // Get is_drawn flag for all lottery types
         const isDrawn = vault.isDrawn === true || vault.is_drawn === true;
-        console.log(`   Is drawn: ${isDrawn}`);
         
         // For LPM: Check participant_count == 100
         // We don't check isDrawn here because if it's true but still has 100 participants,
         // it means the previous draw failed and we should retry it.
         if (lotteryType === "LPM") {
           if (participantCount !== 100) {
-            console.log(`⏳ LPM Tier $${currentTier} has ${participantCount}/100 participants, skipping...`);
             continue;
           }
           
           // LPM is ready to draw when participant_count == 100
-          console.log(`✅ LPM Tier $${currentTier} has 100 participants - ready for draw!`);
         } else {
           // - Check is_drawn flag (must be false)
           // - Require end_time to have passed
           // - Require at least 1 participant (UNLIMITED - no max)
           if (isDrawn) {
-            console.log(`⏳ ${lotteryType} Tier $${currentTier} already drawn, skipping...`);
             continue;
           }
           
@@ -1236,7 +1132,6 @@ export async function resolveLotteryRound(
           const adjustedNow = Math.floor(useTimeOffsetStore.getState().getAdjustedNow());
           
           if (adjustedNow < endTime) {
-            console.log(`⏳ ${lotteryType} Tier $${currentTier} time not ended yet (${adjustedNow} < ${endTime}), skipping...`);
             continue;
           }
           
@@ -1264,12 +1159,10 @@ export async function resolveLotteryRound(
         let winningPagePDA: PublicKey = page0PDA;
 
         if (participantCount === 0 && lotteryType !== 'LPM') {
-          console.log(`ℹ️ ${lotteryType} Tier $${currentTier} has 0 participants — calling draw to auto-extend period`);
           // Dummy winner: on-chain will auto-extend and return Ok without touching these accounts
           winnerPubkey = program.provider.publicKey!;
           winningPagePDA = page0PDA;
         } else if (allParticipants.length === 0) {
-          console.log(`❌ No participants found in pages for ${lotteryType} Tier $${currentTier}`);
           continue;
         }
         // else: winner discovered by findWinnerBySimulation inside the retry loop below
@@ -1316,7 +1209,6 @@ export async function resolveLotteryRound(
           "MPL": "executeDrawMpl",
         };
         const methodName = drawMethods[lotteryType];
-        console.log(`📝 Using ${methodName} for ${lotteryType} Tier $${currentTier}`);
 
         const callerPubkey = program.provider.publicKey!;
         const callerAta = getAssociatedTokenAddressSync(
@@ -1388,7 +1280,6 @@ export async function resolveLotteryRound(
         const _modBase = BigInt(allParticipants.length || 100);
         const _predictedIdx = drawCandidates.length > 0 ? Number(_entropyBI % _modBase) : -1;
         const _predictedCandidate = _predictedIdx >= 0 ? (drawCandidates[_predictedIdx] ?? null) : null;
-        console.log(`[ENTROPY] Clock path: slot=${_slotBI} ts=${_ts} idx=${_predictedIdx}`);
 
         // Simulation preInstructions — ATAs are created on-chain by the program
         // with treasury paying, so no client-side ATA creation needed.
@@ -1423,9 +1314,7 @@ export async function resolveLotteryRound(
         // Main finder: try the predicted index first (O(1)), then fall back to sequential (O(N)).
         const findWinnerBySimulation = async (): Promise<{ pubkey: PublicKey; page: PublicKey } | null> => {
           if (_predictedCandidate) {
-            console.log(`[SIM] Fast-path: trying idx=${_predictedIdx} (${_predictedCandidate.pubkey.toString().slice(0,8)}...)`);
             if (await simOneCandidate(_predictedCandidate)) {
-              console.log(`[SIM] Fast-path succeeded ✅`);
               return _predictedCandidate;
             }
             console.warn(`[SIM] Fast-path missed (slot drifted?) — falling back to sequential scan`);
@@ -1462,7 +1351,6 @@ export async function resolveLotteryRound(
           const allAccounts = buildDrawAccounts(winnerPubkey, currentWinnerAta, winningPagePDA);
 
           try {
-            console.log(`🎲 Attempt ${attempt}: winner=${winnerPubkey.toString().slice(0, 8)}... Sending TX...`);
 
             // Caller ATA and winner ATA are created on-chain by the program via treasury CPI.
             // No pre-instructions needed — using caller as payer here would cause Phantom to
@@ -1500,7 +1388,6 @@ export async function resolveLotteryRound(
             }
             // After first successful draw, preInitInstructions will be empty on retry attempts too
             preInitInstructions.length = 0;
-            console.log(`✅ Draw confirmed (attempt ${attempt}): ${txSignature}`);
             break; // ── Success ──
           } catch (sendErr: any) {
             const msg: string = sendErr?.message || sendErr?.toString() || "unknown";
@@ -1522,7 +1409,6 @@ export async function resolveLotteryRound(
 
         // 6. Handle result based on whether this was an auto-extend (0 participants) or a real draw
         if (isAutoExtend) {
-          console.log(`⏱ ${lotteryType} Tier $${currentTier} period auto-extended (no participants)`);
           // Return early with extension message — no winner to record
           return {
             transactionSignature: txSignature,
@@ -1548,7 +1434,6 @@ export async function resolveLotteryRound(
           txSignature: txSignature,
         });
 
-        console.log(`🎉 Winner drawn for ${lotteryType} Tier $${currentTier}: ${winnerPubkey.toString().slice(0, 8)}... - Prize: ${prize} FPT`);
 
         // Save winner to history for "Last 10 Winners" display
         saveWinnerToHistory({
@@ -1612,7 +1497,6 @@ export async function resolveLotteryRound(
 
     if (results.length === 0) {
       // No tiers were ready to draw - provide more context
-      console.log(`ℹ️ No tiers were ready for draw in ${lotteryType}`);
       
       // If a specific tier was requested but nothing was drawn, it means 
       // either it wasn't at 100 participants or an error occurred
@@ -1656,7 +1540,6 @@ export async function resolveLotteryRound(
  */
 export function resetLotteryTier(lotteryType: string, tier: number) {
   try {
-    console.log(`🔄 Resetting ${lotteryType} Tier $${tier}...`);
 
     // Clear participants for this tier
     const participantsKey = `${lotteryType}-tier-${tier}-participants`;
@@ -1674,9 +1557,6 @@ export function resetLotteryTier(lotteryType: string, tier: number) {
       JSON.stringify(filteredPurchases),
     );
 
-    console.log(
-      `✅ ${lotteryType} Tier $${tier} has been reset for a fresh start!`,
-    );
   } catch (error) {
     console.error(`Failed to reset ${lotteryType} Tier $${tier}:`, error);
   }
@@ -1709,7 +1589,6 @@ export async function rolloverTier(
     program.programId
   );
 
-  console.log(`🔄 Rolling over stuck ${lotteryType} Tier $${tier}...`);
 
   const txSignature: string = await (program.methods as any)[methodName](tier)
     .accountsStrict({
@@ -1719,7 +1598,6 @@ export async function rolloverTier(
     })
     .rpc({ commitment: "confirmed" });
 
-  console.log(`✅ Rollover confirmed: ${txSignature}`);
   return txSignature;
 }
 
@@ -1770,18 +1648,15 @@ export async function initializeLotteryAccounts(
   }
 
   try {
-    console.log("🚀 Initializing lottery accounts...");
 
     // Derive Treasury PDA - pays for all initializations
     const treasuryPDA = PublicKey.findProgramAddressSync(
       [Buffer.from("treasury")],
       new PublicKey(PROGRAM_ID),
     )[0];
-    console.log("Treasury PDA:", treasuryPDA.toBase58());
 
     // 1. Initialize Global Registry
     try {
-      console.log("Initializing global registry...");
       const [registryPDA] = PublicKey.findProgramAddressSync(
         [Buffer.from("global_registry")],
         new PublicKey(PROGRAM_ID),
@@ -1796,10 +1671,8 @@ export async function initializeLotteryAccounts(
         })
         .rpc();
 
-      console.log("✅ Global registry initialized:", txSig);
     } catch (error: any) {
       if (error.message?.includes("already in use")) {
-        console.log("✓ Global registry already initialized");
       } else {
         throw error;
       }
@@ -1811,8 +1684,7 @@ export async function initializeLotteryAccounts(
       await (program.methods as any).initializeTreasury()
         .accounts({ admin: program.provider.publicKey, treasury: treasuryInitPDA, systemProgram: SystemProgram.programId })
         .rpc();
-      console.log("✅ Treasury initialized");
-    } catch (e: any) { console.log("✓ Treasury:", e.message?.includes("already in use") ? "already exists" : e.message); }
+    } catch { /* treasury already initialized */ }
 
     // 4. Initialize Vault + WinnerHistory for each (type, tier)
     const LOTTERY_CONFIGS_INIT = [
@@ -1826,7 +1698,6 @@ export async function initializeLotteryAccounts(
     for (const lottery of lotteryTypes) {
       for (const tier of lottery.tiers) {
         try {
-          console.log(`Initializing ${lottery.name} tier ${tier}...`);
 
           const vaultPDA = PublicKey.findProgramAddressSync(
             [Buffer.from(lottery.prefix), Buffer.from([tier])],
@@ -1848,10 +1719,8 @@ export async function initializeLotteryAccounts(
             })
             .rpc();
 
-          console.log(`✅ ${lottery.name} tier ${tier} initialized:`, txSig);
         } catch (error: any) {
           if (error.message?.includes("already in use")) {
-            console.log(`✓ ${lottery.name} tier ${tier} already initialized`);
           } else {
             console.warn(
               `⚠️ Failed to initialize ${lottery.name} tier ${tier}:`,
@@ -1862,7 +1731,6 @@ export async function initializeLotteryAccounts(
       }
     }
 
-    console.log("🎉 Lottery initialization complete!");
   } catch (error) {
     console.error("❌ Lottery initialization error:", error);
     throw error;
@@ -2057,7 +1925,6 @@ export async function requestDrawEntropy(
     throw new Error(parseOnChainError(rpcErr));
   }
 
-  console.log(`[VRF REQUEST] ${lotteryType} T$${tier} → sig=${sig}`);
   return sig;
 }
 
@@ -2113,7 +1980,6 @@ export async function fulfillDrawEntropy(
       const revealSlot = raInfo.data.readBigUInt64LE(REVEAL_SLOT_OFFSET);
       if (revealSlot > requestRevealSlot) {
         sbValue = new Uint8Array(raInfo.data.slice(SB_VALUE_OFFSET, SB_VALUE_OFFSET + 32));
-        console.log(`[VRF REVEAL] slot=${revealSlot} (request_reveal_slot=${requestRevealSlot}) sbValue=${Buffer.from(sbValue).toString('hex').slice(0, 16)}…`);
         break;
       }
     }
@@ -2148,7 +2014,6 @@ export async function fulfillDrawEntropy(
 
   const entropyBI = computeVrfEntropy(sbValue, storedCommitment, lotteryTypeId, tier, currentRound);
   const winnerIdx = Number(entropyBI % BigInt(participantCount));
-  console.log(`[VRF ENTROPY] entropy=${entropyBI} participants=${participantCount} winnerIdx=${winnerIdx}`);
 
   // ── 4. Find winner across participant pages ──
   const [page0PDA] = getParticipantPagePDA(program.programId, lotteryType, tier, 0);
@@ -2207,7 +2072,6 @@ export async function fulfillDrawEntropy(
     ),
     5_000_000, // ceiling: 5 FPT (matches MAX_SETTLER_REWARD on-chain)
   );
-  console.log(`[VRF FULFILL] settler reward = ${settlerRewardFpt} µFPT (fptPerUsd6dec=${fptPerUsd6dec})`);
 
   // ── 7. Call fulfill_draw_entropy ──
   // All ATAs (vault, treasury, caller, winner) are created on-chain by the
@@ -2248,8 +2112,5 @@ export async function fulfillDrawEntropy(
     throw new Error(parseOnChainError(rpcErr));
   }
 
-  console.log(
-    `[VRF FULFILL] ${lotteryType} T$${tier} winner=${winnerPubkey.toBase58().slice(0,8)}… sig=${sig}`,
-  );
   return { signature: sig, winner: winnerPubkey.toBase58(), prize: prizeAmount };
 }

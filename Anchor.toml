@@ -5,7 +5,7 @@ anchor_version = "0.32.1"
 resolution = true
 skip-lint = false
 
-[programs.devnet]
+[programs.mainnet]
 fortress_protocol = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
 
 [programs.localnet]
@@ -15,11 +15,10 @@ fortress_protocol = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "https://api.devnet.solana.com"
+cluster = "https://api.mainnet-beta.solana.com"
 wallet = "/home/dev/my-wallet.json"
 
 [scripts]
-init-devnet = "npx ts-node scripts/init-devnet.ts"
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
 [test]
@@ -29,9 +28,9 @@ upgradeable = false
 
 [test.validator]
 bind_address = "0.0.0.0"
-url = "https://api.devnet.solana.com"
+url = "https://api.mainnet-beta.solana.com"
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
 
 [[test.validator.clone]]
-address = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"
+address = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"

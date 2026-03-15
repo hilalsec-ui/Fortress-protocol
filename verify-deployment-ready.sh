@@ -61,7 +61,7 @@ if [[ "$CURRENT_CLUSTER" == *"mainnet"* ]]; then
     echo "   Cluster: $CURRENT_CLUSTER"
 else
     echo -e "${YELLOW}⚠️  Solana CLI not on mainnet: $CURRENT_CLUSTER${NC}"
-    echo "   Run: solana config set --url https://api.devnet.solana.com"
+    echo "   Run: solana config set --url https://api.mainnet-beta.solana.com"
 fi
 
 # Check 5: Admin Wallet Balance
@@ -82,7 +82,7 @@ fi
 # Check 6: Program Account
 echo ""
 echo "📋 [6/7] Checking program account..."
-PROGRAM_ID="HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
+PROGRAM_ID="2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
 if solana program show $PROGRAM_ID 2>/dev/null | grep -q "Program Id"; then
     echo -e "${GREEN}✅ Program already deployed${NC}"
     PROGRAM_DATA=$(solana program show $PROGRAM_ID | grep "Data Length" | awk '{print $3}')
@@ -96,7 +96,7 @@ fi
 # Check 7: FPT Mint
 echo ""
 echo "🪙 [7/7] Verifying FPT token mint..."
-FPT_MINT="96i8AFYcjBErBJeAdxzbR9ANSjKbtYstn1QRSaDvmexw"
+FPT_MINT="3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"
 if solana account $FPT_MINT 2>/dev/null | grep -q "Account"; then
     echo -e "${GREEN}✅ FPT mint exists on mainnet${NC}"
     echo "   Mint: $FPT_MINT"

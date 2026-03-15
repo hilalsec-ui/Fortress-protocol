@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import { Copy, Check } from "lucide-react";
 
-const FPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
+const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 
 function truncate(addr: string, start = 6, end = 4) {
   return `${addr.slice(0, start)}…${addr.slice(-end)}`;

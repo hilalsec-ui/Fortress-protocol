@@ -5,8 +5,8 @@
 **Program ID**: `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb`  
 **Network**: Solana Devnet  
 **Token**: FPT (Fortress Protocol Token) - 6 decimals  
-**FPT Mint**: `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2`  
-**Admin Wallet**: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`  
+**FPT Mint**: `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`  
+**Admin Wallet**: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`  
 **Treasury Vault PDA**: `BN5CKV4yA95RNQsid5GPRwiRTgVcXTYpKCzbqdzEP68G`
 
 ---
@@ -335,7 +335,7 @@ Each lottery vault must maintain **≥0.5 SOL** balance for:
 ## 🔐 Security Features
 
 ### Access Control
-- Admin wallet hardcoded: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- Admin wallet hardcoded: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 - Treasury operations: Admin only
 - Pricing updates: Admin only
 - Draw initiation: Any signer (conditions enforced by program)
@@ -475,7 +475,7 @@ vault.end_time = current_time + cycle_duration; // Set next end time
 ### On-Chain Status (Devnet)
 - ✅ Program deployed: `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb`
 - ✅ Treasury Vault funded: `0.497 SOL` at `BN5CKV4yA95RNQsid5GPRwiRTgVcXTYpKCzbqdzEP68G`
-- ✅ Program authority: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- ✅ Program authority: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 
 ### Configuration Sync
 - ✅ Admin wallet matches (backend ↔ frontend)

@@ -523,7 +523,7 @@ Prize Distribution: (same as before, but to User72)
 
 2. User's Token Account (ATA)
    ├─ Authority: User's wallet
-   ├─ Mint: FPT (7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2)
+   ├─ Mint: FPT (3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj)
    ├─ Decrease: -ticket_price
    └─ Signal: Transfer complete
 

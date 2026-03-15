@@ -8,13 +8,13 @@ async function closeAndReinitializeRegistry() {
     new Uint8Array(JSON.parse(fs.readFileSync(walletPath, 'utf-8')))
   );
   
-  const connection = new anchor.web3.Connection('https://api.devnet.solana.com', 'confirmed');
+  const connection = new anchor.web3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
   const wallet = new anchor.Wallet(walletKeypair);
   const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
   anchor.setProvider(provider);
 
   const program = anchor.workspace.FortressProtocol;
-  const programId = new PublicKey("BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW");
+  const programId = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
   
   const [globalRegistryPDA] = PublicKey.findProgramAddressSync(
     [Buffer.from("registry")],

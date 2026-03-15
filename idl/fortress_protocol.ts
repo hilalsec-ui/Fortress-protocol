@@ -3545,7 +3545,7 @@ export type FortressProtocol = {
           {
             "name": "authority",
             "docs": [
-              "The admin authority (EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg)"
+              "The admin authority (EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv)"
             ],
             "type": "pubkey"
           },

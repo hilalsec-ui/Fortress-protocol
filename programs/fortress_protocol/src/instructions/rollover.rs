@@ -49,8 +49,6 @@ fn rollover_tier_impl(ctx: Context<RolloverTier>, tier: u8, lottery_type_id: u8)
         .checked_add(duration)
         .ok_or(LotteryError::ArithmeticOverflow)?;
 
-    msg!("[ROLLOVER] type={} tier={} new_end_time={} participants={}",
-         lottery_type_id, tier, vault.end_time, vault.participant_count);
     Ok(())
 }
 

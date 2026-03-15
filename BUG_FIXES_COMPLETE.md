@@ -293,7 +293,7 @@ anchor run close-vault -- 4 5
 
 ### If FPT Errors Persist:
 1. Check browser console for detailed error logs
-2. Verify FPT Mint address: `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2`
+2. Verify FPT Mint address: `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`
 3. Check user ATA derivation: `getAssociatedTokenAddress(FPT_MINT, wallet, false, TOKEN_2022_PROGRAM_ID)`
 4. Confirm Token Program is `TOKEN_2022_PROGRAM_ID` (not `TOKEN_PROGRAM_ID`)
 

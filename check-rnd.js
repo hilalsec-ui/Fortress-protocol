@@ -1,5 +1,5 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
-const conn = new Connection('https://api.devnet.solana.com', 'confirmed');
+const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 const acct = new PublicKey('4dqvnPSuq9PEZaGojLke2oe3zd3q26iS7wBYEhQSkWC3'); // LPM $5
 conn.getAccountInfo(acct).then(info => {
   if (!info) { console.log('NOT FOUND'); return; }

@@ -240,7 +240,7 @@ export default function DonatePage() {
                     <div>
                       <p className="text-green-500 font-semibold">Donation Successful!</p>
                       <a
-                        href={`https://solscan.io/tx/${txSignature}?cluster=devnet`}
+                        href={`https://solscan.io/tx/${txSignature}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors"
@@ -271,7 +271,7 @@ export default function DonatePage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className={`rounded-2xl p-5 ${c.card}`}>
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <div className={`text-xs uppercase tracking-wider font-semibold mb-1 ${c.subtle}`}>Donation Wallet</div>
+              <div className={`text-xs uppercase tracking-wider font-semibold mb-1 ${c.subtle}`}>Admin Wallet · Solana Mainnet</div>
               <div className={`font-mono text-sm break-all ${c.body}`}>{ADMIN_WALLET.toString()}</div>
             </div>
             <button

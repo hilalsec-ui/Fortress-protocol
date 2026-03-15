@@ -11,7 +11,7 @@ export function useTreasuryWarnings(programId?: string) {
     const rpcEndpoint =
       process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
       process.env.NEXT_PUBLIC_RPC_ENDPOINT ||
-      "https://api.devnet.solana.com";
+      "https://api.mainnet-beta.solana.com";
 
     const connection = new Connection(rpcEndpoint);
 

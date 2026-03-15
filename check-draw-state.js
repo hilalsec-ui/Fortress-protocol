@@ -1,5 +1,5 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
-const conn = new Connection('https://api.devnet.solana.com', 'confirmed');
+const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
 
 const types = [

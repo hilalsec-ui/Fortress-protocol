@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useAnchorProgram } from '@/utils/anchor';
-import { PROGRAM_ID, PRIZE_WINNER_PCT, PRIZE_TREASURY_PCT } from '@/utils/constants';
+import { PROGRAM_ID, PRIZE_WINNER_PCT, PRIZE_TREASURY_PCT, FPT_MINT, ADMIN_WALLET, CRANK_AUTHORITY } from '@/utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, RefreshCw, TrendingUp, Award, Zap } from 'lucide-react';
+import { Calendar, RefreshCw, TrendingUp, Award, Zap, ExternalLink } from 'lucide-react';
 import DrawStepTracker from '@/components/DrawStepTracker';
 import BuyTicketModal from '@/components/BuyTicketModal';
 import CountdownTimer from '@/components/CountdownTimer';
@@ -133,7 +133,6 @@ const MPLPage: React.FC = () => {
       const key = `presync:${tier.tier}:${tier.endTime}`;
       if (remaining > 0 && remaining <= 30 && !preExpirySyncedRef.current.has(key)) {
         preExpirySyncedRef.current.add(key);
-        console.log(`[MPL] Pre-expiry sync: tier $${tier.tier} expires in ${remaining}s`);
         getSolanaHeartbeat().forceSync();
       }
     }
@@ -174,9 +173,9 @@ const MPLPage: React.FC = () => {
     }
     const result = await buyTicketWithProgram(program, 'MPL', tier, participantId, quantity, publicKey, onProgress, sendTransaction ?? undefined);
 
-    // Trigger crank if the tier is already expired (purchase into a drawable vault)
+    // Trigger crank only if the tier is already expired at time of purchase
     const tierState = lotteryData?.tiers?.find((t: any) => t.tier === tier);
-    if (tierState && tierState.endTime > 0 && (tierState.participants ?? 0) + quantity > 0) {
+    if (tierState && tierState.endTime > 0 && nowSeconds >= tierState.endTime && (tierState.participants ?? 0) + quantity > 0) {
       settlementTrigger('MPL', tier, tierState.endTime);
     }
 
@@ -195,6 +194,7 @@ const MPLPage: React.FC = () => {
       const key = `${t}:${tierData.endTime}`;
       if (expired && hasParticipants && onChainReady && getPhase(t) === 'idle' && !houseTriggerFiredRef.current.has(key)) {
         houseTriggerFiredRef.current.add(key);
+        triggerCrank('MPL', t); // dispatch GitHub crank immediately on expiry
         setLocalTxState(prev => ({ ...prev, [t]: 'house_triggering' }));
         (async () => {
           const MAX_ATTEMPTS = 3;
@@ -319,76 +319,94 @@ const MPLPage: React.FC = () => {
     }
     const id = `draw-step-${tier}`;
     try {
-      const { Transaction, Keypair, PublicKey: Pk, SystemProgram } = await import('@solana/web3.js');
+      const { Transaction, PublicKey: Pk } = await import('@solana/web3.js');
 
-      const LOTTERY_TYPE_ID = 3; // MPL
+      const LOTTERY_TYPE_ID_VAL = 3; // MPL
       const FORTRESS_PROGRAM = new Pk(PROGRAM_ID);
 
       const [pendingDrawPDA] = Pk.findProgramAddressSync(
-        [Buffer.from('pending_draw'), Buffer.from([LOTTERY_TYPE_ID]), Buffer.from([tier])],
-        FORTRESS_PROGRAM,
-      );
-      const [vaultPDA] = Pk.findProgramAddressSync(
-        [Buffer.from('vault_mpl'), Buffer.from([tier])],
+        [Buffer.from('pending_draw'), Buffer.from([LOTTERY_TYPE_ID_VAL]), Buffer.from([tier])],
         FORTRESS_PROGRAM,
       );
 
       const pdInfo = await connection.getAccountInfo(pendingDrawPDA, 'confirmed');
 
-      if (pdInfo) {
-        // ── Step 1 already on-chain — attempt Step 2 (oracle reveal) ──
+      if (pdInfo && pdInfo.data.length >= 42) {
+        // ── Step 2 path: PendingDraw exists on-chain ──
+        const rndPk = new Pk(pdInfo.data.slice(10, 42));
+        const rndInfo = await connection.getAccountInfo(rndPk, 'confirmed');
+        if (!rndInfo) throw new Error('RNG account not found on-chain. Please wait 30s and retry.');
 
-        if (pdInfo.data.length >= 42) {
-          const rndPk = new Pk(pdInfo.data.slice(10, 42));
-          const rndInfo = await connection.getAccountInfo(rndPk, 'confirmed');
-          let alreadyRevealed = false;
-          if (rndInfo && rndInfo.data.length >= 152) {
-            const buf = Buffer.from(rndInfo.data);
-            alreadyRevealed = buf.readUInt32LE(144) > 0 || buf.readUInt32LE(148) > 0;
+        let alreadyRevealed = false;
+        if (rndInfo.data.length >= 152) {
+          const buf = Buffer.from(rndInfo.data);
+          const revSlotLo = buf.readUInt32LE(144);
+          const revSlotHi = buf.readUInt32LE(148);
+          if (pdInfo.data.length >= 123) {
+            const reqRevSlotLo = pdInfo.data.readUInt32LE(115);
+            const reqRevSlotHi = pdInfo.data.readUInt32LE(119);
+            alreadyRevealed = revSlotHi > reqRevSlotHi || (revSlotHi === reqRevSlotHi && revSlotLo > reqRevSlotLo);
+          } else {
+            alreadyRevealed = revSlotLo > 0 || revSlotHi > 0;
           }
-
-          if (alreadyRevealed) {
-            toast.success('✅ Steps 1 & 2 already signed on-chain — click "Finalize Draw"', { duration: 5000 });
-            setLocalTxState(prev => ({ ...prev, [tier]: null }));
-            return;
-          }
-
-          setLocalTxState(prev => ({ ...prev, [tier]: 'step2_processing' }));
-          toast.loading('🔮 Getting oracle reveal transaction…', { id });
-          const proxyRes = await fetch('/api/oracle-proxy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ randomness_account: rndPk.toBase58(), user_pubkey: publicKey.toBase58() }),
-          });
-          const proxyData = await proxyRes.json();
-          if (!proxyRes.ok) throw new Error(proxyData.error ?? 'Oracle reveal failed — please retry');
-          const revealTx = Transaction.from(Buffer.from(proxyData.transaction, 'base64'));
-          toast.dismiss(id);
-          toast.loading('✍️ Approve oracle reveal in your wallet…', { id });
-          const sig2 = await sendTransaction(revealTx, connection, { skipPreflight: true });
-          toast.dismiss(id);
-          toast.loading('⏳ Confirming reveal…', { id });
-          await connection.confirmTransaction(sig2, 'confirmed');
-          toast.dismiss(id);
-          toast.success('✅ Step 2 signed — Oracle revealed on-chain. Click "Finalize Draw".', { duration: 7000 });
+        }
+        if (alreadyRevealed) {
+          toast.success('✅ Oracle already revealed — click "Finalize Draw"', { duration: 5000 });
           setLocalTxState(prev => ({ ...prev, [tier]: null }));
           return;
         }
+
+        // Step 2a: Oracle Commit (crank partial-signs as authority, user pays fees)
+        setLocalTxState(prev => ({ ...prev, [tier]: 'step2_processing' }));
+        toast.loading('🔮 Preparing oracle commit…', { id });
+        const commitRes = await fetch('/api/draw/oracle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lottery_type: 'MPL', tier, user_pubkey: publicKey.toBase58(), mode: 'build' }),
+        });
+        const commitData = await commitRes.json();
+        if (!commitRes.ok) throw new Error(commitData.error ?? 'Oracle commit build failed — please retry');
+        const commitTx = Transaction.from(Buffer.from(commitData.commit_tx, 'base64'));
+        toast.dismiss(id);
+        toast.loading('✍️ Approve oracle commit in your wallet…', { id });
+        const sigCommit = await sendTransaction(commitTx, connection, { skipPreflight: true });
+        toast.dismiss(id);
+        toast.loading('⏳ Confirming oracle commit…', { id });
+        await connection.confirmTransaction(sigCommit, 'confirmed');
+        toast.dismiss(id);
+        toast.loading('⏳ Oracle processing commit…', { id });
+        await new Promise(r => setTimeout(r, 2500));
+        toast.dismiss(id);
+
+        // Step 2b: Oracle Reveal (crank partial-signs as authority, user pays oracle reward fee)
+        toast.loading('🔮 Preparing oracle reveal…', { id });
+        const revealRes = await fetch('/api/draw/oracle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lottery_type: 'MPL', tier, user_pubkey: publicKey.toBase58(), mode: 'build_reveal' }),
+        });
+        const revealData = await revealRes.json();
+        if (!revealRes.ok) throw new Error(revealData.error ?? 'Oracle reveal build failed — please retry');
+        const revealTx = Transaction.from(Buffer.from(revealData.reveal_tx, 'base64'));
+        toast.dismiss(id);
+        toast.loading('✍️ Approve oracle reveal in your wallet…', { id });
+        const sigReveal = await sendTransaction(revealTx, connection, { skipPreflight: true });
+        toast.dismiss(id);
+        toast.loading('⏳ Confirming oracle reveal…', { id });
+        await connection.confirmTransaction(sigReveal, 'confirmed');
+        toast.dismiss(id);
+        toast.success('✅ Oracle committed & revealed. Click "Finalize Draw" to claim your FPT bounty.', { duration: 7000 });
+        setLocalTxState(prev => ({ ...prev, [tier]: null }));
+        return;
       }
 
-      // ── Step 1: Create new draw request (stop after this step) ──
+      // ── Step 1: request_draw_entropy (user is feePayer, no crank involved) ──
       setLocalTxState(prev => ({ ...prev, [tier]: 'requesting' }));
       toast.loading('🔧 Building draw transaction…', { id });
-      const rngKp = Keypair.generate();
       const initRes = await fetch('/api/draw/init', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lottery_type: 'MPL',
-          tier,
-          user_pubkey: publicKey.toBase58(),
-          rng_pubkey: rngKp.publicKey.toBase58(),
-        }),
+        body: JSON.stringify({ lottery_type: 'MPL', tier, user_pubkey: publicKey.toBase58() }),
       });
       const initData = await initRes.json();
       if (!initRes.ok) throw new Error(initData.error ?? 'Failed to build draw transaction');
@@ -396,14 +414,32 @@ const MPLPage: React.FC = () => {
 
       toast.dismiss(id);
       toast.loading('✍️ Approve draw request in your wallet…', { id });
-      const sig1 = await sendTransaction(tx1, connection, { signers: [rngKp], skipPreflight: true });
+      const sig1 = await sendTransaction(tx1, connection, { skipPreflight: true });
       toast.dismiss(id);
       toast.loading('⏳ Confirming draw on-chain…', { id });
       const conf1 = await connection.confirmTransaction(sig1, 'confirmed');
       if (conf1.value.err) throw new Error(`Draw TX failed on-chain: ${JSON.stringify(conf1.value.err)}`);
+      toast.dismiss(id);
+
+      // After Step 1, try oracle execute (crank-paid) silently.
+      toast.loading('⏳ Requesting oracle to process draw…', { id });
+      try {
+        const kickRes = await fetch('/api/draw/oracle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lottery_type: 'MPL', tier }),
+        });
+        const kickData = await kickRes.json();
+        if (kickData.success) {
+          toast.dismiss(id);
+          toast.success('✅ Draw requested and oracle processed. Click "Finalize Draw".', { duration: 7000 });
+          setLocalTxState(prev => ({ ...prev, [tier]: null }));
+          return;
+        }
+      } catch { /* crank balance too low — show manual Step 2 */ }
 
       toast.dismiss(id);
-      toast.success('✅ Step 1 signed on-chain. Next: complete oracle reveal.', { duration: 7000 });
+      toast.success('✅ Step 1 complete. Click "Complete Oracle" to continue.', { duration: 7000 });
       setLocalTxState(prev => ({ ...prev, [tier]: 'step1_complete' }));
     } catch (err: any) {
       toast.dismiss(id);
@@ -841,6 +877,28 @@ const MPLPage: React.FC = () => {
 
           </div>
 
+        </div>
+      </section>
+
+      {/* ── Mainnet Contract Info ── */}
+      <section className="py-6 px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className={`rounded-xl p-4 text-xs font-mono flex flex-wrap gap-x-6 gap-y-2 items-center ${ isDarkMode ? 'bg-white/[0.02] border border-white/5 text-gray-500' : 'bg-gray-50 border border-gray-100 text-gray-400' }`}>
+            <span className="text-green-500 font-bold uppercase tracking-wider">● Solana Mainnet</span>
+            {[
+              { label: 'Program', val: PROGRAM_ID },
+              { label: 'FPT Mint', val: FPT_MINT },
+              { label: 'Admin', val: ADMIN_WALLET },
+              { label: 'Crank', val: CRANK_AUTHORITY },
+            ].map(({ label, val }) => (
+              <a key={label} href={`https://solscan.io/account/${val}`} target="_blank" rel="noopener noreferrer"
+                className={`flex items-center gap-1 hover:text-cyan-400 transition-colors ${ isDarkMode ? 'text-gray-600' : 'text-gray-400' }`}>
+                <span className={isDarkMode ? 'text-gray-500' : 'text-gray-500'}>{label}:</span>
+                <span>{val.slice(0, 6)}…{val.slice(-4)}</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 

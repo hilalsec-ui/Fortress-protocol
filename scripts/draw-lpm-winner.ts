@@ -25,7 +25,7 @@ import {
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
 const LOTTERY_TYPE_LPM = 0;
 
 // ═══════════════════════════════════════════════════════════════════════════

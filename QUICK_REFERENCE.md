@@ -3,8 +3,8 @@
 ## 📌 Essential Information
 
 **Program ID**: `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb`  
-**Admin Wallet**: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`  
-**FPT Mint**: `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2`  
+**Admin Wallet**: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`  
+**FPT Mint**: `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`  
 **Network**: Solana Devnet (`https://api.devnet.solana.com`)  
 **Current Rate**: 0.5 FPT per 1 USDC (500,000 in 6-decimal format)
 
@@ -139,10 +139,10 @@ anchor build
 solana program show HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb
 
 # Check admin wallet balance
-solana balance EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg
+solana balance EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv
 
 # Check FPT mint
-solana account 7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2
+solana account 3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj
 
 # Verify cluster configuration
 solana config get

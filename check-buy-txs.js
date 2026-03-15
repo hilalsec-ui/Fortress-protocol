@@ -1,6 +1,6 @@
 // Check what address buy_ticket uses for the vault_token_account
 const { Connection, PublicKey } = require('@solana/web3.js');
-const conn = new Connection('https://api.devnet.solana.com', 'confirmed');
+const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 
 async function main() {
   const vault = new PublicKey('9e66v1zAnHRw5RKNCZmKJyWopy6NmsfkdRSUGcPUssuG');

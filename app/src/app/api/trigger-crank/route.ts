@@ -20,7 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '../_guard';
 
 const GITHUB_REPO  = 'hilalsec-ui/crank';
-const EVENT_TYPE   = 'trigger-devnet-draw';
+const EVENT_TYPE   = 'trigger-mainnet-draw';
 
 const VALID_LOTTERY_TYPES = new Set(['LPM', 'DPL', 'WPL', 'MPL']);
 const VALID_TIERS         = new Set([5, 10, 15, 20, 50]);

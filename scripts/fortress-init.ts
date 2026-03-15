@@ -31,9 +31,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // ───────────────────────── Configuration ──────────────────────────────────────
-const PROGRAM_ID = new PublicKey('BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW');
-const FPT_MINT   = new PublicKey('7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2');
-const ADMIN_KEY  = new PublicKey('EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg');
+const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const FPT_MINT   = new PublicKey('3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj');
+const ADMIN_KEY  = new PublicKey('EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv');
 
 // SOL deposited into sol_vault so it can pay for all PDA rent allocations
 const SOL_VAULT_DEPOSIT = 0.5 * LAMPORTS_PER_SOL;
@@ -128,7 +128,7 @@ async function main() {
   const idl = JSON.parse(fs.readFileSync(idlPath, 'utf8'));
 
   // Setup provider
-  const rpc = process.env.RPC_URL || 'https://api.devnet.solana.com';
+  const rpc = process.env.RPC_URL || 'https://api.mainnet-beta.solana.com';
   const conn = new Connection(rpc, 'confirmed');
   const provider = new AnchorProvider(conn, new Wallet(adminKp), {
     commitment: 'confirmed',

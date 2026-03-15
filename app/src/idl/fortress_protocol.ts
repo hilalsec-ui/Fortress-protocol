@@ -931,7 +931,7 @@ export type FortressProtocol = {
             "Crank authority wallet that receives SOL for Switchboard oracle operations."
           ],
           "writable": true,
-          "address": "CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz"
+          "address": "BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5"
         },
         {
           "name": "systemProgram",
@@ -2052,7 +2052,7 @@ export type FortressProtocol = {
           {
             "name": "authority",
             "docs": [
-              "The admin authority (EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg)"
+              "The admin authority (EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv)"
             ],
             "type": "pubkey"
           },

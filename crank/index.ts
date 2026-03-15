@@ -1,5 +1,5 @@
 /**
- * Fortress Protocol — Devnet Crank
+ * Fortress Protocol — Mainnet Crank
  *
  * Scans all 16 lottery vault (type, tier) pairs and:
  *   1. Calls request_draw_entropy when a vault is ready (LPM: 100 participants,
@@ -11,13 +11,13 @@
  *   6. Skips gracefully when a vault is not ready or has already been drawn.
  *
  * Prerequisites:
- *   • Crank wallet (CH5CLt2e...) funded with devnet SOL: solana airdrop 2 CH5CLt2e... --url devnet
+ *   • Crank wallet (BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5) funded with SOL on Mainnet-Beta
  *   • RandomnessAccounts pre-initialised: npx ts-node ../scripts/reinit-sb-randomness-crank.ts
  *
  * Local usage:
  *   cd crank && CRANK_PRIVATE_KEY=<base58-secret-key> npx ts-node index.ts
  *
- * CI usage: CRANK_PRIVATE_KEY is injected from GitHub Secrets (see ../.github/workflows/crank-devnet.yml).
+ * CI usage: CRANK_PRIVATE_KEY is injected from GitHub Secrets (see ../.github/workflows/crank-mainnet.yml).
  */
 
 // In CI, env vars are injected by GitHub Actions. For local dev, run:
@@ -46,10 +46,10 @@ import * as path from "path";
 
 // ─── Network & Program Constants ────────────────────────────────────────────
 
-const RPC_URL    = "https://api.devnet.solana.com";
+const RPC_URL = process.env.RPC_URL ?? "https://api.mainnet-beta.solana.com";
 const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
-const FPT_MINT   = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
-const SB_DEVNET_QUEUE = new PublicKey("EYiAmGSdsQTuCw413V5BzaruWuCCSDgTPtBGvLkXHbe7");
+const FPT_MINT   = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
+const SB_MAINNET_QUEUE = new PublicKey("3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1");
 
 // ─── Pre-initialised Switchboard RandomnessAccounts ─────────────────────────
 //
@@ -96,7 +96,7 @@ const LOTTERY_CONFIGS = [
 const REVEAL_SLOT_OFFSET = 144;  // u64 LE — slot when oracle revealed
 const SB_VALUE_OFFSET    = 152;  // [u8; 32] — the VRF output
 
-const POLL_TIMEOUT_MS  = 45_000;  // 45 s — oracle reveals within ~5 s on devnet
+const POLL_TIMEOUT_MS  = 45_000;  // 45 s — oracle reveals within ~5 s on mainnet
 const POLL_INTERVAL_MS = 1_500;
 
 // $0.50 equivalent in µFPT at ~$180 SOL / 1000 FPT-per-SOL ≈ 500 000 µFPT.
@@ -210,34 +210,45 @@ type SbProgram = any;
 
 async function main(): Promise<void> {
   // ── Load and validate private key ──
-  // Supports two formats:
-  //   CRANK_PRIVATE_KEY=<base58 string>       (local dev)
-  //   ANCHOR_WALLET=<JSON byte array string>  (GitHub CI via secrets.CRANK_KEYPAIR)
+  // Supports three formats for CRANK_PRIVATE_KEY:
+  //   • base58 string     (Phantom export)
+  //   • JSON byte array   [1,2,3,...] (Solana CLI / most wallets)
+  // Also falls back to ANCHOR_WALLET (same JSON array format).
   const rawKey = process.env.CRANK_PRIVATE_KEY?.trim();
   const anchorWallet = process.env.ANCHOR_WALLET?.trim();
 
   let crankKp: Keypair;
 
+  function keypairFromAny(value: string): Keypair {
+    // Try base58 first
+    try { return Keypair.fromSecretKey(bs58.decode(value)); } catch { /* fall through */ }
+    // Try JSON byte array
+    try {
+      const parsed = JSON.parse(value);
+      return Keypair.fromSecretKey(Uint8Array.from(parsed));
+    } catch { /* fall through */ }
+    throw new Error("Key is neither valid base58 nor a JSON byte array.");
+  }
+
   if (rawKey) {
     try {
-      crankKp = Keypair.fromSecretKey(bs58.decode(rawKey));
-    } catch {
-      console.error("❌  CRANK_PRIVATE_KEY is not valid base58. Re-export from Phantom.");
+      crankKp = keypairFromAny(rawKey);
+    } catch (e: any) {
+      console.error(`❌  CRANK_PRIVATE_KEY is invalid — ${e.message}`);
       process.exit(1);
     }
   } else if (anchorWallet) {
     try {
-      const parsed = JSON.parse(anchorWallet);
-      crankKp = Keypair.fromSecretKey(Uint8Array.from(parsed));
-    } catch {
-      console.error("❌  ANCHOR_WALLET is not a valid JSON key array.");
+      crankKp = keypairFromAny(anchorWallet);
+    } catch (e: any) {
+      console.error(`❌  ANCHOR_WALLET is invalid — ${e.message}`);
       process.exit(1);
     }
   } else {
     console.error(
       "❌  No crank key found.\n" +
       "    • Local dev: add CRANK_PRIVATE_KEY=<base58-key> to crank/.env\n" +
-      "    • GitHub CI: add CRANK_KEYPAIR as a repository secret (Settings → Secrets → Actions)",
+      "    • GitHub CI: set mainnet_crank secret (base58 or JSON byte array)",
     );
     process.exit(1);
   }
@@ -250,8 +261,8 @@ async function main(): Promise<void> {
   console.log(`💰  Balance       : ${(balance / 1e9).toFixed(4)} SOL`);
   if (balance < 0.05e9) {
     console.warn(
-      "⚠️   Balance is low — fund with:\n" +
-      `    solana airdrop 2 ${crankKp.publicKey.toBase58()} --url devnet`,
+      "⚠️   Balance is low — please fund the crank wallet with SOL on Mainnet-Beta:\n" +
+      `    solana transfer ${crankKp.publicKey.toBase58()} 0.1`,
     );
   }
 
@@ -269,13 +280,28 @@ async function main(): Promise<void> {
   // ── Switchboard SDK ──
   const sbProgram: SbProgram = await sb.AnchorUtils.loadProgramFromConnection(connection, wallet);
 
+  // ── Targeted mode: only process one vault when LOTTERY_TYPE + TIER are set ──
+  const targetType = process.env.LOTTERY_TYPE?.trim().toUpperCase() || null;
+  const targetTierRaw = process.env.TIER ? parseInt(process.env.TIER, 10) : NaN;
+  const targetTier = Number.isFinite(targetTierRaw) ? targetTierRaw : null;
+
+  const filteredLotteries = targetType
+    ? LOTTERY_CONFIGS.filter(l => l.name === targetType)
+    : [...LOTTERY_CONFIGS];
+  const effectiveLotteries = filteredLotteries.length > 0 ? filteredLotteries : [...LOTTERY_CONFIGS];
+
+  const header = targetType && targetTier !== null
+    ? `${targetType} $${targetTier} (targeted)`
+    : `all ${LOTTERY_CONFIGS.reduce((n, l) => n + l.tiers.length, 0)} vaults`;
+
   console.log(`\n${"═".repeat(72)}`);
-  console.log("  FORTRESS DEVNET CRANK — scanning all 16 vaults");
+  console.log(`  FORTRESS MAINNET CRANK — scanning ${header}`);
   console.log(`${"═".repeat(72)}\n`);
 
-  // ── Process every vault ──
-  for (const lottery of LOTTERY_CONFIGS) {
+  // ── Process vaults ──
+  for (const lottery of effectiveLotteries) {
     for (const tier of lottery.tiers) {
+      if (targetTier !== null && tier !== targetTier) continue;
       await processVault(connection, program, sbProgram, crankKp, lottery, tier);
     }
   }
@@ -428,7 +454,7 @@ async function doRequestDraw(
   try {
     console.log(`${tag}  → SB oracle commit`);
     const randomness    = new sb.Randomness(sbProgram, randomnessAccountPk);
-    const commitIx      = await (randomness.commitIx(SB_DEVNET_QUEUE) as Promise<import("@solana/web3.js").TransactionInstruction>);
+    const commitIx      = await (randomness.commitIx(SB_MAINNET_QUEUE) as Promise<import("@solana/web3.js").TransactionInstruction>);
     const { blockhash } = await connection.getLatestBlockhash("confirmed");
     const msg           = new TransactionMessage({
       payerKey:        crankKp.publicKey,
@@ -445,7 +471,7 @@ async function doRequestDraw(
     await connection.confirmTransaction(commitSig, "confirmed");
     console.log(`${tag}  ✅  SB commit  sig=${commitSig.slice(0, 20)}…`);
   } catch (sbErr: any) {
-    // Non-fatal — oracle may auto-pick up the request on devnet
+    // Non-fatal — oracle may auto-pick up the request on mainnet
     console.warn(`${tag}  ⚠️   SB commit failed (proceeding anyway): ${String(sbErr?.message ?? sbErr).slice(0, 100)}`);
   }
 }

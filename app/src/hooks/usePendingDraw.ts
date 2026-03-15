@@ -132,7 +132,7 @@ export function usePendingDraws(
               // Oracle is truly ready only when it revealed AFTER this draw was requested.
               const oracleReady = revealSlot > requestRevealSlot;
 
-              const CRANK_AUTHORITY = "CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz";
+              const CRANK_AUTHORITY = "BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5";
               const rndAuthority = rndInfo.data.length >= 40
                 ? new PublicKey(rndInfo.data.slice(8, 40)).toBase58()
                 : null;

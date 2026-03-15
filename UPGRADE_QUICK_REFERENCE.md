@@ -146,7 +146,7 @@ pub const MPL_DURATION: i64 = 2_592_000; // 30 days
 - **Tracking:** `Treasury.total_priority_tips` field
 
 ### Token
-- **FPT Mint:** `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2`
+- **FPT Mint:** `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`
 - **Standard:** Token-2022
 - **Decimals:** 6
 

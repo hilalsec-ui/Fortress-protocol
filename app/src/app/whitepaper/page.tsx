@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import Link from 'next/link';
 import { ExternalLink, FileText, Zap, Shield, Copy, Check } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { FPT_MINT } from '@/utils/constants';
+import { FPT_MINT, PROGRAM_ID, ADMIN_WALLET, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM } from '@/utils/constants';
 
 // ─── Framer variants ──────────────────────────────────────────────────────────
 const fadeUp = { hidden: { opacity: 0, y: 32 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
@@ -989,13 +989,13 @@ export default function WhitepaperPage() {
               </div>
               {/* Feed address pill */}
               <div className="mt-3 rounded-lg border border-cyan-500/20 bg-black/30 p-3 text-xs font-mono">
-                <span className="text-gray-600">SB On-Demand Program (devnet): </span>
+                <span className="text-gray-600">SB On-Demand Program (mainnet): </span>
                 <a
-                  href="https://solscan.io/account/Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2?cluster=devnet"
+                  href={`https://solscan.io/account/${SB_ON_DEMAND_PROGRAM}`}
                   target="_blank" rel="noopener noreferrer"
                   className="text-cyan-400 hover:text-cyan-300 break-all transition-colors"
                 >
-                  Aio4ga…ji2 <ExternalLink className="inline w-3 h-3" />
+                  {`${SB_ON_DEMAND_PROGRAM.slice(0,6)}…${SB_ON_DEMAND_PROGRAM.slice(-3)}`} <ExternalLink className="inline w-3 h-3" />
                 </a>
               </div>
             </motion.div>
@@ -1251,15 +1251,24 @@ export default function WhitepaperPage() {
               <ArchitectureDiagram />
             </div>
           </motion.div>
-          <motion.div variants={fadeUp} className="mt-8 grid sm:grid-cols-3 gap-4 text-xs font-mono">
+          <motion.div variants={fadeUp} className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs font-mono">
             {[
-              { key: 'Program ID', val: '2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY', color: 'text-cyan-400' },
-              { key: 'FPT Mint', val: '7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2', color: 'text-purple-400' },
-              { key: 'SB On-Demand', val: 'Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2', color: 'text-yellow-400' },
+              { key: 'Program ID (mainnet)', val: PROGRAM_ID, color: 'text-cyan-400' },
+              { key: 'FPT Mint (mainnet)', val: FPT_MINT, color: 'text-purple-400' },
+              { key: 'SB On-Demand (mainnet)', val: SB_ON_DEMAND_PROGRAM, color: 'text-yellow-400' },
+              { key: 'Admin Authority (mainnet)', val: ADMIN_WALLET, color: 'text-emerald-400' },
+              { key: 'Crank Wallet (mainnet)', val: CRANK_AUTHORITY, color: 'text-pink-400' },
             ].map(item => (
               <div key={item.key} className="rounded-lg border border-gray-800 bg-black/30 p-3">
                 <div className="text-gray-600 mb-1">{item.key}</div>
-                <div className={`${item.color} break-all leading-relaxed`}>{item.val}</div>
+                <div className={`${item.color} break-all leading-relaxed mb-2`}>{item.val}</div>
+                <a
+                  href={`https://solscan.io/account/${item.val}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-400 transition-colors"
+                >
+                  Solscan <ExternalLink className="inline w-3 h-3" />
+                </a>
               </div>
             ))}
           </motion.div>
@@ -1342,8 +1351,8 @@ export default function WhitepaperPage() {
 
             {/* Decorative bottom */}
             <div className={`mt-12 font-mono text-xs space-y-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              <div>Fortress Protocol · Solana Devnet · 2026</div>
-              <div>Program: 2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY</div>
+              <div>Fortress Protocol · Solana Mainnet · 2026</div>
+              <div>Program: {PROGRAM_ID}</div>
               <div className={isDarkMode ? 'text-gray-500' : 'text-gray-500'}>This document is provided for informational purposes only.</div>
             </div>
           </motion.div>

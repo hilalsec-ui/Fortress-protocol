@@ -54,7 +54,7 @@ show_balances() {
     print_step "Current Balances:"
     
     WALLET=$(solana balance 2>/dev/null | awk '{print $1}')
-    PROGRAM=$(solana program show HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb 2>/dev/null | grep "Balance:" | awk '{print $2}' || echo "0")
+    PROGRAM=$(solana program show 2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY 2>/dev/null | grep "Balance:" | awk '{print $2}' || echo "0")
     
     echo "  Wallet: $WALLET SOL"
     echo "  Program: $PROGRAM SOL"
@@ -62,8 +62,8 @@ show_balances() {
     # Calculate vault totals
     node -e "
         const { PublicKey, Connection } = require('@solana/web3.js');
-        const programId = new PublicKey('HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb');
-        const connection = new Connection('https://api.devnet.solana.com');
+        const programId = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+        const connection = new Connection('https://api.mainnet-beta.solana.com');
         
         async function main() {
             let total = 0;

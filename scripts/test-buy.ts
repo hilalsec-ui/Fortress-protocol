@@ -5,13 +5,13 @@ import { getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_
 import * as fs from "fs";
 import { FortressProtocol } from "../target/types/fortress_protocol";
 
-const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
 
 async function main() {
   const kp = anchor.web3.Keypair.fromSecretKey(
     new Uint8Array(JSON.parse(fs.readFileSync("/home/dev/my-wallet.json", "utf-8")))
   );
-  const conn = new anchor.web3.Connection("https://api.devnet.solana.com", "confirmed");
+  const conn = new anchor.web3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
   const provider = new anchor.AnchorProvider(conn, new anchor.Wallet(kp), { commitment: "confirmed" });
   anchor.setProvider(provider);
   const program = anchor.workspace.FortressProtocol as Program<FortressProtocol>;

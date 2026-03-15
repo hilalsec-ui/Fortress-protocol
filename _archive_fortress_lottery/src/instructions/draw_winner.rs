@@ -116,7 +116,7 @@ pub struct DrawLpmWinner<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        address = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2".parse::<Pubkey>().unwrap()
+        address = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj".parse::<Pubkey>().unwrap()
     )]
     pub dpt_mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -463,7 +463,7 @@ pub struct DrawDplWinner<'info> {
 
 pub fn draw_dpl_winner(ctx: Context<DrawDplWinner>, tier: u8) -> Result<()> {
     // [STACK_OPTIMIZATION] Verify FPT mint address
-    require_keys_eq!(ctx.accounts.dpt_mint.key(), pubkey!("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"), LotteryError::InvalidLotteryType);
+    require_keys_eq!(ctx.accounts.dpt_mint.key(), pubkey!("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"), LotteryError::InvalidLotteryType);
 
     // [SECURITY_NOTICE] Temporary Clock-Based Entropy - Pending Pyth SDK Upgrade
     let config = &mut ctx.accounts.config;
@@ -653,7 +653,7 @@ pub struct DrawWplWinner<'info> {
 
     /// CHECK: Address checked in function to save stack space
     #[account(
-        address = pubkey!("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2")
+        address = pubkey!("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj")
     )]
     pub dpt_mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -916,7 +916,7 @@ pub struct DrawMplWinner<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        address = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2".parse::<Pubkey>().unwrap()
+        address = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj".parse::<Pubkey>().unwrap()
     )]
     pub dpt_mint: Box<InterfaceAccount<'info, Mint>>,
 

@@ -9,12 +9,21 @@ import { extractRecentWinnersFromVaults, RecentWinner } from "@/services/winnerS
 import { getWinnerHistory } from "@/services/participantsService";
 import { fetchAllWinnerHistories } from "@/services/winnerHistoryService";
 import { ShieldCheck, ExternalLink, Copy, CheckCheck, Cpu, Hash, Layers, AlertTriangle, Eye, ArrowRight } from "lucide-react";
+import { PROGRAM_ID, FPT_MINT, ADMIN_WALLET, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM, SB_MAINNET_QUEUE } from "@/utils/constants";
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
-const SB_PROGRAM_ID = "Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2";
-const SB_EXPLORER_URL = "https://ondemand.switchboard.xyz/solana/devnet";
-const SOLSCAN_TX = (sig: string) => `https://solscan.io/tx/${sig}?cluster=devnet`;
-const SOLSCAN_ACCOUNT = (addr: string) => `https://solscan.io/account/${addr}?cluster=devnet`;
+const SB_PROGRAM_ID = SB_ON_DEMAND_PROGRAM;
+const SB_EXPLORER_URL = "https://ondemand.switchboard.xyz/solana/mainnet-beta";
+const SOLSCAN_TX = (sig: string) => `https://solscan.io/tx/${sig}`;
+const SOLSCAN_ACCOUNT = (addr: string) => `https://solscan.io/account/${addr}`;
+
+const CONTRACT_ADDRESSES = [
+  { label: "Fortress Program (mainnet)", value: PROGRAM_ID },
+  { label: "FPT Token Mint (mainnet)", value: FPT_MINT },
+  { label: "Admin Authority (mainnet)", value: ADMIN_WALLET },
+  { label: "Crank Wallet (mainnet)", value: CRANK_AUTHORITY },
+  { label: "Switchboard Queue (mainnet)", value: SB_MAINNET_QUEUE },
+];
 
 /* ── Small helpers ────────────────────────────────────────────────────── */
 function CopyButton({ value }: { value: string }) {
@@ -263,7 +272,7 @@ winner  = final % participant_count`}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <div className={`text-xs uppercase tracking-wider mb-1 ${c.subtle}`}>Switchboard On-Demand Program (devnet)</div>
+                <div className={`text-xs uppercase tracking-wider mb-1 ${c.subtle}`}>Switchboard On-Demand Program (mainnet)</div>
                 <div className={`flex items-center gap-1 font-mono text-sm break-all ${isDarkMode ? "text-cyan-300" : "text-cyan-700"}`}>
                   {SB_PROGRAM_ID}
                   <CopyButton value={SB_PROGRAM_ID} />
@@ -404,6 +413,33 @@ winner  = final % participant_count`}
                 ))}
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* ═══ CONTRACT ADDRESSES ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+          <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${c.h}`}>
+            <Layers className={`w-5 h-5 ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`} />
+            On-Chain Addresses
+          </h2>
+          <div className="space-y-3">
+            {CONTRACT_ADDRESSES.map(({ label, value }) => (
+              <div key={value} className={`rounded-xl p-4 ${isDarkMode ? "border border-white/10 bg-white/[0.03]" : "border border-gray-200 bg-white"}`}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div className={`text-xs uppercase tracking-wider mb-1 ${c.subtle}`}>{label}</div>
+                    <div className={`flex items-center gap-1 font-mono text-sm break-all ${isDarkMode ? "text-emerald-300" : "text-emerald-700"}`}>
+                      {value}
+                      <CopyButton value={value} />
+                    </div>
+                  </div>
+                  <a href={SOLSCAN_ACCOUNT(value)} target="_blank" rel="noopener noreferrer"
+                    className={`shrink-0 inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${isDarkMode ? "bg-white/5 hover:bg-white/10 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}>
+                    Solscan <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
 

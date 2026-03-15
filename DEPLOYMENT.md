@@ -12,7 +12,7 @@
 |-------|-------|--------|
 | **Program ID (Active)** | `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb` | ✅ Current |
 | **Network** | Solana Devnet | ✅ Configured |
-| **Authority Wallet** | `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg` | ✅ Active |
+| **Authority Wallet** | `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv` | ✅ Active |
 | **Keypair Location** | `target/deploy/fortress_lottery-keypair.json` | ✅ Present |
 | **IDL Address** | (Will be available after deployment) | ⏳ Pending |
 
@@ -31,9 +31,9 @@
 ```typescript
 // Fortress Lottery Program
 export const PROGRAM_ID = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb";
-export const FPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
+export const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 export const RPC_ENDPOINT = "https://api.devnet.solana.com";
-export const AUTHORITY = "EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg";
+export const AUTHORITY = "EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv";
 ```
 
 ---
@@ -76,7 +76,7 @@ All PDAs are keyed with the new Program ID.
 
 ### Step 1: Verify Wallet Balance
 ```bash
-solana balance EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg --url devnet
+solana balance EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv --url devnet
 ```
 
 **Required**: At least 5 SOL (for deployment + state initialization)
@@ -90,7 +90,7 @@ anchor deploy --provider.cluster devnet
 **Expected Output**:
 ```
 Deploying cluster: https://api.devnet.solana.com
-Upgrade authority: EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg
+Upgrade authority: EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv
 Deploying program "fortress_lottery"...
 Program deployed to: HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb
 ```
@@ -112,7 +112,7 @@ This will:
 solana program show HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb --url devnet
 
 # Check wallet balance
-solana balance EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg --url devnet
+solana balance EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv --url devnet
 ```
 
 ---
@@ -145,7 +145,7 @@ fortress_lottery = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
 ```typescript
 export const PROGRAM_ID = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb";
 export const RPC_ENDPOINT = "https://api.devnet.solana.com";
-export const FPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
+export const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 ```
 
 ---
@@ -171,7 +171,7 @@ export const FPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
 - [x] Frontend constants updated
 - [x] IDL and Types refreshed
 - [x] Old Program ID deprecated
-- [x] Authority wallet: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- [x] Authority wallet: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 - [ ] Wallet has sufficient SOL (verify with step 1 above)
 - [ ] Program deployed (run: `anchor deploy --provider.cluster devnet`)
 - [ ] Registry initialized (run: `anchor run init-devnet`)

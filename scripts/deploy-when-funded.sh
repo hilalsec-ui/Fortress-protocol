@@ -17,9 +17,9 @@
 
 set -e
 
-WALLET_ADDRESS="EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg"
+WALLET_ADDRESS="EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv"
 REQUIRED_SOL=6
-RPC_URL="https://api.devnet.solana.com"
+RPC_URL="https://api.mainnet-beta.solana.com"
 WALLET_PATH="/home/dev/my-wallet.json"
 
 echo "═══════════════════════════════════════════════════════════════════════════"
@@ -85,7 +85,7 @@ echo "════════════════════════�
 echo " DEPLOYMENT COMPLETE!"
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo ""
-echo "Program ID: HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
+echo "Program ID: 2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
 echo ""
 echo "Next steps:"
 echo "  1. Reset LPM vaults: npx ts-node scripts/reset-lpm-vaults.ts"

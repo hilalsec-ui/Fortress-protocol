@@ -20,7 +20,10 @@ import * as sb from '@switchboard-xyz/on-demand';
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT
   ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT
-  ?? 'https://api.devnet.solana.com';
+  ?? 'https://api.mainnet-beta.solana.com';
+
+// Allow up to 60 s for the oracle TEE to process the commit before giving up.
+export const maxDuration = 60;
 
 const MAX_REVEAL_ATTEMPTS = 8;
 const RETRY_DELAY_MS = 5_000;

@@ -22,8 +22,8 @@ describe("Buy Ticket with Dynamic Pricing", () => {
   const authority = provider.wallet as anchor.Wallet;
 
   // Known addresses from deployment
-  const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
-  const ADMIN_WALLET = new PublicKey("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg");
+  const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
+  const ADMIN_WALLET = new PublicKey("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv");
 
   // PDAs
   let globalRegistry: PublicKey;

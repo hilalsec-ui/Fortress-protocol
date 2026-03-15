@@ -17,7 +17,7 @@ pub enum WithdrawAsset {
 pub struct UnifiedWithdrawFromTreasuryVault<'info> {
     #[account(
         mut,
-        address = pubkey!("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg")
+        address = pubkey!("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv")
     )]
     pub admin: Signer<'info>,
 
@@ -31,7 +31,7 @@ pub struct UnifiedWithdrawFromTreasuryVault<'info> {
     pub treasury_vault: UncheckedAccount<'info>,
 
     /// FPT Mint (Token-2022)
-    #[account(address = pubkey!("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"))]
+    #[account(address = pubkey!("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"))]
     pub fpt_mint: Box<InterfaceAccount<'info, Mint>>,
 
     /// Treasury's FPT ATA — owned by treasury_vault (sol_vault PDA, seeds=[b"sol_vault"]).
@@ -71,28 +71,17 @@ pub fn unified_withdraw_from_treasury_vault(
     asset: WithdrawAsset,
     amount: u64,
 ) -> Result<()> {
-    // [DIAGNOSTIC] Log all key values so simulation logs show exactly where failure occurs
-    msg!("[WITHDRAW] asset={:?}, amount={}, admin={}, vault={}",
-        asset as u8, amount,
-        ctx.accounts.admin.key(),
-        ctx.accounts.treasury_vault.key()
-    );
-
     // [ACCESS CONTROL] Must be the hardcoded admin pubkey
     require_keys_eq!(
         ctx.accounts.admin.key(),
-        pubkey!("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg"),
+        pubkey!("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv"),
         LotteryError::UnauthorizedDraw
     );
-    msg!("[WITHDRAW] Access control: OK");
-
     require!(amount > 0, LotteryError::InvalidAmount);
 
     match asset {
         WithdrawAsset::SOL => {
             let vault_balance = ctx.accounts.treasury_vault.lamports();
-            msg!("[WITHDRAW] SOL: vault_balance={}, requested={}, min_reserve={}",
-                vault_balance, amount, TREASURY_VAULT_MIN_LAMPORTS);
 
             // [RENT PROTECTION] Must leave at least 0.003 SOL in vault
             require!(
@@ -120,11 +109,9 @@ pub fn unified_withdraw_from_treasury_vault(
                 amount,
             )?;
 
-            msg!("[WITHDRAW] SOL transfer complete: {} lamports → admin", amount);
         }
         WithdrawAsset::FPT => {
             let fpt_balance = ctx.accounts.treasury_fpt_ata.amount;
-            msg!("[WITHDRAW] FPT: ata_balance={}, requested={}", fpt_balance, amount);
 
             require!(fpt_balance >= amount, LotteryError::InsufficientBalance);
 
@@ -145,7 +132,6 @@ pub fn unified_withdraw_from_treasury_vault(
             );
             transfer_checked(cpi_ctx, amount, 6)?;
 
-            msg!("[WITHDRAW] FPT transfer complete: {} tokens → admin ATA", amount);
         }
     }
     Ok(())
@@ -215,10 +201,6 @@ pub fn fund_oracle_crank(ctx: Context<FundOracleCrank>, lamports: u64) -> Result
         amount,
     )?;
 
-    msg!(
-        "[FUND_CRANK] Transferred {} lamports from treasury vault to CRANK_AUTHORITY",
-        amount
-    );
     Ok(())
 }
 

@@ -10,7 +10,7 @@ async function checkRegistry() {
     new Uint8Array(JSON.parse(fs.readFileSync(walletPath, 'utf-8')))
   );
   
-  const connection = new anchor.web3.Connection('https://api.devnet.solana.com', 'confirmed');
+  const connection = new anchor.web3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
   const wallet = new anchor.Wallet(walletKeypair);
   const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
   anchor.setProvider(provider);

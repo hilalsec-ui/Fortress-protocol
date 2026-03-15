@@ -1,7 +1,7 @@
 /**
  * switchboardPriceService.ts
  *
- * FPT ticket pricing via Switchboard On-Demand CrossbarClient.
+ * FPT ticket pricing via live SOL/USD from CoinGecko (primary) or Coinbase (fallback).
  *
  * On-chain formula (oracle.rs `compute_fpt_ticket_cost`):
  *   fpt_per_ticket = tier_usd × DEFAULT_FPT_PER_SOL × 10^12 / sol_usd_6dec
@@ -13,12 +13,11 @@
  *
  * Example: $5 tier @ $180 SOL → 5 × (10^9 / 180) ≈ 27,777,778 µFPT = 27.78 FPT
  */
-import { CrossbarClient } from "@switchboard-xyz/common";
 
-// ── Constants mirroring oracle.rs ─────────────────────────────────────────
+// ── Constants mirroring oracle.rs ──────────────────────────────────────────
 /** oracle.rs DEFAULT_FPT_PER_SOL */
 const DEFAULT_FPT_PER_SOL = 1_000;
-/** oracle.rs DEFAULT_SOL_USD_6DEC — fallback when Crossbar is unreachable */
+/** oracle.rs DEFAULT_SOL_USD_6DEC — fallback when all price sources unreachable */
 const DEFAULT_SOL_USD_6DEC = 180_000_000; // $180.00
 const DEFAULT_SOL_PRICE_USD = DEFAULT_SOL_USD_6DEC / 1_000_000; // 180
 
@@ -27,79 +26,116 @@ export const DEFAULT_FPT_PER_USD = Math.round(
   (DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / DEFAULT_SOL_USD_6DEC,
 ); // ≈ 5_555_556
 
-/** Minimum fptPerUsd6dec — clamps display when SOL approaches $1 000 */
+/** Minimum fptPerUsd6dec — clamps display when SOL approaches $1 000 */
 export const MIN_FPT_PER_USD = Math.round(
   (DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / 1_000_000_000,
 ); // = 1_000_000
 
-// ── Cache ─────────────────────────────────────────────────────────────────
+/** FPT SPL mint address (mainnet) */
+const FPT_MINT = '3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj';
+
+// ── Cache ──────────────────────────────────────────────────────────────────────
 let _cache: {
+  solUsd: number;
   fptUsd: number;
   fptPerUsd6dec: number;
+  fptMarketUsd: number | null;
   fetchedAt: number;
 } | null = null;
 const CACHE_TTL_MS = 30_000;
 
-// ── SOL/USD fetch via Switchboard CrossbarClient ──────────────────────────
-async function fetchSolUsdViaCrossbar(): Promise<number | null> {
+// ── fetch helpers ───────────────────────────────────────────────────────────────
+async function fetchWithTimeout(url: string, ms = 5000): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
   try {
-    const crossbar = CrossbarClient.default();
-
-    // simulateJobs POSTs the job definition directly — no store step needed.
-    // This mirrors what a Switchboard oracle node does when evaluating the feed.
-    const response = await crossbar.simulateJobs({
-      jobs: [
-        {
-          tasks: [
-            {
-              httpTask: {
-                url: "https://api.coinbase.com/v2/exchange-rates?currency=SOL",
-              },
-            },
-            { jsonParseTask: { path: "$.data.rates.USD" } },
-          ],
-        },
-      ],
-    } as any);
-
-    const raw = response?.results?.[0];
-    const price = typeof raw === "number" ? raw : parseFloat(String(raw));
-    if (isFinite(price) && price > 0) return price;
-    return null;
-  } catch (err) {
-    console.warn("[SBPrice] CrossbarClient error:", err);
-    return null;
+    const res = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+    return res;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-// ── Public API ────────────────────────────────────────────────────────────
+async function fetchSolUsd(): Promise<number | null> {
+  // Primary: CoinGecko (free, no auth required)
+  try {
+    const res = await fetchWithTimeout(
+      'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const price = data?.solana?.usd;
+      if (typeof price === 'number' && price > 0) return price;
+    }
+  } catch { /* fall through */ }
+
+  // Fallback: Coinbase
+  try {
+    const res = await fetchWithTimeout(
+      'https://api.coinbase.com/v2/exchange-rates?currency=SOL',
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const price = parseFloat(data?.data?.rates?.USD);
+      if (isFinite(price) && price > 0) return price;
+    }
+  } catch { /* fall through */ }
+
+  return null;
+}
 
 /**
- * Fetch live SOL/USD via Switchboard Crossbar and compute fptPerUsd6dec using
- * the exact formula from oracle.rs `compute_fpt_ticket_cost`.
- * Falls back to DEFAULT_SOL_USD_6DEC ($180) on any error.
+ * Fetch FPT's live market price from Jupiter Price API v2.
+ * Returns null when there is no DEX market / liquidity for the token.
+ */
+async function fetchFptMarketPrice(): Promise<number | null> {
+  try {
+    const res = await fetchWithTimeout(
+      `https://api.jup.ag/price/v2?ids=${FPT_MINT}`,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const price = parseFloat(data?.data?.[FPT_MINT]?.price);
+      if (isFinite(price) && price > 0) return price;
+    }
+  } catch { /* no DEX market yet */ }
+  return null;
+}
+
+// ── Public API ──────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch live SOL/USD (for oracle-based ticket pricing) and FPT's DEX market
+ * price (from Jupiter) in parallel.  fptMarketUsd is null when FPT has no
+ * liquidity yet — callers must handle this case honestly in the UI.
  */
 export async function fetchFptUsdPrice(): Promise<{
+  solUsd: number;
   fptUsd: number;
   fptPerUsd6dec: number;
+  fptMarketUsd: number | null;
 }> {
   const now = Date.now();
   if (_cache && now - _cache.fetchedAt < CACHE_TTL_MS) {
-    return { fptUsd: _cache.fptUsd, fptPerUsd6dec: _cache.fptPerUsd6dec };
+    return {
+      solUsd: _cache.solUsd,
+      fptUsd: _cache.fptUsd,
+      fptPerUsd6dec: _cache.fptPerUsd6dec,
+      fptMarketUsd: _cache.fptMarketUsd,
+    };
   }
 
   let solUsd6dec = DEFAULT_SOL_USD_6DEC;
-  const liveSolPrice = await fetchSolUsdViaCrossbar();
+  // Fetch SOL/USD and FPT DEX market price in parallel
+  const [liveSolPrice, fptMarketUsd] = await Promise.all([
+    fetchSolUsd(),
+    fetchFptMarketPrice(),
+  ]);
 
   if (liveSolPrice !== null) {
     solUsd6dec = Math.round(liveSolPrice * 1_000_000);
-    console.log(
-      `[SBPrice] SOL/USD = $${liveSolPrice.toFixed(2)}, sol_usd_6dec = ${solUsd6dec}`,
-    );
   } else {
-    console.warn(
-      `[SBPrice] Fallback: sol_usd_6dec = ${DEFAULT_SOL_USD_6DEC} ($${DEFAULT_SOL_PRICE_USD})`,
-    );
+    console.warn(`[SBPrice] All price sources failed — using fallback $${DEFAULT_SOL_PRICE_USD} SOL`);
   }
 
   // Exact mirror of oracle.rs compute_fpt_ticket_cost:
@@ -110,9 +146,10 @@ export async function fetchFptUsdPrice(): Promise<{
   );
   // USD value of 1 FPT = sol_usd_6dec / (DEFAULT_FPT_PER_SOL × 10^6)
   const fptUsd = solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000);
+  const solUsd = solUsd6dec / 1_000_000;
 
-  _cache = { fptUsd, fptPerUsd6dec, fetchedAt: now };
-  return { fptUsd, fptPerUsd6dec };
+  _cache = { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd, fetchedAt: now };
+  return { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd };
 }
 
 /**
@@ -145,3 +182,4 @@ export function computeMaxFptAmount(
 export function formatFPT(raw: number | bigint): string {
   return (Number(raw) / 1_000_000).toFixed(4);
 }
+

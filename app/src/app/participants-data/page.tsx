@@ -447,7 +447,7 @@ export default function ParticipantsDataPage() {
             </div>
             <div>
               <h1 className={`text-2xl sm:text-3xl font-black ${isDarkMode ? 'bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent' : 'bg-gradient-to-r from-green-600 to-cyan-600 bg-clip-text text-transparent'}`}>Participants Data</h1>
-              <p className={`text-sm ${c.subtle}`}>Live from Solana devnet · all 16 vaults</p>
+              <p className={`text-sm ${c.subtle}`}>Live from Solana Mainnet · all 16 vaults</p>
             </div>
           </div>
           <button
@@ -699,7 +699,7 @@ export default function ParticipantsDataPage() {
                       </td>
                       <td className="px-4 py-3">
                         <a
-                          href={`https://explorer.solana.com/address/${row.wallet}?cluster=devnet`}
+                          href={`https://explorer.solana.com/address/${row.wallet}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-green-500/70 hover:text-green-600 transition-colors"

@@ -3,9 +3,9 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import fs from "fs";
 import os from "os";
 
-const PROGRAM_ID = new PublicKey("BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW");
+const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
 const PRICING_CONFIG_PDA = new PublicKey("982GraduHuXxwgoQFeecxnTR8ED9pggcHgXBotJH1dgh");
-const RPC = "https://api.devnet.solana.com";
+const RPC = "https://api.mainnet-beta.solana.com";
 
 async function main() {
   const connection = new Connection(RPC, "confirmed");

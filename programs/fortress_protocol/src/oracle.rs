@@ -5,13 +5,13 @@ use crate::errors::LotteryError;
 pub const HASH_K1: u64 = 0x9e3779b97f4a7c15;
 pub const HASH_K2: u64 = 0x517cc1b727220a95;
 
-/// Switchboard V3 On-Demand program (verified EXE on devnet)
+/// Switchboard V3 On-Demand program (mainnet)
 pub const SB_ON_DEMAND_PROGRAM: Pubkey = pubkey!("Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2");
 
 /// Server-side crank wallet — auto-triggers draws silently (no user wallet popup).
 /// On-chain reference used to distinguish crank from manual-fallback callers so
 /// the vault only pays out the trigger bounty to real users, not to the crank.
-pub const CRANK_AUTHORITY: Pubkey = pubkey!("CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz");
+pub const CRANK_AUTHORITY: Pubkey = pubkey!("BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5");
 
 // ── Switchboard On-Demand Pull-Oracle price-feed constants ────────────────────
 

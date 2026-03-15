@@ -9,7 +9,7 @@ import {
 } from "@solana/spl-token";
 import { FortressProtocol } from "../target/types/fortress_protocol";
 
-const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
 
 async function createTokenAccountIfNeeded(
   provider: anchor.AnchorProvider,
@@ -102,7 +102,7 @@ async function initializeAllPDAs() {
   );
   console.log("DEBUG: Wallet publicKey:", walletKeypair.publicKey.toString());
   
-  const connection = new anchor.web3.Connection('https://api.devnet.solana.com', 'confirmed');
+  const connection = new anchor.web3.Connection('https://api.mainnet-beta.solana.com', 'confirmed');
   const wallet = new anchor.Wallet(walletKeypair);
   const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
   anchor.setProvider(provider);

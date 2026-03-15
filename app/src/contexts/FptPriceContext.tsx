@@ -4,10 +4,17 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { fetchFptUsdPrice, DEFAULT_FPT_PER_USD } from "@/services/switchboardPriceService";
 
 interface FptPriceState {
-  /** Current FPT price in USD (e.g. 0.000017 for BONK-mirrored) */
+  /** Current SOL price in USD */
+  solUsd: number;
+  /** Current FPT price in USD (oracle-implied) */
   fptUsd: number;
   /** FPT base units per $1 USD (6 decimal, e.g. 500_000 = 0.5 FPT/$) */
   fptPerUsd6dec: number;
+  /**
+   * Live FPT/USD market price from Jupiter DEX.
+   * null = token has no liquidity / no DEX market yet.
+   */
+  fptMarketUsd: number | null;
   /** True while the first fetch is in progress */
   isLoading: boolean;
   /** Last successful refresh timestamp (ms) */
@@ -15,8 +22,10 @@ interface FptPriceState {
 }
 
 const DEFAULT_STATE: FptPriceState = {
+  solUsd: 0,
   fptUsd: 1_000_000 / DEFAULT_FPT_PER_USD,
   fptPerUsd6dec: DEFAULT_FPT_PER_USD,
+  fptMarketUsd: null,
   isLoading: true,
   lastUpdatedAt: 0,
 };
@@ -28,8 +37,8 @@ export function FptPriceProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = useCallback(async () => {
     try {
-      const { fptUsd, fptPerUsd6dec } = await fetchFptUsdPrice();
-      setState({ fptUsd, fptPerUsd6dec, isLoading: false, lastUpdatedAt: Date.now() });
+      const { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd } = await fetchFptUsdPrice();
+      setState({ solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd, isLoading: false, lastUpdatedAt: Date.now() });
     } catch {
       setState(prev => ({ ...prev, isLoading: false }));
     }

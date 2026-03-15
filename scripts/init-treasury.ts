@@ -7,12 +7,12 @@ import * as fs from "fs";
 const idlPath = "./target/idl/fortress_protocol.json";
 const idl = JSON.parse(fs.readFileSync(idlPath, "utf8"));
 
-const PROGRAM_ID = new PublicKey("BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW");
+const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
 
 async function main() {
   // Setup provider
   const connection = new anchor.web3.Connection(
-    "https://api.devnet.solana.com",
+    "https://api.mainnet-beta.solana.com",
     "confirmed"
   );
   

@@ -1,15 +1,14 @@
 /**
  * POST /api/draw/init
  *
- * Builds the unsigned TX1 for the manual fallback draw path.
- * The Switchboard SDK runs server-side (avoids client-side Node.js bundle issues).
+ * Builds the unsigned TX for the manual fallback draw path (Step 1).
+ * Uses the same pre-initialised SB RandomnessAccount as the house crank —
+ * no fresh keypair, no oracle contact at build time, no commitIx needed.
  *
- * NO crank wallet involved — user pays everything, user is the only signer.
- * The transaction is returned unsigned; the client adds:
- *   - rngKp signature (passed as `signers: [rngKp]` to sendTransaction)
- *   - user wallet signature (Phantom popup)
+ * The oracle observes the PendingDraw on-chain and commits/reveals autonomously
+ * (identical mechanism to the house-crank path in /api/draw/request).
  *
- * Input:  { lottery_type, tier, user_pubkey, rng_pubkey }
+ * Input:  { lottery_type, tier, user_pubkey }
  * Output: { success: true, transaction: "<base64 unsigned TX>" }
  */
 
@@ -17,20 +16,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   Connection,
   ComputeBudgetProgram,
-  Keypair,
   PublicKey,
   SystemProgram,
   Transaction,
 } from '@solana/web3.js';
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
-import * as sb from '@switchboard-xyz/on-demand';
 import { guardRequest, validateInputs, safeError } from '../../_guard';
 
 const IDL = require('@/idl/fortress_protocol.json');
 
-const RPC_ENDPOINT    = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.devnet.solana.com';
-const PROGRAM_ID      = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
-const SB_DEVNET_QUEUE = new PublicKey('EYiAmGSdsQTuCw413V5BzaruWuCCSDgTPtBGvLkXHbe7');
+const RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.mainnet-beta.solana.com';
+const PROGRAM_ID   = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
 
 const LOTTERY_TYPE_ID: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };
 const VAULT_SEED: Record<string, string> = {
@@ -38,6 +34,15 @@ const VAULT_SEED: Record<string, string> = {
   DPL: 'vault_dpl',
   WPL: 'vault_wpl',
   MPL: 'vault_mpl',
+};
+
+// Pre-initialised SB RandomnessAccounts — same accounts used by the house crank.
+// No fresh account creation needed; the oracle commits/reveals autonomously.
+const SB_RANDOMNESS_ACCOUNTS: Record<string, Record<number, string>> = {
+  LPM: { 5: '3RNBFv6gsfLVAdPShje3U4oWksJ5yei8BxAPEpkpjvcZ', 10: '89yqdqDCCEVEcDDtiSruUzbogPwvSafQogVw6RrvWyXr', 20: 'ABztidiDtQc5f8AWpCEAH812SsMWPFfx1cj6hq97jsPK', 50: 'BaVkrGGXenHmyJiugxqabVUZT688cRdqbzWTR5B8FRRd' },
+  DPL: { 5: 'DXD7WX7ZJ6J3G4en9QjfLMED4NNFaUccnH2p4SBDnELi', 10: 'BVsgsmAcgxuut5m6iHTVq2cjQ9Kou8zwGfwb9oBAUect', 15: '54jw437jQKWWx4fSNhUm1ksVyXMbtNVPExDmPzNX7VR8', 20: 'AQqoHS5s5VABzpGdjTRcxDUwTWgs8bWtM8gTuMAzXS1T' },
+  WPL: { 5: 'EoHXzefgFstYot72iswj9oZ3UHbPdCv44boodxDD4Age', 10: 'H5ekLQD7NwKgcpc5AJ73nEohv5QTxVUVYHFAh2kMGfSR', 15: '5RnkTBHtqV9j7Z9xEiDDixwsCLNwNKjDa9N4vBr74XYt', 20: '8YZaUddM74dH3Aqe3wAYUyJnVNDQaZyCfh7UpS8pKW4C' },
+  MPL: { 5: '2H1VT31g6gXLfpoT92D3yvtqCBaztXELiueUXYdPKUMB', 10: 'Hag4Kd215YVSCVsQfA9K85PmF2LBRij3WF65FAJbjNNy', 15: '2d8TfV4tmGNT5bANfYPPy3CaqhmUczKzp9DEinE6kaTA', 20: 'Hhza1xnE1cn89xTE3Mmn9Zx5y426iUdpdkySAjUMpCrD' },
 };
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -53,15 +58,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 }
 
 async function handlePost(req: NextRequest): Promise<NextResponse> {
-  // 1. Parse + validate inputs
-  let lotteryType: string, tier: number, userPubkeyStr: string, rngPubkeyStr: string;
+  let lotteryType: string, tier: number, userPubkeyStr: string;
   try {
     const body = await req.json();
     if (typeof body.lottery_type !== 'string') throw new Error('bad type');
     lotteryType   = body.lottery_type.toUpperCase();
     tier          = Number(body.tier);
     userPubkeyStr = String(body.user_pubkey ?? '');
-    rngPubkeyStr  = String(body.rng_pubkey ?? '');
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
@@ -70,31 +73,21 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
   if (inputErr) return inputErr;
 
   let userPubkey: PublicKey;
-  let rngPubkey: PublicKey;
   try {
     userPubkey = new PublicKey(userPubkeyStr);
-    rngPubkey  = new PublicKey(rngPubkeyStr);
   } catch {
     return NextResponse.json({ error: 'Invalid public key' }, { status: 400 });
   }
 
+  const randomnessStr = SB_RANDOMNESS_ACCOUNTS[lotteryType]?.[tier];
+  if (!randomnessStr) {
+    return NextResponse.json({ error: `No RandomnessAccount configured for ${lotteryType} tier ${tier}` }, { status: 400 });
+  }
+  const randomnessAccount = new PublicKey(randomnessStr);
+
   const connection = new Connection(RPC_ENDPOINT, 'confirmed');
   const lotteryTypeId = LOTTERY_TYPE_ID[lotteryType];
 
-  // 2. Build SB program — user pubkey as wallet so authority field in SB account = user
-  const userWallet = {
-    publicKey: userPubkey,
-    signTransaction: async <T extends Transaction>(tx: T) => tx,
-    signAllTransactions: async <T extends Transaction>(txs: T[]) => txs,
-  };
-  const sbProgram = await sb.AnchorUtils.loadProgramFromConnection(connection, userWallet as any);
-
-  // 3. Build randomnessInitIx — only the publicKey is needed for IX building;
-  //    the real secretKey lives client-side and signs via sendTransaction({ signers: [rngKp] })
-  const fakeRngKp = { publicKey: rngPubkey, secretKey: new Uint8Array(64) } as Keypair;
-  const [rnd, randomnessInitIx] = await sb.Randomness.create(sbProgram, fakeRngKp, SB_DEVNET_QUEUE, userPubkey);
-
-  // 4. Build drawIx (request_draw_entropy) — user is requester + feePayer
   const [vaultPDA] = PublicKey.findProgramAddressSync(
     [Buffer.from(VAULT_SEED[lotteryType]), Buffer.from([tier])],
     PROGRAM_ID,
@@ -108,46 +101,37 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
     PROGRAM_ID,
   );
 
+  const userWallet = {
+    publicKey: userPubkey,
+    signTransaction: async <T extends Transaction>(tx: T) => tx,
+    signAllTransactions: async <T extends Transaction>(txs: T[]) => txs,
+  };
   const readProvider = new AnchorProvider(connection, userWallet as any, { commitment: 'confirmed' });
   const program = new Program(IDL, readProvider);
 
   const commitment = Array.from(crypto.getRandomValues(new Uint8Array(32)));
 
-  // Static cost covering all Switchboard charges:
-  //   • Randomness account rent (480 bytes)  = 4,231,680
-  //   • wSOL ATA(s) + oracle state accounts  = ~2,980,320 (empirically observed)
-  //   • Oracle queue commit fee              = 1,000,000
-  //   • TX fee buffer                        = ~10,000
-  // Total SB cost observed: ~8,222,000. We pad to 8,800,000 so the user sees
-  // zero or a tiny positive SOL change in their wallet popup (treasury pays the rest).
-  const EXTRA_LAMPORTS = new BN(8_800_000);
-
   const drawIx = await (program.methods as any)
-    .requestDrawEntropy(lotteryTypeId, tier, commitment, EXTRA_LAMPORTS)
+    .requestDrawEntropy(lotteryTypeId, tier, commitment, new BN(0))
     .accountsStrict({
       requester: userPubkey,
       lotteryState: vaultPDA,
       pendingDraw: pendingDrawPDA,
       treasuryVault: treasuryVaultPDA,
       systemProgram: SystemProgram.programId,
-      randomnessAccount: rngPubkey,
+      randomnessAccount,
     })
     .instruction();
 
-  const commitIx = await rnd.commitIx(SB_DEVNET_QUEUE, userPubkey);
   const { blockhash } = await connection.getLatestBlockhash('confirmed');
   const tx = new Transaction({ recentBlockhash: blockhash, feePayer: userPubkey });
   tx.add(
     ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }),
-    randomnessInitIx,
     drawIx,
-    commitIx,
   );
 
-  // Return unsigned — client will sign with: rngKp (via signers:[]) + user wallet (Phantom)
   const serialized = tx.serialize({ requireAllSignatures: false }).toString('base64');
-
-  console.log(`[DRAW-INIT] Built unsigned TX for ${lotteryType} T$${tier} rng=${rngPubkeyStr.slice(0, 8)}… user=${userPubkeyStr.slice(0, 8)}…`);
+  console.log(`[DRAW-INIT] Built unsigned TX for ${lotteryType} T$${tier} user=${userPubkeyStr.slice(0, 8)}…`);
 
   return NextResponse.json({ success: true, transaction: serialized });
 }

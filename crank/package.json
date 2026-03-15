@@ -1,8 +1,8 @@
 {
-  "name": "fortress-devnet-crank",
+  "name": "fortress-mainnet-crank",
   "version": "1.0.0",
   "private": true,
-  "description": "Automated crank for Fortress Protocol devnet lottery draws",
+  "description": "Automated crank for Fortress Protocol mainnet lottery draws",
   "scripts": {
     "dev": "ts-node index.ts",
     "start": "ts-node index.ts",

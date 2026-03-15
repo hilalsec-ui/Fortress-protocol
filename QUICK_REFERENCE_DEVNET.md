@@ -62,7 +62,7 @@ npx ts-node scripts/init-all-vaults.ts
 | Pricing Config | `5BLPKRyJJomAkiF9sguVQTGRgxuerjzB7tEppAevPGon` |
 | Treasury | `HuudKwarLqLycaFh9u6vfLXm8q17pgUi8namsHuspC1Q` |
 | Treasury Vault | `FLvbZWgmj8tJ4Gj8wuZfbKFPTViFdJ2UYV1DKZvdEvtW` |
-| FPT Token | `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2` |
+| FPT Token | `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj` |
 
 ---
 

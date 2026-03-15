@@ -26,7 +26,7 @@ solana config set --url http://localhost:8899
 
 # Fund the wallet with 1000 SOL
 echo "💰 Funding wallet with 1000 SOL..."
-solana airdrop 1000 EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg --url localhost
+solana airdrop 1000 EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv --url localhost
 
 # Check balance
 echo ""

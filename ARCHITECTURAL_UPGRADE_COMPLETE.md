@@ -174,10 +174,10 @@ Successfully implemented and deployed a comprehensive architectural upgrade to t
 - **Rent Reserve:** 0.05 SOL per vault for draw operations
 
 ### Token Configuration
-- **FPT Mint:** `7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2`
+- **FPT Mint:** `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`
 - **Token Standard:** Token-2022
 - **Decimals:** 6
-- **Admin Wallet:** `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- **Admin Wallet:** `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 
 ---
 

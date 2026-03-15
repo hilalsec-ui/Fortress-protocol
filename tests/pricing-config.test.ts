@@ -23,7 +23,7 @@ describe("Fortress Pricing Configuration", () => {
   const program = anchor.workspace.FortressProtocol as Program<FortressProtocol>;
 
   // Admin wallet (hardcoded in program)
-  const ADMIN_WALLET = new PublicKey("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg");
+  const ADMIN_WALLET = new PublicKey("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv");
 
   // Derive PricingConfig PDA
   const [pricingConfigPDA] = PublicKey.findProgramAddressSync(

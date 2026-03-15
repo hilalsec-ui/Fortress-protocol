@@ -53,7 +53,7 @@ pub fn close_ypl_account(ctx: Context<CloseYplAccount>, tier: u8) -> Result<()>
 ```
 
 **Security:**
-- Admin-only: `EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg`
+- Admin-only: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`
 - Participant count must be 0 before closing
 
 ### 3. **VaultState Enum Implementation**

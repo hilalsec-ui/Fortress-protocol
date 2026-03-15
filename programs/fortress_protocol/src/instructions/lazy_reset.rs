@@ -63,14 +63,6 @@ pub fn lazy_reset_vault(
         LotteryError::InsufficientBalance
     );
 
-    msg!(
-        "[LAZY_RESET] Resetting dead pool: type={}, tier={}, round={}->{}",
-        lottery_type,
-        tier,
-        vault.round_number,
-        vault.round_number + 1
-    );
-
     // ── Reset vault state ──
     vault.participant_count = 0;
     vault.balance = 0;
@@ -95,12 +87,6 @@ pub fn lazy_reset_vault(
         vault.end_time = current_time
             .checked_add(duration)
             .ok_or(LotteryError::ArithmeticOverflow)?;
-        msg!(
-            "[LAZY_RESET] Round {} starts at {}, ends at {}",
-            vault.round_number,
-            current_time,
-            vault.end_time
-        );
     }
 
     // ── Transfer reset gas/rent cost from treasury to user ──
@@ -121,7 +107,6 @@ pub fn lazy_reset_vault(
             ),
             rent_cost,
         )?;
-        msg!("[LAZY_RESET] Treasury reimbursed {} lamports for reset gas", rent_cost);
     }
 
     Ok(())

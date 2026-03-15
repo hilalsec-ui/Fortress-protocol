@@ -10,16 +10,16 @@ const {
 const fs = require('fs');
 const BN = require('bn.js');
 
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 const walletRaw = JSON.parse(fs.readFileSync('/home/dev/my-wallet.json', 'utf8'));
 const admin = Keypair.fromSecretKey(Uint8Array.from(walletRaw));
 const idl = JSON.parse(fs.readFileSync('/home/dev/fortress/app/src/idl/fortress_protocol.json', 'utf8'));
 const provider = new anchor.AnchorProvider(connection, new anchor.Wallet(admin), { commitment: 'confirmed' });
 const program = new anchor.Program(idl, provider);
 
-const FPT_MINT    = new PublicKey('7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2');
+const FPT_MINT    = new PublicKey('3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj');
 const PYTH        = new PublicKey('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
-const PROGRAM_ID  = new PublicKey('BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW');
+const PROGRAM_ID  = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
 
 // PDAs
 const [SOL_VAULT_PDA] = PublicKey.findProgramAddressSync([Buffer.from('sol_vault')], PROGRAM_ID);

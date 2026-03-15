@@ -3,7 +3,7 @@ const anchor = require('@coral-xyz/anchor');
 const { getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } = require('@solana/spl-token');
 const fs = require('fs');
 
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 const walletRaw = JSON.parse(fs.readFileSync('/home/dev/my-wallet.json', 'utf8'));
 const admin = Keypair.fromSecretKey(Uint8Array.from(walletRaw));
 const idl = JSON.parse(fs.readFileSync('/home/dev/fortress/app/src/idl/fortress_protocol.json', 'utf8'));

@@ -46,8 +46,6 @@ pub fn verify_and_create_winner_ata<'info>(
 
     // Create ATA if it doesn't exist — treasury pays, not the user
     if winner_ata_account.data_is_empty() {
-        msg!("[ATA] Creating ATA: {}", expected_winner_ata);
-
         anchor_spl::associated_token::create(CpiContext::new_with_signer(
             associated_token_program.clone(),
             anchor_spl::associated_token::Create {
@@ -60,10 +58,6 @@ pub fn verify_and_create_winner_ata<'info>(
             },
             signer_seeds,
         ))?;
-
-        msg!("[ATA] ATA created successfully");
-    } else {
-        msg!("[ATA] ATA already exists");
     }
 
     Ok(expected_winner_ata)
@@ -98,13 +92,6 @@ pub fn reset_vault_after_draw(
     if duration_seconds > 0 {
         let current_time = Clock::get()?.unix_timestamp;
         vault.end_time = current_time.checked_add(duration_seconds).ok_or(LotteryError::ArithmeticOverflow)?;
-        msg!(
-            "[RESET] Vault reset - Round {}, next draw at {}",
-            vault.round_number,
-            vault.end_time
-        );
-    } else {
-        msg!("[RESET] Vault reset - Round {}", vault.round_number);
     }
 
     Ok(())

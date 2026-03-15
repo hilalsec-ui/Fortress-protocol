@@ -25,8 +25,8 @@ import { guardRequest, validateInputs, safeError } from '../../_guard';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 // Server-side RPC: prefer unpublished env var to avoid leaking API keys in client bundle
-const RPC_ENDPOINT    = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.devnet.solana.com';
-const SB_DEVNET_QUEUE = new PublicKey('EYiAmGSdsQTuCw413V5BzaruWuCCSDgTPtBGvLkXHbe7');
+const RPC_ENDPOINT    = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_URL ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.mainnet-beta.solana.com';
+const SB_MAINNET_QUEUE = new PublicKey('3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1');
 const PROGRAM_ID      = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
 
 const LOTTERY_TYPE_ID: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };
@@ -164,7 +164,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
     try {
       // No authority_ arg: SDK reads stored authority (CRANK_AUTHORITY) from the on-chain
       // Randomness account. Authority is isSigner:true in the commit instruction.
-      const commitIx = await rnd.commitIx(SB_DEVNET_QUEUE);
+      const commitIx = await rnd.commitIx(SB_MAINNET_QUEUE);
       const { blockhash } = await connection.getLatestBlockhash('confirmed');
       // feePayer = userPubkey — user's wallet pays all transaction fees
       const commitTx = new Transaction({ recentBlockhash: blockhash, feePayer: userPubkey }).add(commitIx);
@@ -272,7 +272,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
   // 5. Switchboard commit (assigns oracle + records seedSlot on-chain)
   let commitOk = false;
   try {
-    const commitIx  = await rnd.commitIx(SB_DEVNET_QUEUE);
+    const commitIx  = await rnd.commitIx(SB_MAINNET_QUEUE);
     const commitSig = await provider.sendAndConfirm(new Transaction().add(commitIx), [], {
       skipPreflight: true,
       commitment: 'confirmed',

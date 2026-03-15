@@ -18,7 +18,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //   Authorization: Bearer <secret>
 //
 // If CRANK_API_SECRET is not set in the environment the routes run in
-// open mode (devnet-only convenience — always set CRANK_API_SECRET in production). Log a warning at startup.
+// open mode — always set CRANK_API_SECRET in production. Log a warning at startup.
 
 const API_SECRET = process.env.CRANK_API_SECRET;
 if (!API_SECRET) {

@@ -7,7 +7,7 @@ use anchor_lang::solana_program::system_instruction;
 
 #[derive(Accounts)]
 pub struct InitializeGlobalRegistry<'info> {
-    #[account(mut, address = pubkey!("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg"))]
+    #[account(mut, address = pubkey!("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv"))]
     pub admin: Signer<'info>,
     #[account(init, payer = admin, space = GlobalRegistry::LEN, seeds = [b"global_registry"], bump)]
     pub registry: Account<'info, GlobalRegistry>,
@@ -25,7 +25,7 @@ pub fn initialize_global_registry(ctx: Context<InitializeGlobalRegistry>) -> Res
 
 #[derive(Accounts)]
 pub struct InitializeTreasury<'info> {
-    #[account(mut, address = pubkey!("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg"))]
+    #[account(mut, address = pubkey!("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv"))]
     pub admin: Signer<'info>,
     #[account(init, payer = admin, space = Treasury::LEN, seeds = [Treasury::SEED_PREFIX], bump)]
     pub treasury: Account<'info, Treasury>,
@@ -44,7 +44,7 @@ pub fn initialize_treasury(ctx: Context<InitializeTreasury>) -> Result<()> {
 #[derive(Accounts)]
 #[instruction(lottery_type_id: u8, tier: u8)]
 pub struct InitializeVault<'info> {
-    #[account(mut, address = pubkey!("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg"))]
+    #[account(mut, address = pubkey!("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv"))]
     pub admin: Signer<'info>,
     #[account(
         init, payer = admin, space = LotteryVault::LEN,

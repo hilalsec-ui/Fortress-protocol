@@ -17,7 +17,7 @@ async function main() {
   console.log("Admin Wallet:", adminWallet.toBase58());
 
   // FPT Token
-  const fptMint = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+  const fptMint = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
   console.log("FPT Token:", fptMint.toBase58());
 
   // Step 1: Initialize Pricing Config

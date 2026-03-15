@@ -33,9 +33,9 @@ import * as readline from 'readline';
 
 // ==================== CONFIGURATION ====================
 
-const PROGRAM_ID = new PublicKey('BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW');
-const ADMIN_PUBKEY = new PublicKey('EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg');
-const FPT_MINT = new PublicKey('7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2');
+const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const ADMIN_PUBKEY = new PublicKey('EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv');
+const FPT_MINT = new PublicKey('3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj');
 
 // Recommended funding: ~0.03 SOL (20 tiers * 0.00128 SOL rent each + buffer)
 const RECOMMENDED_TREASURY_FUNDING = 0.5 * LAMPORTS_PER_SOL;
@@ -140,7 +140,7 @@ async function main() {
   console.log('   ✅ Admin wallet verified\n');
 
   // Setup connection
-  const rpcUrl = process.env.RPC_URL || 'https://api.devnet.solana.com';
+  const rpcUrl = process.env.RPC_URL || 'https://api.mainnet-beta.solana.com';
   const connection = new Connection(rpcUrl, 'confirmed');
   console.log(`   RPC: ${rpcUrl}\n`);
 

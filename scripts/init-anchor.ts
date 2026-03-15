@@ -5,9 +5,9 @@ const { getAssociatedTokenAddressSync } = require("@solana/spl-token");
 const fs = require("fs");
 const path = require("path");
 
-const PROGRAM_ID = new PublicKey("BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW");
-const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
-const RPC = "https://api.devnet.solana.com";
+const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
+const RPC = "https://api.mainnet-beta.solana.com";
 
 // Define TypeScript types for better type safety
 type LotteryType = 'LPM' | 'DPL' | 'WPL' | 'MPL' | 'YPL';

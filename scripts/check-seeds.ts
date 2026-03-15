@@ -7,10 +7,10 @@ async function main() {
   const kp = anchor.web3.Keypair.fromSecretKey(
     new Uint8Array(JSON.parse(fs.readFileSync("/home/dev/my-wallet.json", "utf-8")))
   );
-  const conn = new anchor.web3.Connection("https://api.devnet.solana.com", "confirmed");
+  const conn = new anchor.web3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
   anchor.setProvider(new anchor.AnchorProvider(conn, new anchor.Wallet(kp), {}));
   const program = anchor.workspace.FortressProtocol;
-  const FPT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
+  const FPT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
 
   const [vaultPDA] = PublicKey.findProgramAddressSync([Buffer.from("vault_lpm"), Buffer.from([5])], program.programId);
   const vaultAta = getAssociatedTokenAddressSync(FPT, vaultPDA, true, TOKEN_2022_PROGRAM_ID);

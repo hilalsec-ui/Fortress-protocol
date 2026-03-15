@@ -25,9 +25,9 @@ export function useWalletBalance() {
       setIsLoading(true);
       setError(null);
 
-      // Use devnet connection
+      // Use mainnet-beta connection
       const connection = new Connection(
-        "https://api.devnet.solana.com",
+        "https://api.mainnet-beta.solana.com",
         "confirmed",
       );
       const balanceInLamports = await connection.getBalance(publicKey);

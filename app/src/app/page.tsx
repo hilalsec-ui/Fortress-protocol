@@ -8,7 +8,7 @@ import RegistryFeed from "@/components/RegistryFeed";
 import Link from "next/link";
 import { useChainData } from "@/contexts/ChainDataContext";
 import { useTimeOffsetStore } from "@/stores/timeOffsetStore";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 /* ── Feature detail modals ── */
 const FEATURE_DETAILS = [
@@ -113,6 +113,52 @@ const FEATURE_DETAILS = [
     ],
   },
 ];
+
+function FptMintPill({ mint, isDarkMode }: { mint: string; isDarkMode: boolean }) {
+  const [copied, setCopied] = useState(false);
+  const copy = useCallback(() => {
+    navigator.clipboard.writeText(mint).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [mint]);
+  const short = `${mint.slice(0, 6)}…${mint.slice(-6)}`;
+  return (
+    <div className="mt-3 space-y-1.5">
+      <p className={`text-[10px] font-mono uppercase tracking-widest ${isDarkMode ? "text-blue-400/70" : "text-blue-500/80"}`}>
+        Use this address to swap SOL → FPT on any DEX
+      </p>
+      <button
+        onClick={copy}
+        title="Copy FPT mint address"
+        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border font-mono text-[10px] transition-all duration-200 ${
+          isDarkMode
+            ? "bg-blue-500/10 border-blue-500/25 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/40"
+            : "bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300"
+        }`}
+      >
+        <span className="truncate hidden sm:block">{mint}</span>
+        <span className="sm:hidden">{short}</span>
+        <span className={`shrink-0 flex items-center gap-1 transition-colors ${copied ? (isDarkMode ? "text-green-400" : "text-green-600") : ""}`}>
+          {copied ? (
+            <>
+              <CheckCircle className="w-3 h-3" />
+              <span>Copied!</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span>Copy</span>
+            </>
+          )}
+        </span>
+      </button>
+    </div>
+  );
+}
 
 export default function Home() {
   const { isDarkMode } = useTheme();
@@ -267,7 +313,7 @@ export default function Home() {
           >
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className={`text-xs font-mono uppercase tracking-wider ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>Live on Devnet</span>
+              <span className={`text-xs font-mono uppercase tracking-wider ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>Live on Mainnet</span>
             </div>
             <div className={`h-4 w-px ${isDarkMode ? "bg-white/10" : "bg-gray-200"}`} />
             <div className="text-sm">
@@ -312,6 +358,7 @@ export default function Home() {
                   border: isDarkMode ? "border-blue-500/20" : "border-blue-200",
                   title: "Get FPT & Connect",
                   body: "Swap SOL for FPT tokens directly in your Solana wallet — any DEX works. Then connect your wallet to Fortress. Your FPT balance is your entry currency across all tiers.",
+                  mintAddress: "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj",
                 },
                 {
                   n: "02",
@@ -370,6 +417,11 @@ export default function Home() {
                     <p className={`text-xs leading-relaxed ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                       {step.body}
                     </p>
+
+                    {/* FPT Mint Address — step 01 only */}
+                    {'mintAddress' in step && (
+                      <FptMintPill mint={step.mintAddress as string} isDarkMode={isDarkMode} />
+                    )}
                   </motion.div>
                 );
               })}

@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-PROGRAM_ID="HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
-FPT_MINT="7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2"
+PROGRAM_ID="2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
+FPT_MINT="3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj"
 WALLET="${ANCHOR_WALLET:-/home/dev/my-wallet.json}"
-RPC="https://api.devnet.solana.com"
+RPC="https://api.mainnet-beta.solana.com"
 
 echo "🔧 FORTRESS LOTTERY VAULT INITIALIZATION"
 echo ""

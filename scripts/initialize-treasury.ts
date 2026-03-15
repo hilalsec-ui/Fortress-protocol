@@ -8,10 +8,10 @@ const idlPath = path.join(__dirname, '../target/idl/fortress_protocol.json');
 const idl = JSON.parse(fs.readFileSync(idlPath, 'utf8'));
 
 // Program ID
-const PROGRAM_ID = new PublicKey('BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW');
+const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
 
 // Admin wallet
-const ADMIN_PUBKEY = new PublicKey('EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg');
+const ADMIN_PUBKEY = new PublicKey('EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv');
 
 // Treasury PDA
 function deriveTreasuryPDA(): [PublicKey, number] {
@@ -39,7 +39,7 @@ async function main() {
 
   // Setup connection
   const connection = new Connection(
-    process.env.RPC_URL || 'https://api.devnet.solana.com',
+    process.env.RPC_URL || 'https://api.mainnet-beta.solana.com',
     'confirmed'
   );
 

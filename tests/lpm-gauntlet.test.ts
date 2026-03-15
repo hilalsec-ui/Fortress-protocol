@@ -34,8 +34,8 @@ import { expect } from "chai";
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const FPT_MINT = new PublicKey("7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2");
-const ADMIN_WALLET = new PublicKey("EzrUKQPTj7iEAvaJj9rnv4HKUhRGjj4bDLRsAEQfyaYg");
+const FPT_MINT = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
+const ADMIN_WALLET = new PublicKey("EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv");
 
 const LPM_TIERS = [5, 10, 20, 50];
 const PARTICIPANTS_REQUIRED = 356; // LPM requires exactly 356 participants (256% harder)

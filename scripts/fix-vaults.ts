@@ -11,9 +11,9 @@ import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import fs from "fs";
 import path from "path";
 
-const PROGRAM_ID = "BLNY4gLMg4MnPhBGin5p1vxhtY47nYPMw4XGJf63QMHW";
-const FPT_MINT = "7vZbJ3WN4eGF6rGikB4MBLs4kiJwaRzNSX3smQRJJNw2";
-const RPC = "https://api.devnet.solana.com";
+const PROGRAM_ID = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY";
+const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
+const RPC = "https://api.mainnet-beta.solana.com";
 const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJsyFbPVwwQW3bLvyS46Q8YVgJ4";
 const ATA_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 

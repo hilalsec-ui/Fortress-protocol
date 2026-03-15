@@ -49,7 +49,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
 }) => {
   const { connected, publicKey } = useWallet();
   const { refreshBalance } = useWalletBalance();
-  const { fptPerUsd6dec, isLoading: pricingLoading } = useFptPrice();
+  const { fptPerUsd6dec, solUsd, fptMarketUsd, isLoading: pricingLoading } = useFptPrice();
   // fptPerUsd6dec = FPT per USD in 6-decimal units (e.g. 500_000 = 0.5 FPT per $)
   const exchangeRateHuman = fptPerUsd6dec > 0 ? fptPerUsd6dec / 1_000_000 : null;
   const calculateFptCost = (tier: number, qty: number): string =>
@@ -62,15 +62,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
-  console.log('🎟️ BuyTicketModal rendered with:', {
-    connected,
-    isContractReady,
-    isOpen,
-    publicKey: publicKey?.toString(),
-    isLoading,
-    exchangeRateHuman,
-    pricingLoading,
-  });
   const [transactionResult, setTransactionResult] = useState<{
     transactionSignature: string;
     tier: number;
@@ -112,15 +103,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
   };
 
   const handleBuyTicket = async () => {
-    console.log('====================');
-    console.log('🎟️ BUY BUTTON CLICKED');
-    console.log('Connected:', connected);
-    console.log('PublicKey:', publicKey?.toBase58());
-    console.log('Selected Tier:', selectedTier);
-    console.log('Quantity:', quantity);
-    console.log('Is Loading:', isLoading);
-    console.log('Contract Ready:', isContractReady);
-    console.log('Program:', !!program);
 
     if (!connected || !publicKey) {
       console.error('❌ Wallet not connected');
@@ -141,7 +123,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
 
     const totalCost = Number(calculateFptCost(selectedTier, quantity) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
 
-    console.log('✅ Starting purchase...');
     setIsLoading(true);
     setError('');
 
@@ -149,7 +130,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
 
     try {
       const participantId = Date.now();
-      console.log('📞 Calling onBuyTicket...', { selectedTier, participantId, quantity });
 
       const onProgress = (step: number, total: number, qty: number) => {
         if (total > 1) {
@@ -163,13 +143,11 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
       const result = await onBuyTicket(selectedTier, participantId, quantity, onProgress);
       toast.dismiss(PROGRESS_TOAST);
 
-      console.log('✅ Result received:', result);
 
       setTransactionResult(result);
       refreshBalance(3000);
       toast.success(`✅ ${quantity} ticket(s) purchased! ${totalCost} FPT paid`);
 
-      console.log('🎉 Purchase complete!');
       setTimeout(() => onClose(), 500);
     } catch (err) {
       toast.dismiss(PROGRESS_TOAST);
@@ -198,7 +176,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
       toast.error(`❌ ${errorMessage}`);
     } finally {
       setIsLoading(false);
-      console.log('🏁 Purchase attempt finished');
     }
   };
 
@@ -319,8 +296,15 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                       <div className="flex flex-col items-center justify-center">
                         <span className="font-bold text-xl">${tier.value}</span>
                         <span className="text-xs text-gray-400 mt-1" style={{ fontSize: '0.665rem' }}>
-                          {tier.fpt > 0 ? tier.fpt.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '…'} FPT
+                          {tier.fpt > 0
+                            ? `${fptMarketUsd == null ? '~' : ''}${tier.fpt.toLocaleString(undefined, { maximumFractionDigits: 0 })} FPT`
+                            : '…'}
                         </span>
+                        {fptMarketUsd != null && tier.fpt > 0 && (
+                          <span className="text-[9px] text-green-400/70 leading-none">
+                            ≈ ${(tier.fpt * fptMarketUsd).toFixed(2)}
+                          </span>
+                        )}
                       </div>
                     </button>
                   ))}
@@ -392,14 +376,33 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                       <Coins className="w-4 h-4 text-purple-400" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-xs font-medium text-gray-400 leading-tight">FPT Entry Price</span>
+                      <span className="text-xs font-medium text-gray-400 leading-tight">
+                        {fptMarketUsd != null ? 'FPT Entry Price' : 'Est. FPT Cost'}
+                      </span>
                       {exchangeRateHuman != null ? (
                         <span className="text-[10px] text-gray-500 leading-tight">
-                          Market rate&nbsp;&bull;&nbsp;
-                          <span className="text-purple-400/80">$1&nbsp;=&nbsp;{exchangeRateHuman.toFixed(4)}&nbsp;FPT</span>
+                          {fptMarketUsd != null ? (
+                            // Real DEX market price is available
+                            <>
+                              <span className="text-green-400/90">&#x25cf;&nbsp;DEX live</span>
+                              <span className="text-purple-400/80">&nbsp;&bull;&nbsp;FPT&nbsp;${fptMarketUsd < 0.001 ? fptMarketUsd.toFixed(6) : fptMarketUsd.toFixed(4)}</span>
+                              {solUsd > 0 && (
+                                <span className="text-gray-600">&nbsp;&bull;&nbsp;SOL&nbsp;${solUsd.toFixed(2)}</span>
+                              )}
+                            </>
+                          ) : (
+                            // No DEX liquidity yet — show honest oracle label
+                            <>
+                              <span className="text-yellow-400/70">&#x25cf;&nbsp;Oracle rate</span>
+                              {solUsd > 0 && (
+                                <span className="text-gray-500">&nbsp;&bull;&nbsp;SOL&nbsp;${solUsd.toFixed(2)}</span>
+                              )}
+                              <span className="text-gray-600">&nbsp;&bull;&nbsp;no DEX market yet</span>
+                            </>
+                          )}
                         </span>
                       ) : (
-                        <span className="text-[10px] text-gray-500 leading-tight">Fetching live rate…</span>
+                        <span className="text-[10px] text-gray-500 leading-tight animate-pulse">Fetching live rate…</span>
                       )}
                     </div>
                   </div>
@@ -408,10 +411,16 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                     {exchangeRateHuman != null && selectedTier != null ? (
                       <>
                         <span className="text-base font-bold text-white tracking-tight">
+                          {fptMarketUsd == null && <span className="text-gray-400 font-normal">~</span>}
                           {calculateFptCost(selectedTier, 1)}
                         </span>
                         <span className="ml-1 text-xs font-medium text-purple-300">FPT</span>
-                        <div className="text-[10px] text-gray-500 mt-0.5">per ticket</div>
+                        <div className="text-[10px] text-gray-500 mt-0.5">
+                          {fptMarketUsd != null
+                            ? `≈ $${(parseFloat(calculateFptCost(selectedTier, 1)) * fptMarketUsd).toFixed(2)} · per ticket`
+                            : 'oracle est. · per ticket'
+                          }
+                        </div>
                       </>
                     ) : (
                       <span className="text-sm text-gray-500 animate-pulse">—</span>
@@ -454,9 +463,13 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                     <div>
                       <div className="text-gray-300 text-sm font-medium mb-1">You Will Pay</div>
                       <div className="text-xs text-gray-400">FPT Token (Token-2022)</div>
+                      {fptMarketUsd == null && (
+                        <div className="text-[10px] text-yellow-400/60 mt-0.5">oracle est. · exact set on-chain at tx</div>
+                      )}
                     </div>
                     <div className="text-right">
                       <div className="text-green-400 font-bold tabular-nums leading-tight" style={{ fontSize: '0.95rem', letterSpacing: '-0.01em' }}>
+                        {fptMarketUsd == null && <span className="text-green-400/60 font-normal">~</span>}
                         {Number(calculateFptCost(selectedTier, quantity) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                       </div>
                       <div className="flex items-center justify-end gap-1 text-green-300 font-bold" style={{ fontSize: '0.831rem' }}>
@@ -464,6 +477,11 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                         <img src={FPT_TOKEN_ICON} alt="FPT" className="w-4 h-4 rounded-full" />
                         FPT
                       </div>
+                      {fptMarketUsd != null && (
+                        <div className="text-[10px] text-green-400/60 mt-0.5">
+                          ≈ ${(parseFloat(calculateFptCost(selectedTier, quantity)) * fptMarketUsd).toFixed(2)}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -489,7 +507,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
               <div className="flex space-x-3">
                 <button
                   onClick={() => {
-                    console.log('🔴 CANCEL BUTTON CLICKED');
                     onClose();
                   }}
                   className="flex-1 py-2 px-4 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-medium transition-colors"
@@ -498,7 +515,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                 </button>
                 <button
                   onClick={() => {
-                    console.log('🟢 PAY BUTTON CLICKED - HANDLER STARTING');
                     if (!connected) {
                       handleConnectWallet();
                     } else {

@@ -2,12 +2,12 @@
  * fund-crank-wallet.ts
  *
  * Transfers SOL from the admin wallet to the crank wallet
- * (CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz).
+ * (BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5).
  * The admin wallet must have sufficient SOL.
  *
  * Usage:
  *   ANCHOR_WALLET=~/.config/solana/id.json \
- *   ANCHOR_PROVIDER_URL=https://api.devnet.solana.com \
+ *   ANCHOR_PROVIDER_URL=https://api.mainnet-beta.solana.com \
  *   npx ts-node scripts/fund-crank-wallet.ts [amount_sol]
  *
  * Defaults to 0.1 SOL if no amount is given.
@@ -18,7 +18,7 @@ import { PublicKey, SystemProgram, LAMPORTS_PER_SOL, Transaction } from "@solana
 import * as fs from "fs";
 
 const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
-const CRANK_AUTHORITY = new PublicKey("CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz");
+const CRANK_AUTHORITY = new PublicKey("BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5");
 
 async function main() {
   const amountSol = parseFloat(process.argv[2] ?? "0.1");

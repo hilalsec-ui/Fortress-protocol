@@ -26,7 +26,7 @@ import * as path from "path";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const RPC_URL = "https://api.devnet.solana.com";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
 const WALLET_PATH = process.env.ANCHOR_WALLET || "/home/dev/my-wallet.json";
 const KEYS_DIR = path.join(__dirname, "keys");
 // Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2

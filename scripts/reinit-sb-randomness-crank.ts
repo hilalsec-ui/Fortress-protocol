@@ -30,7 +30,7 @@ for (const line of envContent.split("\n")) {
   if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
 }
 
-const RPC_URL = "https://api.devnet.solana.com";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
 
 const LOTTERY_TYPES: Record<string, { id: number; tiers: number[] }> = {
   LPM: { id: 0, tiers: [5, 10, 20, 50] },
@@ -81,7 +81,7 @@ async function main() {
   const balance = await connection.getBalance(crankKp.publicKey);
   console.log(`💰 Crank balance: ${(balance / 1e9).toFixed(4)} SOL`);
   if (balance < 0.3e9) {
-    console.error("❌ Crank needs at least 0.3 SOL. Run: solana airdrop 2 CH5CLt2e26cho7es4oAs536AgZqSzNR29WWrQ3QR6JUz --url devnet");
+    console.error("❌ Crank needs at least 0.3 SOL. Run: solana airdrop 2 BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5 --url devnet");
     process.exit(1);
   }
 

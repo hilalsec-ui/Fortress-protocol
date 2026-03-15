@@ -1,360 +1,135 @@
-# Fortress Protocol Lottery - Solana Backend
+# Fortress Protocol
 
-A high-scale, production-ready lottery system built on Solana with Anchor 0.30.0, featuring 5 lottery types with 4 tiers each (20 independent vaults), linked-page participant sharding, blockhash-based randomness, and automatic 95/5 prize distribution.
+A production-ready on-chain lottery system deployed on **Solana mainnet**. Built with Anchor 0.32.1, Token-2022, and Switchboard V3 On-Demand randomness.
 
-## ⚠️ Current Status
+## 🚀 Deployment
 
-**✅ ALL CODE COMPLETE** - Program logic, instructions, and deployment scripts are production-ready
+| | |
+|---|---|
+| **Network** | Solana Mainnet-Beta |
+| **Program ID** | `EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3` |
+| **IDL Account** | `BDNQMd2XwvAhmMB8wCzxzajQEF3Ky5h5krpWg1dZ17iG` |
+| **Deploy TX** | `3yrt41a5PsNC3q2V2xiLeD6r7BNQz1TvQV9RkSeWnymsTRfGjbCBA1kvKz1Jq99ThRLT4LkKujowi1ed5woNGgWN` |
+| **Deployed** | 2026-03-16 |
+| **FPT Mint** | `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj` (Token-2022) |
+| **Authority** | `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv` |
 
-**❌ BUILD BLOCKED** - Waiting for Solana CLI update due to edition2024 dependency incompatibility
-- Root cause: Solana CLI 1.18.22's `cargo-build-sbf` uses Rust 1.75.0, which cannot parse `constant_time_eq v0.4.2` (requires edition2024)
-- Solution: Update Solana CLI to v2.0+ (requires network access)
-- See [BUILD_SOLUTIONS.md](./BUILD_SOLUTIONS.md) for detailed workarounds
+## 🎯 Lottery Types
 
-**Next Steps:**
-1. Restore network connectivity
-2. Run `./update-solana.sh` to update Solana CLI
-3. Run `anchor build` to compile program
-4. Run `./deploy.sh` to deploy and initialize
+4 lottery types × 4 tiers each = **16 independent vaults**.
 
-## 🎯 Architecture Overview
+| Type | Full Name | Tiers (USD) | Draw Condition |
+|---|---|---|---|
+| **LPM** | Lightning Pool Monthly | 5, 10, 20, 50 | 100 participants reached |
+| **DPL** | Daily Pool | 5, 10, 15, 20 | 24-hour interval |
+| **WPL** | Weekly Pool | 5, 10, 15, 20 | 7-day interval |
+| **MPL** | Monthly Pool | 5, 10, 15, 20 | 30-day interval |
 
-### Lottery Types
+Prize split: **95% to winner, 5% to treasury** — enforced on-chain.
 
-1. **LPM (Lightning Pool Monthly)** - Participant-based (100 players)
-   - Tiers: 5, 10, 20, 50 FPT
-   - Draws automatically when any tier reaches 100 participants
-   - Uses blockhash-based randomness
+## 🏛️ On-Chain Accounts
 
-2. **DPL (Daily Pool)** - Time-based (24 hours)
-   - Tiers: 5, 10, 15, 20 FPT
-   - Draws at 24-hour intervals
-   - Automated via Clockwork
+### Global (3 accounts)
 
-3. **WPL (Weekly Pool)** - Time-based (7 days)
-   - Tiers: 5, 10, 15, 20 FPT
-   - Draws every 7 days
-   - Automated via Clockwork
+| Account | Address | Description |
+|---|---|---|
+| `GlobalRegistry` | `6qwNDYDswpsQiPbrh22mRmoVZn7NyKczHXkkwapjPgTm` | Protocol-wide registry |
+| `Treasury` | `9ygCDTSwHQHXavdBPW2V6LNpUbG12czvqxZrYnqWkE9e` | Fee recipient (5%) |
+| `sol_vault` | `5PjvdFbGwr1psQmL6aZun21mN6gJYBoLhH1VMRFh13si` | SOL operational wallet |
 
-4. **MPL (Monthly Pool)** - Time-based (30 days)
-   - Tiers: 5, 10, 15, 20 FPT
-   - Draws every 30 days
-   - Automated via Clockwork
+### Vault PDAs (16 accounts)
 
-5. **YPL (Yearly Pool)** - Time-based (365 days)
-   - Tiers: 5, 10, 15, 20 FPT
-   - Draws every 365 days
-   - Automated via Clockwork
+Seeds: `["vault_lpm" | "vault_dpl" | "vault_wpl" | "vault_mpl", tier_byte]`
 
-### Core Features
+Each vault has a paired `WinnerHistory` account (seeds: `["winner_history", type_id_byte, tier_byte]`).
 
-✅ **20 Independent Vault PDAs** - Separate state and token accounts per tier
-✅ **Linked-Page Sharding** - 50 participants per page with automatic pagination
-✅ **Token-2022 Integration** - Uses FPT mint on Token Extensions program
-✅ **Blockhash Randomness** - Deterministic winner selection using blockhash + slot
-✅ **Automatic ATA Creation** - Winners' token accounts created via `init_if_needed`
-✅ **95/5 Fee Split** - 95% to winner, 5% to admin wallet (EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv)
-✅ **Frontend Compatible** - Matches exact instruction signatures from Next.js app
+| Vault | Address |
+|---|---|
+| LPM-5 | `AvKG8Q5S2uLkWQJu3fWGVABmC53Mb6EumXKt798wprKM` |
+| LPM-10 | `CcoBjChgmxjmPYbG2X4iPLjXUsBTQDfeFkkkZMZLJJDY` |
+| LPM-20 | `AJkAYJwAHaWKju8wx1QuQyUMR3wDvKeLigAJyXqkvY8F` |
+| LPM-50 | `G78mH6UiNpDNAnjsQussSaaLpNer8u8vn2oc3TTiQrpG` |
+| DPL-5  | `E3fJQmXSU4kEdE99XnBgkgf4KTKD3BF8nymyE3p83d1G` |
+| DPL-10 | `FbL2bcGGBWD8RLRSCZve5z69g6aCQBQ2P8J8h2mexqY` |
+| DPL-15 | `5H7vYJSDKf1E6bBGkjZDxKB2nbPfRG6moWNeFuQc6ShT` |
+| DPL-20 | `DDp9myrfDgfTCKVFMRGmQd97JGaaddNkhPDXPVRivmwZ` |
+| WPL-5  | `FC9T9yEA8LLFwtCXeg36bBWkZ3RSe2WiwDuGoxCpjuni` |
+| WPL-10 | `8reAf26acLaWnVLt5ukabB18tR2zkwzLSSUwCaMC8RfQ` |
+| WPL-15 | `E1HSLGT6mSNQxCZcGVRbDzZCkK5K2uRTuwbqiefkaFm8` |
+| WPL-20 | `HcpPEUrJJzXyxxMXurG5jxSmVWLW8F8V3g1CzfAUxnnd` |
+| MPL-5  | `HfxgvKnMUbPws3txcmfR5CLxNjhARDux8wtq7Z6YakH3` |
+| MPL-10 | `5wsBcHucSZzMF5BEuJAAoEEUHgeL58pj4kQiVTputtkM` |
+| MPL-15 | `9rKZyhb6KncyEgQec6bZzogeA9Tw6nD5x3WmuDwqb9uR` |
+| MPL-20 | `6rEdCLeyukfegRmopbBMeFH4RfzD9XLsnJ9LxeU1R6S3` |
 
-## 📋 Prerequisites
+## ⚙️ Architecture
 
-- Rust 1.85.0+ (to support edition2024 parsing locally)
-- Solana CLI 2.0.0+ (requires Rust 1.76+ in cargo-build-sbf)
-- Anchor CLI 0.30.1
-- Node.js 18.19.1+
-- npm 9.2.0+
+### Randomness
 
-## 🚀 Quick Start
+Uses **Switchboard V3 On-Demand** (SRS — Secured Randomness Service):
+- Program: `Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2`
+- Queue: `3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1`
+- Each vault tier has a pre-initialized `RandomnessAccount` PDA
+- Draw flow: `requestDrawEntropy` → oracle TEE commits → `fulfillDrawEntropy` reveals winner
 
-### 1. Install Dependencies
+### Token Standard
 
-```bash
-cd /home/dev/fortress
-npm install
-```
+All FPT transfers use **Token-2022** (`TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb`).
 
-### 2. Build Program
+### Draw Flow
+
+1. Crank (or user) calls `requestDrawEntropy(lottery_type_id, tier)` — commits randomness
+2. Switchboard oracle TEE processes the commit (~1–5 s on mainnet)
+3. Crank calls `fulfillDrawEntropy(lottery_type_id, tier, bounty_fpt)` — reveals, selects winner, distributes prizes
+4. `WinnerHistory` is updated; vault resets for the next round
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Rust (stable, `sbpf-solana-solana` target)
+- Anchor CLI 0.32.1
+- Node.js 18+
+- Solana CLI 2.0+
+
+### Build
 
 ```bash
 anchor build
 ```
 
-This compiles the Rust program with **edition = "2021"** (avoiding edition2024 errors).
-
-### 3. Deploy to Devnet
+### Install frontend dependencies
 
 ```bash
-anchor deploy --provider.cluster devnet
+cd app && npm install
 ```
 
-**Important:** Verify the deployed program ID matches `Ft3s4d2kqTcJR8f5pXt2i8m3uzdJzq1LkX5Hjw3z4Y5Z`. If different, update:
-- `Anchor.toml`
-- `lib.rs` (declare_id!)
-- `app/src/utils/constants.ts` (frontend)
-
-### 4. Initialize Lotteries
+### Run frontend (dev)
 
 ```bash
-npm run init-lotteries
+cd app && npm run dev
 ```
 
-This creates:
-- Global Registry PDA
-- 5 Lottery configuration accounts (LPM, DPL, WPL, MPL, YPL)
-- 20 Vault PDAs (5 types × 4 tiers)
-- 20 Token accounts (ATA for each vault)
+### Scripts (`scripts/`)
 
-### 5. Setup Clockwork Automation (Optional)
+| Script | Purpose |
+|---|---|
+| `init-all.ts` | Initialize all 19 on-chain accounts (run once after deploy) |
+| `init-sb-randomness.ts` | Initialize Switchboard randomness accounts |
+| `reinit-sb-randomness-crank.ts` | Re-initialize SB randomness for crank wallet |
+| `fund-crank-wallet.ts` | Fund the crank operator wallet |
+| `fund-treasury-fpt.ts` | Seed the treasury ATA with FPT |
+| `check-registry.ts` | Read GlobalRegistry state |
+| `check-seeds.ts` | Verify PDA derivation |
+| `verify-lottery-status.ts` | Check vault states |
+| `withdraw-treasury-vault.ts` | Admin: withdraw treasury FPT |
 
-```bash
-npm run setup-clockwork
-```
+## 📄 Documentation
 
-**Note:** Clockwork v2 requires manual thread creation via their CLI or dashboard. See [Clockwork Documentation](https://docs.clockwork.xyz/).
+- [Whitepaper](./docs/Fortress_Whitepaper.html)
+- [PDA Manifest (Mainnet)](./PDA_MANIFEST_MAINNET.json)
+- [Quick Reference](./QUICK_REFERENCE.md)
 
-## 📚 Program Architecture
-
-### Account Structures
-
-#### GlobalRegistry
-```rust
-pub struct GlobalRegistry {
-    pub authority: Pubkey,
-    pub total_lotteries: u8,        // 20
-    pub total_participants: u64,
-    pub total_prizes_distributed: u64,
-    pub bump: u8,
-}
-```
-**PDA:** `["registry"]`
-
-#### LotteryVault
-```rust
-pub struct LotteryVault {
-    pub lottery_type: LotteryType,  // LPM, DPL, WPL, MPL, YPL
-    pub tier: u8,
-    pub balance: u64,
-    pub participant_count: u32,
-    pub current_page: u32,
-    pub end_time: i64,              // Unix timestamp (0 for LPM)
-    pub last_winner: Option<Pubkey>,
-    pub last_prize: u64,
-    pub is_drawn: bool,
-    pub bump: u8,
-}
-```
-**PDA:** `["lottery_vault", lottery_type, tier]`
-- Example: `["lottery_vault", "LPM", 5]`
-
-#### ParticipantPage
-```rust
-pub struct ParticipantPage {
-    pub lottery_type: u8,           // 0=LPM, 1=DPL, 2=WPL, 3=MPL, 4=YPL
-    pub tier: u8,
-    pub page_number: u32,
-    pub participants: Vec<Pubkey>,  // Max 50
-    pub next_page: Option<Pubkey>,  // Linked list pointer
-    pub bump: u8,
-}
-```
-**PDA:** `["lottery_page", lottery_type, tier, page_number]`
-
-### Instructions
-
-#### Buy Tickets
-```rust
-buy_lpm_ticket(tier: u8)
-buy_dpl_ticket(tier: u8)
-buy_wpl_ticket(tier: u8)
-buy_mpl_ticket(tier: u8)
-buy_ypl_ticket(tier: u8)
-```
-
-**Flow:**
-1. Validate tier (5/10/20/50 for LPM, 5/10/15/20 for others)
-2. Check lottery not already drawn
-3. Calculate ticket price: `tier * 3 FPT * 10^9`
-4. Transfer FPT from buyer to vault (CPI to Token-2022)
-5. Add participant to current page (or create new page if full)
-6. Update vault balance and participant count
-
-#### Draw Winners
-```rust
-draw_lpm_winner(tier: u8)  // Participant-based
-draw_dpl_winner(tier: u8)  // Time-based
-draw_wpl_winner(tier: u8)  // Time-based
-draw_mpl_winner(tier: u8)  // Time-based
-draw_ypl_winner(tier: u8)  // Time-based
-```
-
-**Flow:**
-1. Validate tier and check not already drawn
-2. **LPM:** Require 100 participants | **Others:** Require end_time passed
-3. Generate random winner index (Pyth Entropy for LPM, blockhash for others)
-4. Calculate prizes: 95% winner, 5% admin
-5. Create winner ATA if needed (`init_if_needed`, payer=authority)
-6. Transfer 95% to winner, 5% to admin (`EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`)
-7. Mark lottery as drawn, reset state
-
-#### Initialize
-```rust
-initialize_global_registry()
-initialize_lpm_lottery()
-initialize_dpl_lottery()
-initialize_wpl_lottery()
-initialize_mpl_lottery()
-initialize_ypl_lottery()
-```
-
-## 🔗 Frontend Integration
-
-### Update IDL
-
-After deploying, sync the IDL to your frontend:
-
-```bash
-# Copy IDL to frontend
-cp target/idl/fortress_lottery.json app/src/fortress_protocol.json
-
-# Or upload to Anchor registry (recommended)
-anchor idl init --filepath target/idl/fortress_lottery.json Ft3s4d2kqTcJR8f5pXt2i8m3uzdJzq1LkX5Hjw3z4Y5Z
-```
-
-### Frontend Constants
-
-Ensure these match in `app/src/utils/constants.ts`:
-
-```typescript
-PROGRAM_ID = 'Ft3s4d2kqTcJR8f5pXt2i8m3uzdJzq1LkX5Hjw3z4Y5Z'
-FPT_MINT = '3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj'
-TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-ADMIN_WALLET = 'EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv'
-```
-
-### Example: Buy LPM Ticket (Frontend)
-
-```typescript
-import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
-import { PublicKey } from '@solana/web3.js';
-
-const program = new Program(idl, PROGRAM_ID, provider);
-
-const [lotteryVault] = PublicKey.findProgramAddressSync(
-  [Buffer.from("lottery_vault"), Buffer.from("LPM"), Buffer.from([tier])],
-  program.programId
-);
-
-const [participantPage] = PublicKey.findProgramAddressSync(
-  [Buffer.from("lottery_page"), Buffer.from("LPM"), Buffer.from([tier]), Buffer.from([0])],
-  program.programId
-);
-
-const [registry] = PublicKey.findProgramAddressSync(
-  [Buffer.from("registry")],
-  program.programId
-);
-
-const tx = await program.methods
-  .buyLpmTicket(tier)
-  .accounts({
-    buyer: wallet.publicKey,
-    dptMint: FPT_MINT,
-    buyerTokenAccount: userDptAccount,
-    lotteryVault,
-    vaultTokenAccount: vaultDptAccount,
-    participantPage,
-    registry,
-    tokenProgram: TOKEN_2022_PROGRAM_ID,
-    associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
-    systemProgram: SystemProgram.programId,
-  })
-  .rpc();
-```
-
-## 🔐 Security Features
-
-1. **PDA Authority** - All vaults use PDA as authority, no external keys
-2. **Constraint Checks** - Tier validation, time verification, balance checks
-3. **Arithmetic Safety** - All math uses `checked_*` operations
-4. **State Validation** - Cannot draw same lottery twice
-5. **Admin Hardcoded** - Admin wallet hardcoded in program, cannot be changed
-
-## 🛠️ Development
-
-### Run Tests
-
-```bash
-anchor test
-```
-
-### Check Errors
-
-```bash
-anchor build 2>&1 | grep error
-```
-
-### Update IDL
-
-```bash
-anchor idl upgrade --filepath target/idl/fortress_lottery.json Ft3s4d2kqTcJR8f5pXt2i8m3uzdJzq1LkX5Hjw3z4Y5Z
-```
-
-## 📊 Account Sizes
-
-| Account | Size | Rent (SOL) |
-|---------|------|------------|
-| GlobalRegistry | 58 bytes | ~0.0006 |
-| LotteryVault | 78 bytes | ~0.0008 |
-| ParticipantPage | 1,695 bytes | ~0.012 |
-| LpmLottery | 169 bytes | ~0.0015 |
-| Token Account (ATA) | 182 bytes | ~0.002 |
-
-**Total Initialization Cost:** ~0.5 SOL (20 vaults + configs + registry)
-
-## ⚠️ Important Notes
-
-### Cargo Edition
-- **MUST use edition = "2021"** in Cargo.toml
-- Edition 2024 causes `constant_time_eq` errors with Anchor 0.30.0
-
-### Pyth Accounts
-- **LPM Randomness:** `8ahPGPjEbpgGaZx2NV1iG5Shj7TDwvsjkEDcGWjt94TP` (Devnet)
-- For mainnet, update to mainnet Pyth Entropy account
-
-### Token-2022
-- Uses Token Extensions program, not standard Token program
-- FPT mint must exist on-chain before deployment
-
-### Clockwork Automation
-- Requires separate setup and SOL funding for thread accounts
-- Each thread needs ~0.01 SOL for execution fees
-- Monitor thread health in Clockwork dashboard
-
-## 🐛 Common Issues
-
-### Error: "edition2024 not found"
-**Fix:** Change `edition = "2024"` to `edition = "2021"` in Cargo.toml
-
-### Error: "Cargo version 1.84.0 too old"
-**Note:** This warning can be ignored if you're on Rust 1.79.0. The program compiles successfully.
-
-### Error: "Network access 403 Forbidden"
-**Fix:** Check your RPC endpoint in Anchor.toml. Use `https://api.devnet.solana.com` for devnet.
-
-### Error: "Account already in use"
-**Fix:** Program already deployed. Use `anchor upgrade` or deploy to new address.
-
-## 📝 License
+## License
 
 MIT
-
-## 🤝 Support
-
-For issues or questions:
-- Check program logs: `solana logs | grep "Fortress"`
-- Verify PDAs: `solana account <PDA_ADDRESS>`
-- Test instructions: `anchor test --skip-local-validator`
-
----
-
-**Built with ❤️ for Fortress Protocol**

@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 
 const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROGRAM_ID = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 
 // Look at recent program transactions
 const sigs = await conn.getSignaturesForAddress(PROGRAM_ID, { limit: 10 });

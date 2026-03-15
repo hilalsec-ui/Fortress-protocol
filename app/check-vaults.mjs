@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-const PROG = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROG = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 
 const LPM_TIERS = [5, 10, 20, 50];
 for (const tier of LPM_TIERS) {

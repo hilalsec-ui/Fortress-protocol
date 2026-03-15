@@ -14,7 +14,7 @@ async function closeAndReinitializeRegistry() {
   anchor.setProvider(provider);
 
   const program = anchor.workspace.FortressProtocol;
-  const programId = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+  const programId = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
   
   const [globalRegistryPDA] = PublicKey.findProgramAddressSync(
     [Buffer.from("registry")],

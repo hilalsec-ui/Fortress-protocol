@@ -8,7 +8,7 @@ const idlPath = path.join(__dirname, '../target/idl/fortress_protocol.json');
 const idl = JSON.parse(fs.readFileSync(idlPath, 'utf8'));
 
 // Program ID
-const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROGRAM_ID = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 
 // Admin wallet
 const ADMIN_PUBKEY = new PublicKey('EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv');

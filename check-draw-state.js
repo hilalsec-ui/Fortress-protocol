@@ -1,6 +1,6 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROGRAM_ID = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 
 const types = [
   { name: 'LPM', id: 0, tiers: [5, 10, 20, 50] },

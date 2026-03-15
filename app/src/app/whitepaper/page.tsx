@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import Link from 'next/link';
 import { ExternalLink, FileText, Zap, Shield, Copy, Check } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { FPT_MINT, PROGRAM_ID, ADMIN_WALLET, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM } from '@/utils/constants';
+import { FPT_MINT, PROGRAM_ID, IDL_ACCOUNT, DEPLOY_TX, DEPLOYED_AT, ADMIN_WALLET, CRANK_AUTHORITY, SB_ON_DEMAND_PROGRAM } from '@/utils/constants';
 
 // ─── Framer variants ──────────────────────────────────────────────────────────
 const fadeUp = { hidden: { opacity: 0, y: 32 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
@@ -1350,6 +1350,19 @@ export default function WhitepaperPage() {
                 </a>
               </div>
             ))}
+            {/* Deployment receipt — spans full width */}
+            <div className="sm:col-span-2 lg:col-span-3 rounded-lg border border-emerald-900/50 bg-emerald-950/20 p-3">
+              <div className="text-emerald-500 font-semibold mb-2">&#x2705; Deployed on Solana Mainnet — {DEPLOYED_AT}</div>
+              <div className="text-gray-600 mb-1">IDL Account</div>
+              <div className="text-cyan-400 break-all mb-2">{IDL_ACCOUNT}</div>
+              <div className="text-gray-600 mb-1">Deploy Transaction</div>
+              <div className="text-gray-400 break-all text-xs">
+                <a href={`https://solscan.io/tx/${DEPLOY_TX}`} target="_blank" rel="noopener noreferrer"
+                  className="hover:text-cyan-400 transition-colors">
+                  {DEPLOY_TX} <ExternalLink className="inline w-3 h-3" />
+                </a>
+              </div>
+            </div>
           </motion.div>
 
           {/* Appendix table */}

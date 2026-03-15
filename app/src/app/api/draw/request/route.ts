@@ -31,7 +31,7 @@ import { guardRequest, validateInputs, safeError } from '../../_guard';
 const IDL = require('@/idl/fortress_protocol.json');
 
 // ─── Constants (server-safe copies — no "use client" import) ────────────────
-const PROGRAM_ID    = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROGRAM_ID    = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 // Server-side RPC: prefer unpublished env var to avoid leaking API keys in client bundle
 const RPC_ENDPOINT  = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_URL ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.mainnet-beta.solana.com';
 const SB_MAINNET_QUEUE = new PublicKey('3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1');

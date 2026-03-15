@@ -1,28 +1,29 @@
-# 🚀 Fortress Lottery Program - Current Deployment Status
+# 🚀 Fortress Protocol — Mainnet Deployment
 
-**Last Updated**: January 31, 2026
+**Last Updated**: March 16, 2026
 
 ---
 
-## 📊 Current Status: READY FOR DEPLOYMENT
+## ✅ Status: LIVE ON MAINNET
 
 ### Active Program Details
 
 | Field | Value | Status |
 |-------|-------|--------|
-| **Program ID (Active)** | `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb` | ✅ Current |
-| **Network** | Solana Devnet | ✅ Configured |
+| **Program ID** | `EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3` | ✅ Live |
+| **Network** | Solana Mainnet-Beta | ✅ Active |
 | **Authority Wallet** | `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv` | ✅ Active |
-| **Keypair Location** | `target/deploy/fortress_lottery-keypair.json` | ✅ Present |
-| **IDL Address** | (Will be available after deployment) | ⏳ Pending |
+| **IDL Account** | `BDNQMd2XwvAhmMB8wCzxzajQEF3Ky5h5krpWg1dZ17iG` | ✅ On-chain |
+| **Deploy TX** | `3yrt41a5PsNC3q2V2xiLeD6r7BNQz1TvQV9RkSeWnymsTRfGjbCBA1kvKz1Jq99ThRLT4LkKujowi1ed5woNGgWN` | ✅ Confirmed |
+| **Binary size** | 422 KB | — |
+| **Deployment cost** | 2.9446716 SOL | — |
 
-### Deprecated Program ID
+### Deprecated Program IDs
 
 | Field | Value | Status |
 |-------|-------|--------|
-| **Program ID (Old)** | `6ZHKxpH1fhhv7ACzLTwHfV8AZmJB9oW4UfwdTCf1sryd` | ❌ Deprecated |
-| **Reason** | Keypair lost/changed during development | N/A |
-| **All Old Accounts** | Registry, Vaults, Pages | ❌ INVALID (Different Program ID) |
+| **Program ID (v0.1-devnet)** | `6ZHKxpH1fhhv7ACzLTwHfV8AZmJB9oW4UfwdTCf1sryd` | ❌ Deprecated |
+| **Program ID (v0.2-dev)** | `2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY` | ❌ Keypair lost |
 
 ---
 
@@ -30,7 +31,7 @@
 
 ```typescript
 // Fortress Lottery Program
-export const PROGRAM_ID = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb";
+export const PROGRAM_ID = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3";
 export const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 export const RPC_ENDPOINT = "https://api.devnet.solana.com";
 export const AUTHORITY = "EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv";
@@ -92,7 +93,7 @@ anchor deploy --provider.cluster devnet
 Deploying cluster: https://api.devnet.solana.com
 Upgrade authority: EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv
 Deploying program "fortress_lottery"...
-Program deployed to: HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb
+Program deployed to: EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3
 ```
 
 ### Step 3: Initialize Global State
@@ -109,7 +110,7 @@ This will:
 ### Step 4: Verify on Devnet
 ```bash
 # Check program exists
-solana program show HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb --url devnet
+solana program show EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3 --url devnet
 
 # Check wallet balance
 solana balance EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv --url devnet
@@ -135,15 +136,15 @@ solana balance EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv --url devnet
 ### Anchor.toml
 ```toml
 [programs.devnet]
-fortress_lottery = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
+fortress_lottery = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3"
 
 [programs.localnet]
-fortress_lottery = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb"
+fortress_lottery = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3"
 ```
 
 ### app/src/utils/constants.ts
 ```typescript
-export const PROGRAM_ID = "HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb";
+export const PROGRAM_ID = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3";
 export const RPC_ENDPOINT = "https://api.devnet.solana.com";
 export const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 ```
@@ -165,7 +166,7 @@ export const FPT_MINT = "3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj";
 
 ## ✅ Pre-Deployment Checklist
 
-- [x] New Program ID generated: `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb`
+- [x] New Program ID generated: `EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3`
 - [x] Keypair present: `target/deploy/fortress_lottery-keypair.json`
 - [x] All configuration files synced
 - [x] Frontend constants updated

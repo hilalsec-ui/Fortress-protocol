@@ -2,7 +2,7 @@
 
 ## 📌 Essential Information
 
-**Program ID**: `HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb`  
+**Program ID**: `EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3`  
 **Admin Wallet**: `EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv`  
 **FPT Mint**: `3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj`  
 **Network**: Solana Devnet (`https://api.devnet.solana.com`)  
@@ -136,7 +136,7 @@ anchor build
 
 ```bash
 # Check deployment status
-solana program show HerDfQLbrXk8CFPcCGW8sDvaegk1qYawSa82Wuzov4Lb
+solana program show EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3
 
 # Check admin wallet balance
 solana balance EANi5dM5CUbtoiJAN72JgKMSNM6bMWsSWMX1w1t2yWcv

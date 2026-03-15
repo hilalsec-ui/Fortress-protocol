@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/fortress_protocol.json`.
  */
 export type FortressProtocol = {
-  "address": "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY",
+  "address": "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3",
   "metadata": {
     "name": "fortressProtocol",
     "version": "0.1.0",

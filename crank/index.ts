@@ -47,7 +47,7 @@ import * as path from "path";
 // ─── Network & Program Constants ────────────────────────────────────────────
 
 const RPC_URL = process.env.RPC_URL ?? "https://api.mainnet-beta.solana.com";
-const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+const PROGRAM_ID = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 const FPT_MINT   = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
 const SB_MAINNET_QUEUE = new PublicKey("3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1");
 

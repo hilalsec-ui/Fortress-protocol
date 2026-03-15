@@ -7,7 +7,7 @@ import * as fs from "fs";
 const idlPath = "./target/idl/fortress_protocol.json";
 const idl = JSON.parse(fs.readFileSync(idlPath, "utf8"));
 
-const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+const PROGRAM_ID = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 
 async function main() {
   // Setup provider

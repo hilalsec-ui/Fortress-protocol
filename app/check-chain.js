@@ -1,6 +1,6 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-const PROGRAM_ID = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROGRAM_ID = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 const [registryPDA] = PublicKey.findProgramAddressSync([Buffer.from('global_registry')], PROGRAM_ID);
 const [solVaultPDA] = PublicKey.findProgramAddressSync([Buffer.from('sol_vault')], PROGRAM_ID);
 const vaultDpl5Seed = [Buffer.from('vault_dpl'), Buffer.from([5])];

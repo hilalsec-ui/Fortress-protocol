@@ -26,7 +26,7 @@ import { guardRequest, validateInputs, safeError } from '../../_guard';
 const IDL = require('@/idl/fortress_protocol.json');
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.mainnet-beta.solana.com';
-const PROGRAM_ID   = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const PROGRAM_ID   = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 
 const LOTTERY_TYPE_ID: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };
 const VAULT_SEED: Record<string, string> = {

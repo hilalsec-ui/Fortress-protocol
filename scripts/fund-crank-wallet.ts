@@ -17,7 +17,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL, Transaction } from "@solana/web3.js";
 import * as fs from "fs";
 
-const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+const PROGRAM_ID = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 const CRANK_AUTHORITY = new PublicKey("BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5");
 
 async function main() {

@@ -3,7 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 import { Program, BN } from "@coral-xyz/anchor";
 import * as fs from "fs";
 
-const PROGRAM_ID = new PublicKey("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+const PROGRAM_ID = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 
 async function main() {
   console.log("═══════════════════════════════════════════════════════════════════════════");

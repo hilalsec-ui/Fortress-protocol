@@ -10,7 +10,7 @@ pub mod draw_helpers;
 
 use instructions::*;
 
-declare_id!("2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY");
+declare_id!("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 
 #[program]
 pub mod fortress_protocol {

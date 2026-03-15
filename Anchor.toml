@@ -6,17 +6,17 @@ resolution = true
 skip-lint = false
 
 [programs.mainnet]
-fortress_protocol = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
+fortress_protocol = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3"
 
 [programs.localnet]
-fortress_protocol = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY"
+fortress_protocol = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "https://api.mainnet-beta.solana.com"
-wallet = "/home/dev/my-wallet.json"
+wallet = "/home/dev/mainnet-authority.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

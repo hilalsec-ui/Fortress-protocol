@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 const conn = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-const prog = new PublicKey('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const prog = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 const sigs = await conn.getSignaturesForAddress(prog, { limit: 10 });
 
 for (const s of sigs.slice(1, 8)) {

@@ -13,7 +13,7 @@ const allSigs = await conn.getSignaturesForAddress(
 
 // Actually just fetch the full recent list with logs
 const { Connection: C, PublicKey: PK } = await import('@solana/web3.js');
-const prog = new PK('2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY');
+const prog = new PK('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 const sigs = await conn.getSignaturesForAddress(prog, { limit: 10 });
 
 for (const s of sigs.slice(1, 5)) { // skip upgrade tx

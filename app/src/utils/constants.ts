@@ -1,7 +1,10 @@
 // Centralized configuration constants for the Fortress Protocol
 
 // Program Configuration
-export const PROGRAM_ID = "2JHDbUz11kLe7q44nneougHcJCQqD6t26XeEFFNQJpHY";
+export const PROGRAM_ID = "EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3";
+export const IDL_ACCOUNT = "BDNQMd2XwvAhmMB8wCzxzajQEF3Ky5h5krpWg1dZ17iG";
+export const DEPLOY_TX = "3yrt41a5PsNC3q2V2xiLeD6r7BNQz1TvQV9RkSeWnymsTRfGjbCBA1kvKz1Jq99ThRLT4LkKujowi1ed5woNGgWN";
+export const DEPLOYED_AT = "2026-03-16";
 export const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
 
 // Crank wallet public key — server-side only; used for house-sponsored draw triggers

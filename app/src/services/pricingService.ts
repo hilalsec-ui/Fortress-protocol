@@ -48,11 +48,6 @@ export async function fetchPricingConfig(program: Program) {
       (program.account as any).pricingConfig.fetch(pricingConfigPDA)
     );
 
-    console.log('✅ PricingConfig fetched:', {
-      fptToUsdRate: pricingConfig.fptToUsdRate.toString(),
-      useOracle: pricingConfig.useOracle,
-    });
-
     return {
       pda: pricingConfigPDA,
       fptToUsdRate: pricingConfig.fptToUsdRate as BN,
@@ -112,16 +107,6 @@ export function calculateRequiredFPT(
   
   // Multiply by quantity
   const totalRequiredFpt = requiredFptPerTicket.mul(new BN(quantity));
-  
-  console.log('💰 FPT Calculation:', {
-    tierUsdPrice,
-    fptToUsdRate: fptToUsdRate.toString(),
-    quantity,
-    requiredFptPerTicket: requiredFptPerTicket.toString(),
-    totalRequiredFpt: totalRequiredFpt.toString(),
-    totalRequiredFptHuman: (totalRequiredFpt.toNumber() / 1_000_000).toFixed(2) + ' FPT',
-  });
-  
   return totalRequiredFpt;
 }
 
@@ -137,14 +122,6 @@ export function calculateMaxFptAmount(requiredFpt: BN, slippageBps: number = 100
   const maxAmount = requiredFpt
     .mul(new BN(10000 + slippageBps))
     .div(new BN(10000));
-  
-  console.log('🛡️ Slippage Protection:', {
-    requiredFpt: requiredFpt.toString(),
-    slippageBps,
-    maxFptAmount: maxAmount.toString(),
-    slippagePercentage: (slippageBps / 100).toFixed(1) + '%',
-  });
-  
   return maxAmount;
 }
 

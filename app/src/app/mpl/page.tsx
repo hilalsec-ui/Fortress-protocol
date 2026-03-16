@@ -881,7 +881,7 @@ const MPLPage: React.FC = () => {
       {/* ── Mainnet Contract Info ── */}
       <section className="py-6 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className={`rounded-xl p-4 text-xs font-mono flex flex-wrap gap-x-6 gap-y-2 items-center ${ isDarkMode ? 'bg-white/[0.02] border border-white/5 text-gray-500' : 'bg-gray-50 border border-gray-100 text-gray-400' }`}>
+          <div className={`rounded-xl p-4 text-xs font-mono flex flex-wrap gap-y-2 items-center justify-between ${ isDarkMode ? 'bg-white/[0.02] border border-white/5 text-gray-500' : 'bg-gray-50 border border-gray-100 text-gray-400' }`}>
             <span className="text-green-500 font-bold uppercase tracking-wider">● Solana Mainnet</span>
             {[
               { label: 'Program', val: PROGRAM_ID },

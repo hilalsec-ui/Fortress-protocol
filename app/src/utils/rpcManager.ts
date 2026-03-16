@@ -19,8 +19,10 @@
 import { Connection, RpcResponseAndContext } from "@solana/web3.js";
 
 // Three-Pipe RPC Endpoints — from environment variables
-const RPC_GATEKEEPER = process.env.NEXT_PUBLIC_RPC_GATEKEEPER || "https://beta.helius-rpc.com";
-const RPC_STANDARD = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://mainnet.helius-rpc.com";
+// IMPORTANT: fallbacks use public Solana RPC (no key needed)
+// Set NEXT_PUBLIC_RPC_GATEKEEPER and NEXT_PUBLIC_RPC_STANDARD in Vercel for Helius speed
+const RPC_GATEKEEPER = process.env.NEXT_PUBLIC_RPC_GATEKEEPER || "https://api.mainnet-beta.solana.com";
+const RPC_STANDARD = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://api.mainnet-beta.solana.com";
 const RPC_FREE = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";
 
 // Connection pool — reuse connections across the app

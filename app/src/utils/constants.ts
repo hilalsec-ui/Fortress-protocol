@@ -9,20 +9,21 @@ export const DEPLOYED_AT = "2026-03-16";
 // Three-Pipe RPC Strategy for Helius Free Tier Optimization
 // ──────────────────────────────────────────────────────────────
 // RPC_ENDPOINT (legacy) — kept for backwards compatibility with Solana Wallet Adapter
-export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://mainnet.helius-rpc.com";
+export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://api.mainnet-beta.solana.com";
 
 // Three Pipes — use getFortressConnection(pipe) in rpcManager.ts
 // - Gatekeeper: Helius Beta (fastest for user transactions)
 // - Standard: Helius Standard (balanced for background polling)
 // - Free: Solana Public (saves credits for non-critical reads)
-export const RPC_GATEKEEPER = process.env.NEXT_PUBLIC_RPC_GATEKEEPER || "https://beta.helius-rpc.com";
-export const RPC_STANDARD = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://mainnet.helius-rpc.com";
+// NOTE: fallbacks use public RPC (no API key needed) — set NEXT_PUBLIC_RPC_* in Vercel for Helius
+export const RPC_GATEKEEPER = process.env.NEXT_PUBLIC_RPC_GATEKEEPER || "https://api.mainnet-beta.solana.com";
+export const RPC_STANDARD = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://api.mainnet-beta.solana.com";
 export const RPC_FREE = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";
 
 // Legacy RPC constants (kept for backwards compatibility)
-export const RPC_UX = process.env.NEXT_PUBLIC_RPC_UX || "https://beta.helius-rpc.com";
-export const RPC_STABLE = process.env.NEXT_PUBLIC_RPC_STABLE || "https://mainnet.helius-rpc.com";
-export const RPC_PUBLIC = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";
+export const RPC_UX = process.env.NEXT_PUBLIC_RPC_UX || "https://api.mainnet-beta.solana.com";
+export const RPC_STABLE = process.env.NEXT_PUBLIC_RPC_STABLE || "https://api.mainnet-beta.solana.com";
+export const RPC_PUBLIC = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com"; 
 
 // Crank wallet public key — server-side only; used for house-sponsored draw triggers
 export const CRANK_AUTHORITY = 'BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5';

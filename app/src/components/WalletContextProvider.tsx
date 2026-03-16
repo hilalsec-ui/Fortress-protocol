@@ -24,7 +24,12 @@ interface WalletContextProviderProps {
 }
 
 export default function WalletContextProvider({ children }: WalletContextProviderProps) {
-  const endpoint = useMemo(() => process.env.NEXT_PUBLIC_RPC_URL ?? clusterApiUrl('mainnet-beta'), []);
+  const endpoint = useMemo(() =>
+    process.env.NEXT_PUBLIC_RPC_URL ??
+    process.env.NEXT_PUBLIC_RPC_STANDARD ??
+    process.env.NEXT_PUBLIC_RPC_GATEKEEPER ??
+    clusterApiUrl('mainnet-beta'),
+  []);
 
   const wallets = useMemo(
     () => [

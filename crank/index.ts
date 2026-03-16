@@ -110,52 +110,79 @@ const POLL_INTERVAL_MS = 1_500;
 // Must stay within on-chain bounds: [MIN_SETTLER_REWARD = 100_000, MAX_SETTLER_REWARD = 5_000_000].
 const SETTLER_REWARD_FPT = 500_000;
 
-// ─── RPC Connection with Fallback & Retry Logic ──────────────────────────────
+// ─── RPC Connection with Three-Pipe Fallback Strategy ─────────────────────────
+//
+// Fortress uses 3 RPC endpoints in priority order:
+// 1. Gatekeeper (beta.helius-rpc.com) — fastest, for critical operations
+// 2. Standard (mainnet.helius-rpc.com) — balanced, default for most operations
+// 3. Free (api.mainnet-beta.solana.com) — public RPC, free but slower
+//
+// On 403/429/5xx errors, automatically falls back to the next RPC.
+// Retries with exponential backoff: 2s → 4s → 8s
+//
 
 /**
- * Create an RPC connection with intelligent fallback:
- * 1. Try primary RPC (Helius)
- * 2. If 403/429/5xx → fallback to public RPC
- * 3. Retry with exponential backoff
+ * Three-pipe RPC strategy with intelligent fallback.
+ * Cycles through Gatekeeper → Standard → Free with retry logic.
+ * Perfect for handling rate limits gracefully.
  */
-async function createRobustConnection(primaryUrl: string, fallbackUrl: string): Promise<Connection> {
-  const attempts = CONFIG.rpcMaxRetries + 1;
+async function createRobustConnection(): Promise<Connection> {
+  // Construct the three RPC URLs with Helius API key
+  const HELIUS_KEY = CONFIG.heliusApiKey;
+  
+  const rpcUrls = [
+    `https://beta.helius-rpc.com/?api-key=${HELIUS_KEY}`,          // Gatekeeper (fastest)
+    `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`,       // Standard (balanced)
+    CONFIG.rpcFallback ?? "https://api.mainnet-beta.solana.com",   // Free (public)
+  ];
+  
+  const rpcNames = ["Gatekeeper", "Standard", "Free"];
+  const maxAttempts = CONFIG.rpcMaxRetries + 1;
   let lastError: Error | null = null;
 
-  for (let attempt = 0; attempt < attempts; attempt++) {
-    try {
-      // Alternate between primary and fallback URLs
-      const url = attempt % 2 === 0 ? primaryUrl : fallbackUrl;
-      const conn = new Connection(url, "confirmed");
-      
-      // Test the connection with a simple RPC call
-      const latestBlockhash = await Promise.race([
-        conn.getLatestBlockhash(),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("RPC timeout")), CONFIG.rpcTimeoutMs)
-        ),
-      ]);
-      
-      console.log(`✅ Connected to RPC: ${url.substring(0, 50)}…`);
-      return conn;
-    } catch (error) {
-      lastError = error;
-      const msg = error instanceof Error ? error.message : String(error);
-      const urlUsed = attempt % 2 === 0 ? "Helius" : "Public";
-      
-      console.warn(`⚠️  ${urlUsed} RPC failed (attempt ${attempt + 1}/${attempts}): ${msg}`);
-      
-      // Exponential backoff before retry
-      if (attempt < attempts - 1) {
-        const delayMs = CONFIG.rpcRetryDelayMs * Math.pow(2, Math.floor(attempt / 2));
-        console.log(`   ⏳ Waiting ${delayMs}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, delayMs));
+  // Try each RPC multiple times before moving to the next
+  for (let rpcIndex = 0; rpcIndex < rpcUrls.length; rpcIndex++) {
+    const url = rpcUrls[rpcIndex];
+    const name = rpcNames[rpcIndex];
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const conn = new Connection(url, "confirmed");
+        
+        // Test the connection immediately
+        const testResult = await Promise.race([
+          conn.getLatestBlockhash(),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("timeout")), CONFIG.rpcTimeoutMs)
+          ),
+        ]);
+        
+        console.log(`✅ Connected to ${name} RPC (${url.substring(0, 40)}…)`);
+        return conn;
+      } catch (error) {
+        lastError = error;
+        const msg = error instanceof Error ? error.message : String(error);
+        
+        // Log failure
+        if (attempt < maxAttempts - 1) {
+          // Still have retries for this RPC
+          const delayMs = CONFIG.rpcRetryDelayMs * Math.pow(2, attempt);
+          console.warn(`⚠️  ${name} RPC attempt ${attempt + 1}/${maxAttempts} failed: ${msg}`);
+          console.log(`   ⏳ Waiting ${delayMs}ms before next attempt...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        } else if (rpcIndex < rpcUrls.length - 1) {
+          // Moving to the next RPC
+          console.warn(`⚠️  ${name} RPC failed after ${maxAttempts} attempts, trying ${rpcNames[rpcIndex + 1]}...`);
+        } else {
+          // All RPCs exhausted
+          console.error(`❌ ${name} RPC failed after ${maxAttempts} attempts (last in chain)`);
+        }
       }
     }
   }
 
   throw new Error(
-    `Failed to connect to RPC after ${attempts} attempts. Last error: ${lastError?.message}`
+    `❌ Failed to connect to any RPC. Tried: ${rpcNames.join(" → ")}. Last error: ${lastError?.message}`
   );
 }
 
@@ -344,8 +371,9 @@ async function main(): Promise<void> {
 
   console.log(`🔑  Crank wallet : ${crankKp.publicKey.toBase58()}`);
 
-  // ── Connect with intelligent fallback ──
-  const connection = await createRobustConnection(RPC_URL, CONFIG.rpcFallback);
+  // ── Connect with three-pipe RPC strategy ──
+  // Automatically tries: Gatekeeper → Standard → Free (with retries)
+  const connection = await createRobustConnection();
   
   // Test balance with retry
   let balance = 0;

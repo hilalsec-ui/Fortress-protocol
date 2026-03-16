@@ -6,12 +6,20 @@ export const IDL_ACCOUNT = "BDNQMd2XwvAhmMB8wCzxzajQEF3Ky5h5krpWg1dZ17iG";
 export const DEPLOY_TX = "3yrt41a5PsNC3q2V2xiLeD6r7BNQz1TvQV9RkSeWnymsTRfGjbCBA1kvKz1Jq99ThRLT4LkKujowi1ed5woNGgWN";
 export const DEPLOYED_AT = "2026-03-16";
 
-// Three-Tier RPC Strategy for Helius Free Tier Optimization
+// Three-Pipe RPC Strategy for Helius Free Tier Optimization
 // ──────────────────────────────────────────────────────────────
 // RPC_ENDPOINT (legacy) — kept for backwards compatibility with Solana Wallet Adapter
-export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC_STABLE || "https://mainnet.helius-rpc.com";
+export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://mainnet.helius-rpc.com";
 
-// New smart RPC endpoints — use getFortressConnection(type) in rpcManager.ts
+// Three Pipes — use getFortressConnection(pipe) in rpcManager.ts
+// - Gatekeeper: Helius Beta (fastest for user transactions)
+// - Standard: Helius Standard (balanced for background polling)
+// - Free: Solana Public (saves credits for non-critical reads)
+export const RPC_GATEKEEPER = process.env.NEXT_PUBLIC_RPC_GATEKEEPER || "https://beta.helius-rpc.com";
+export const RPC_STANDARD = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://mainnet.helius-rpc.com";
+export const RPC_FREE = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";
+
+// Legacy RPC constants (kept for backwards compatibility)
 export const RPC_UX = process.env.NEXT_PUBLIC_RPC_UX || "https://beta.helius-rpc.com";
 export const RPC_STABLE = process.env.NEXT_PUBLIC_RPC_STABLE || "https://mainnet.helius-rpc.com";
 export const RPC_PUBLIC = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";

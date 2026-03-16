@@ -90,7 +90,7 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
       try {
         // Use smart RPC manager for polling — routes to Helius Standard endpoint
         // with automatic 429 fallback to public RPC
-        const pollingConnection = getFortressConnection("POLLING");
+        const pollingConnection = getFortressConnection("STANDARD");
 
         // All RPC reads fire in parallel — one combined network burst per cycle
         // Batch SOL vault balance + Clock sysvar into ONE getMultipleAccountsInfo call
@@ -102,7 +102,7 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
             program
               ? withFortressRpc(
                   () => fetchAllLotteryAccounts(program),
-                  "POLLING"
+                  "STANDARD"
                 )
               : Promise.resolve(null),
 
@@ -113,7 +113,7 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
                   [SOL_VAULT_PDA, SYSVAR_CLOCK_PUBKEY],
                   "confirmed"
                 ),
-              "POLLING"
+              "STANDARD"
             ),
 
             // 3. FPT ATA balance (treasury page)
@@ -133,7 +133,7 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
                   parseFloat(info.value.amount) / Math.pow(10, FPT_DECIMALS)
                 );
               },
-              "POLLING"
+              "STANDARD"
             ),
           ]);
 

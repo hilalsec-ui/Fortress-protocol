@@ -1,11 +1,11 @@
 /**
  * @file rpcManager.ts
- * @description Smart RPC Connection Manager for Fortress Protocol
+ * @description Smart RPC Connection Manager for Fortress Protocol — "Three Pipes" Strategy
  * 
- * Routes requests to appropriate RPC endpoints based on operation type:
- * - UX: Helius Beta (Fastest for write operations)
- * - POLLING: Helius Standard (Balanced for background polling)
- * - FREE: Solana Public (Conserves Helius credits for wallet queries)
+ * Routes requests to the most appropriate RPC endpoint based on operation type:
+ * - Gatekeeper: Helius Beta (fastest for user transactions)
+ * - Standard: Helius Standard (balanced for background polling)
+ * - Free: Solana Public (conserves Helius credits for non-critical reads)
  * 
  * Implements hybrid fallback logic:
  * - Primary RPC with 429/timeout handling
@@ -13,26 +13,26 @@
  * - Fallback to Solana public RPC on failure
  * 
  * Purpose: Maximize Helius free tier throughput (1,000 req/min) while
- * minimizing per-operation credit waste on non-critical queries.
+ * minimizing per-operation credit waste and ensuring reliability.
  */
 
 import { Connection, RpcResponseAndContext } from "@solana/web3.js";
 
-// RPC Endpoints — from environment variables
-const RPC_UX = process.env.NEXT_PUBLIC_RPC_UX || "https://beta.helius-rpc.com";
-const RPC_STABLE = process.env.NEXT_PUBLIC_RPC_STABLE || "https://mainnet.helius-rpc.com";
-const RPC_PUBLIC = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";
+// Three-Pipe RPC Endpoints — from environment variables
+const RPC_GATEKEEPER = process.env.NEXT_PUBLIC_RPC_GATEKEEPER || "https://beta.helius-rpc.com";
+const RPC_STANDARD = process.env.NEXT_PUBLIC_RPC_STANDARD || "https://mainnet.helius-rpc.com";
+const RPC_FREE = process.env.NEXT_PUBLIC_RPC_PUBLIC || "https://api.mainnet-beta.solana.com";
 
 // Connection pool — reuse connections across the app
 const connectionPool: Map<string, Connection> = new Map();
 
 /**
- * Type of RPC operation — determines which endpoint to use
- * - 'UX': Buy/Draw transactions (write-heavy) → Helius Beta (fastest)
- * - 'POLLING': Background timer updates (read-heavy) → Helius Standard
+ * Type of RPC operation — determines which endpoint ("pipe") to use
+ * - 'GATEKEEPER': Buy/Draw transactions (write-heavy, user-facing) → Helius Beta (fastest)
+ * - 'STANDARD': Background polling, 16-tier data fetching, crank tasks → Helius Standard
  * - 'FREE': Wallet balance, token metadata → Solana Public (saves credits)
  */
-export type RpcOperationType = "UX" | "POLLING" | "FREE";
+export type RpcPipeType = "GATEKEEPER" | "STANDARD" | "FREE";
 
 // Get cached connection or create new one
 function getConnection(url: string): Connection {
@@ -43,16 +43,16 @@ function getConnection(url: string): Connection {
 }
 
 /**
- * Get the appropriate RPC endpoint for this operation type
+ * Get the appropriate RPC endpoint for this operation type ("pipe")
  */
-function getEndpointForType(type: RpcOperationType): string {
-  switch (type) {
-    case "UX":
-      return RPC_UX;
-    case "POLLING":
-      return RPC_STABLE;
+function getEndpointForPipe(pipe: RpcPipeType): string {
+  switch (pipe) {
+    case "GATEKEEPER":
+      return RPC_GATEKEEPER;
+    case "STANDARD":
+      return RPC_STANDARD;
     case "FREE":
-      return RPC_PUBLIC;
+      return RPC_FREE;
   }
 }
 
@@ -79,7 +79,7 @@ function isRetryableError(err: any): boolean {
  * Wraps an async function with retry logic and fallback
  * 
  * @param operation Async function to execute (will receive a Connection object)
- * @param type Operation type (UX, POLLING, FREE)
+ * @param pipe Operation type (GATEKEEPER, STANDARD, FREE)
  * @param maxRetries Number of retries on primary RPC
  * @returns Result from RPC call
  * 
@@ -90,10 +90,10 @@ function isRetryableError(err: any): boolean {
  */
 export async function withFortressRpc<T>(
   operation: (conn: Connection) => Promise<T>,
-  type: RpcOperationType = "POLLING",
+  pipe: RpcPipeType = "STANDARD",
   maxRetries = 3
 ): Promise<T> {
-  const primaryEndpoint = getEndpointForType(type);
+  const primaryEndpoint = getEndpointForPipe(pipe);
   const primaryConnection = getConnection(primaryEndpoint);
 
   try {
@@ -104,22 +104,22 @@ export async function withFortressRpc<T>(
     );
   } catch (primaryErr) {
     // Check if error is retryable and not already on public RPC
-    if (isRetryableError(primaryErr) && primaryEndpoint !== RPC_PUBLIC) {
+    if (isRetryableError(primaryErr) && primaryEndpoint !== RPC_FREE) {
       console.warn(
-        `[RPC] Primary (${primaryEndpoint}) failed: ${(primaryErr as any)?.message}. ` +
+        `[RPC] Primary (${pipe} pipe: ${primaryEndpoint}) failed: ${(primaryErr as any)?.message}. ` +
           `Falling back to Solana public RPC...`
       );
 
-      const fallbackConnection = getConnection(RPC_PUBLIC);
+      const fallbackConnection = getConnection(RPC_FREE);
       try {
         return await withRetryLogic(
           () => operation(fallbackConnection),
-          RPC_PUBLIC,
+          RPC_FREE,
           1 // Single retry on fallback
         );
       } catch (fallbackErr) {
         console.error(
-          `[RPC] Both primary and fallback RPCs failed for operation type '${type}'`,
+          `[RPC] Both primary (${pipe}) and fallback RPCs failed for operation`,
           fallbackErr
         );
         throw fallbackErr;
@@ -163,13 +163,13 @@ async function withRetryLogic<T>(
 }
 
 /**
- * Get a Fortress-optimized Connection object for a specific operation type
+ * Get a Fortress-optimized Connection object for a specific operation type ("pipe")
  * 
- * @param type 'UX' (fastest writes), 'POLLING' (balanced), 'FREE' (public)
+ * @param pipe 'GATEKEEPER' (fastest), 'STANDARD' (balanced), 'FREE' (cheap)
  * @returns Connection object configured to the appropriate endpoint
  */
-export function getFortressConnection(type: RpcOperationType): Connection {
-  const endpoint = getEndpointForType(type);
+export function getFortressConnection(pipe: RpcPipeType): Connection {
+  const endpoint = getEndpointForPipe(pipe);
   return getConnection(endpoint);
 }
 
@@ -188,17 +188,17 @@ export async function fortressGetBalance(
 
 export async function fortressGetAccountInfo(
   pubkey: string,
-  type: RpcOperationType = "POLLING"
+  pipe: RpcPipeType = "STANDARD"
 ): Promise<any | null> {
   return withFortressRpc(
     (conn) => conn.getAccountInfo(new (require("@solana/web3.js").PublicKey)(pubkey), "confirmed"),
-    type
+    pipe
   );
 }
 
 export async function fortressGetMultipleAccountsInfo(
   pubkeys: string[],
-  type: RpcOperationType = "POLLING"
+  pipe: RpcPipeType = "STANDARD"
 ): Promise<any[]> {
   return withFortressRpc(
     (conn) =>
@@ -206,32 +206,32 @@ export async function fortressGetMultipleAccountsInfo(
         pubkeys.map((pk) => new (require("@solana/web3.js").PublicKey)(pk)),
         "confirmed"
       ),
-    type
+    pipe
   );
 }
 
 export async function fortressGetTokenAccountBalance(
   tokenAccountAddress: string,
-  type: RpcOperationType = "POLLING"
+  pipe: RpcPipeType = "STANDARD"
 ): Promise<any> {
   return withFortressRpc(
     (conn) =>
       conn.getTokenAccountBalance(
         new (require("@solana/web3.js").PublicKey)(tokenAccountAddress)
       ),
-    type
+    pipe
   );
 }
 
 /**
- * Send a transaction — uses UX (Helius Beta) for fastest confirmation
+ * Send a transaction — uses GATEKEEPER (Helius Beta) for fastest confirmation
  */
 export async function fortressSendRawTransaction(
   rawTransaction: Buffer | Uint8Array
 ): Promise<string> {
   return withFortressRpc(
     (conn) => conn.sendRawTransaction(rawTransaction, { skipPreflight: true }),
-    "UX", // Fastest endpoint for user-facing transactions
+    "GATEKEEPER", // Fastest endpoint for user-facing transactions
     2
   );
 }

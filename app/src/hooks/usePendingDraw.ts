@@ -7,7 +7,7 @@
  *   'requested'    – PendingDraw PDA exists, oracle hasn't revealed yet
  *   'oracle_ready' – oracle has committed reveal_slot (reveal_slot > 0)
  *
- * Uses smart RPC routing: getFortressConnection('POLLING') with automatic
+ * Uses smart RPC routing: getFortressConnection('STANDARD') with automatic
  * fallback and polling jitter to prevent synchronized RPC spikes.
  */
 
@@ -74,8 +74,8 @@ export function usePendingDraws(
     let firstPollDone = false;
     let pollTimeoutRef: NodeJS.Timeout | null = null;
 
-    // Use smart RPC manager for polling — routes to Helius with automatic fallback
-    const pollingConnection = getFortressConnection("POLLING");
+    // Use smart RPC manager for polling — routes to Helius Standard with automatic fallback
+    const pollingConnection = getFortressConnection("STANDARD");
 
     async function pollAll() {
       if (cancelled) return;

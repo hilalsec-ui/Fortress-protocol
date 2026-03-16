@@ -1,45 +1,70 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletName } from '@solana/wallet-adapter-base';
 
 interface WalletClientWrapperProps {
   className?: string;
 }
 
-function isMobileBrowser(): boolean {
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-}
-
-function isPhantomInjected(): boolean {
-  return !!(
-    (window as any).phantom?.solana?.isPhantom ||
-    ((window as any).solana?.isPhantom)
-  );
-}
-
-function openInPhantom() {
-  const url = encodeURIComponent(window.location.href);
-  const ref = encodeURIComponent(window.location.origin);
-  window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
-}
-
-function openInSolflare() {
-  const url = encodeURIComponent(window.location.href);
-  window.location.href = `https://solflare.com/ul/v1/browse/${url}?ref=${encodeURIComponent(window.location.origin)}`;
-}
+const MWA_NAME = 'Mobile Wallet Adapter' as WalletName;
 
 const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) => {
-  const { connected, publicKey } = useWallet();
+  const { connected, publicKey, select, connect, disconnect, wallet, connecting } = useWallet();
   const [mounted, setMounted] = useState(false);
-  const [showMobileButtons, setShowMobileButtons] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mwaFailed, setMwaFailed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (isMobileBrowser() && !isPhantomInjected()) {
-      setShowMobileButtons(true);
+    const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const phantomInjected = !!(
+      (window as any).phantom?.solana?.isPhantom ||
+      (window as any).solana?.isPhantom
+    );
+    setIsMobile(mobile && !phantomInjected);
+  }, []);
+
+  // Pre-select MWA adapter on mobile so connect() knows which adapter to use
+  useEffect(() => {
+    if (mounted && isMobile && !connected && !wallet) {
+      try { select(MWA_NAME); } catch { /* ignored */ }
     }
+  }, [mounted, isMobile, connected, wallet, select]);
+
+  // When MWA is selected and we just connected, clear any failure state
+  useEffect(() => {
+    if (connected) setMwaFailed(false);
+  }, [connected]);
+
+  const handleMobileConnect = useCallback(async () => {
+    try {
+      setMwaFailed(false);
+      // Ensure MWA is selected
+      if (!wallet || wallet.adapter.name !== MWA_NAME) {
+        select(MWA_NAME);
+        // Brief delay to let React update the selected adapter
+        await new Promise(r => setTimeout(r, 150));
+      }
+      await connect();
+    } catch (e) {
+      console.error('Mobile wallet connect failed:', e);
+      setMwaFailed(true);
+    }
+  }, [wallet, select, connect]);
+
+  const openInPhantom = useCallback(() => {
+    const url = encodeURIComponent(window.location.href);
+    const ref = encodeURIComponent(window.location.origin);
+    window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
+  }, []);
+
+  const openInSolflare = useCallback(() => {
+    const url = encodeURIComponent(window.location.href);
+    const ref = encodeURIComponent(window.location.origin);
+    window.location.href = `https://solflare.com/ul/v1/browse/${url}?ref=${ref}`;
   }, []);
 
   if (!mounted) {
@@ -52,24 +77,49 @@ const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) 
     );
   }
 
-  // On mobile without an injected provider: show deep-link buttons so the user
-  // can open the dApp inside the wallet's in-app browser (where the provider IS
-  // injected and connect works normally).
-  if (showMobileButtons && !connected) {
+  /* ── Desktop or already inside a wallet's in-app browser ── */
+  if (!isMobile) {
+    return (
+      <div className="wallet-wrapper w-full">
+        <WalletMultiButton className={className} />
+        {connected && publicKey && (
+          <p className="text-xs text-gray-400 mt-2 text-center">
+            {publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Mobile — connected ── */
+  if (connected && publicKey) {
+    return (
+      <div className="wallet-wrapper w-full">
+        <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center font-semibold text-sm">
+          ✓ {publicKey.toBase58().slice(0, 4)}…{publicKey.toBase58().slice(-4)}
+        </div>
+        <button
+          onClick={() => disconnect()}
+          className="w-full mt-2 py-2 px-4 rounded-lg text-xs text-gray-400 hover:text-white transition-colors text-center"
+        >
+          Disconnect
+        </button>
+      </div>
+    );
+  }
+
+  /* ── Mobile — MWA failed → show fallback browse links ── */
+  if (mwaFailed) {
     return (
       <div className="wallet-wrapper w-full flex flex-col gap-2">
+        <p className="text-xs text-gray-400 text-center mb-1">
+          Direct connect unavailable — open the site inside your wallet app instead:
+        </p>
         <button
           onClick={openInPhantom}
           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-300"
           style={{ background: 'linear-gradient(135deg, #ab9ff2, #7c5fe6)' }}
         >
-          {/* Phantom ghost icon */}
-          <svg width="20" height="20" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="128" height="128" rx="32" fill="#AB9FF2"/>
-            <path d="M110.5 64.5C110.5 40.5 92 22 68 22C44 22 25.5 40.5 25.5 64.5C25.5 80 34 93.5 46.5 101V106.5C46.5 108.5 48 110 50 110H55C57 110 58.5 108.5 58.5 106.5V104H69.5V106.5C69.5 108.5 71 110 73 110H78C80 110 81.5 108.5 81.5 106.5V101C94 93.5 110.5 80 110.5 64.5Z" fill="white"/>
-            <circle cx="53" cy="62" r="7" fill="#AB9FF2"/>
-            <circle cx="75" cy="62" r="7" fill="#AB9FF2"/>
-          </svg>
           Open in Phantom
         </button>
         <button
@@ -77,25 +127,32 @@ const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) 
           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-300"
           style={{ background: 'linear-gradient(135deg, #fc8f04, #f95c04)' }}
         >
-          {/* Solflare sun icon */}
-          <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="16" cy="16" r="16" fill="#FC8F04"/>
-            <circle cx="16" cy="16" r="7" fill="white"/>
-          </svg>
           Open in Solflare
+        </button>
+        <button
+          onClick={() => setMwaFailed(false)}
+          className="text-xs text-gray-500 hover:text-gray-300 transition-colors mt-1 text-center"
+        >
+          ← Try again
         </button>
       </div>
     );
   }
 
+  /* ── Mobile — primary connect button (triggers MWA) ── */
   return (
     <div className="wallet-wrapper w-full">
-      <WalletMultiButton className={className} />
-      {connected && publicKey && (
-        <p className="text-xs text-gray-400 mt-2 text-center">
-          {publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}
-        </p>
-      )}
+      <button
+        onClick={handleMobileConnect}
+        disabled={connecting}
+        className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-300 ${
+          connecting
+            ? 'bg-gray-500 cursor-wait'
+            : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'
+        }`}
+      >
+        {connecting ? 'Connecting…' : 'Connect Wallet'}
+      </button>
     </div>
   );
 };

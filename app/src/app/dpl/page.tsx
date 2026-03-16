@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useAnchorProgram } from '@/utils/anchor';
 import { PROGRAM_ID, PRIZE_WINNER_PCT, PRIZE_TREASURY_PCT, FPT_MINT, CRANK_AUTHORITY } from '@/utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -145,8 +144,7 @@ const DPLPage: React.FC = () => {
     }
   }, [nowSeconds, lotteryData]);
 
-  const { setVisible: setWalletModalVisible } = useWalletModal();
-  const handleConnectWalletClick = () => setWalletModalVisible(true);
+  const handleConnectWalletClick = () => window.dispatchEvent(new CustomEvent('open-sidebar'));
 
   const handleBuyTicket = async (tier: number) => {
     if (!connected) {

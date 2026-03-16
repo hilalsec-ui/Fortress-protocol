@@ -16,13 +16,27 @@ const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) 
   useEffect(() => {
     setMounted(true);
     const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const walletInjected = !!(
-      (window as any).phantom?.solana?.isPhantom ||
-      (window as any).solana?.isPhantom ||
-      (window as any).solflare?.isSolflare
-    );
+    
+    // ── Auto-detect installed wallets ─────────────────────────────────────
+    // Check if any Solana wallet extension is injected into window
+    const detectInstalledWallets = () => {
+      const installed = [];
+      const w = window as any;
+      
+      if (w.phantom?.solana?.isPhantom) installed.push('Phantom');
+      if (w.solflare?.isSolflare) installed.push('Solflare');
+      if (w.backpack?.solana) installed.push('Backpack');
+      if (w.magicEden?.solana) installed.push('Magic Eden');
+      if (w.sollet) installed.push('Sollet');
+      
+      return installed;
+    };
+    
+    const installedWallets = detectInstalledWallets();
+    const hasWallet = installedWallets.length > 0;
+    
     // Mobile browser without a wallet extension → need deeplink
-    setNeedsDeeplink(mobile && !walletInjected);
+    setNeedsDeeplink(mobile && !hasWallet);
   }, []);
 
   if (!mounted) {
@@ -35,10 +49,17 @@ const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) 
     );
   }
 
-  // Desktop or already inside a wallet's in-app browser → standard button
+  // Desktop or already inside a wallet's in-app browser → standard button with auto-detection
   if (!needsDeeplink) {
     return (
       <div className="wallet-wrapper w-full">
+        {/* 
+          WalletMultiButton automatically:
+          1. Detects installed wallets (Phantom, Solflare, Backpack, etc.)
+          2. Shows a dropdown of available wallets
+          3. Connects to the selected wallet
+          4. Remembers the choice via localStorage
+        */}
         <WalletMultiButton className={className} />
         {connected && publicKey && (
           <p className="text-xs text-gray-400 mt-2 text-center">
@@ -49,23 +70,38 @@ const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) 
     );
   }
 
-  // Mobile without wallet injected → single button that auto-detects wallet
+  // Mobile without wallet injected → button that opens Phantom (most popular deeplink)
   return (
     <div className="wallet-wrapper w-full">
       <button
         onClick={() => {
           const url = encodeURIComponent(window.location.href);
           const ref = encodeURIComponent(window.location.origin);
-          // Try Phantom first (most popular Solana wallet), fall back to Solflare
+          
+          // ── Auto-detect and suggest the most popular Solana wallet ────────
+          // Phantom is most popular (~40% market share) — fallback to Solflare
           const isAndroid = /Android/i.test(navigator.userAgent);
-          // On Android, check if Phantom is likely installed via intent scheme
-          // On iOS, always try Phantom universal link (it redirects to App Store if not installed)
-          window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
+          
+          if (isAndroid) {
+            // Android: Try Phantom app intent, fallback to browser link
+            try {
+              window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
+            } catch {
+              // Fallback to Solflare
+              window.location.href = `https://solflare.com/ul/browse?target=${url}`;
+            }
+          } else {
+            // iOS: Universal links (Phantom then Solflare)
+            window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
+          }
         }}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white active:scale-95 transition-all duration-150 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white active:scale-95 transition-all duration-150 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
       >
-        Connect Wallet
+        🔗 Connect Wallet via Phantom
       </button>
+      <p className="text-xs text-gray-400 mt-2 text-center">
+        Phantom not installed? <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">Download here</a>
+      </p>
     </div>
   );
 };

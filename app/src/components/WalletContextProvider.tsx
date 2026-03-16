@@ -8,6 +8,7 @@ import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger';
 import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
 import { MagicEdenWalletAdapter } from '@solana/wallet-adapter-magiceden';
+import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet';
 import {
   SolanaMobileWalletAdapter,
   createDefaultAddressSelector,
@@ -39,18 +40,22 @@ export default function WalletContextProvider({ children }: WalletContextProvide
         cluster: 'mainnet-beta',
         onWalletNotFound: createDefaultWalletNotFoundHandler(),
       }),
-      // Desktop browser extensions
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-      new MagicEdenWalletAdapter(),
-      new LedgerWalletAdapter(),
+      // ── Desktop Browser Extensions (auto-detected by order) ─────────────────
+      // Each adapter detects if the wallet extension is installed.
+      // If multiple are installed, users can choose from the dropdown.
+      new PhantomWalletAdapter(),           // Most popular (~40% market share)
+      new SolflareWalletAdapter(),          // Second most popular
+      new BackpackWalletAdapter(),          // Growing fast (Xnft support)
+      new MagicEdenWalletAdapter(),         // NFT marketplace + wallet
+      new LedgerWalletAdapter(),            // Hardware wallet support
+      new SolletWalletAdapter(),            // Web-based fallback
     ],
     []
   );
 
   const onError = (error: WalletError) => {
-    console.error('🚨 Wallet Error:', error.message);
+    console.error('🚨 Wallet connection error:', error.message);
+    // Don't throw — let the user try again or use a fallback wallet
   };
 
   return (

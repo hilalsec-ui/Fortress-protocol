@@ -13,15 +13,20 @@
  * Prerequisites:
  *   • Crank wallet (BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5) funded with SOL on Mainnet-Beta
  *   • RandomnessAccounts pre-initialised: npx ts-node ../scripts/reinit-sb-randomness-crank.ts
+ *   • Environment variables set: RPC_URL, CRANK_PRIVATE_KEY (or ANCHOR_WALLET)
  *
  * Local usage:
- *   cd crank && CRANK_PRIVATE_KEY=<base58-secret-key> npx ts-node index.ts
+ *   cd crank && npm install && source .env && npx ts-node index.ts
  *
  * CI usage: CRANK_PRIVATE_KEY is injected from GitHub Secrets (see ../.github/workflows/crank-mainnet.yml).
  */
 
-// In CI, env vars are injected by GitHub Actions. For local dev, run:
-//   source .env && npx ts-node index.ts
+// Load and validate environment variables from .env file (local development)
+// For CI, env vars are injected by GitHub Actions (see ../.github/workflows/crank-mainnet.yml)
+import { CONFIG } from "./config";
+
+// For local dev, run:
+//   cd crank && npm install && source .env && npx ts-node index.ts
 
 import * as anchor from "@coral-xyz/anchor";
 import { AnchorProvider, Program, BN, Wallet } from "@coral-xyz/anchor";
@@ -46,7 +51,9 @@ import * as path from "path";
 
 // ─── Network & Program Constants ────────────────────────────────────────────
 
-const RPC_URL = process.env.RPC_URL ?? "https://api.mainnet-beta.solana.com";
+// RPC Endpoint: Helius (preferred, faster + better rate limits) or Solana public RPC (fallback)
+// Loaded & validated from .env by config.ts
+const RPC_URL = CONFIG.rpcUrl;
 const PROGRAM_ID = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 const FPT_MINT   = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
 const SB_MAINNET_QUEUE = new PublicKey("3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1");

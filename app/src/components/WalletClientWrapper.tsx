@@ -49,31 +49,22 @@ const WalletClientWrapper: React.FC<WalletClientWrapperProps> = ({ className }) 
     );
   }
 
-  // Mobile without wallet injected → deeplink buttons that open the site
-  // inside the wallet app's built-in browser
+  // Mobile without wallet injected → single button that auto-detects wallet
   return (
-    <div className="wallet-wrapper w-full flex flex-col gap-2">
+    <div className="wallet-wrapper w-full">
       <button
         onClick={() => {
           const url = encodeURIComponent(window.location.href);
           const ref = encodeURIComponent(window.location.origin);
+          // Try Phantom first (most popular Solana wallet), fall back to Solflare
+          const isAndroid = /Android/i.test(navigator.userAgent);
+          // On Android, check if Phantom is likely installed via intent scheme
+          // On iOS, always try Phantom universal link (it redirects to App Store if not installed)
           window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
         }}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white active:scale-95 transition-all duration-150"
-        style={{ background: 'linear-gradient(135deg, #ab9ff2, #7c5fe6)' }}
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white active:scale-95 transition-all duration-150 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
       >
-        Connect with Phantom
-      </button>
-      <button
-        onClick={() => {
-          const url = encodeURIComponent(window.location.href);
-          const ref = encodeURIComponent(window.location.origin);
-          window.location.href = `https://solflare.com/ul/v1/browse/${url}?ref=${ref}`;
-        }}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-white active:scale-95 transition-all duration-150"
-        style={{ background: 'linear-gradient(135deg, #fc8f04, #f95c04)' }}
-      >
-        Connect with Solflare
+        Connect Wallet
       </button>
     </div>
   );

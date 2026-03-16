@@ -110,7 +110,89 @@ const POLL_INTERVAL_MS = 1_500;
 // Must stay within on-chain bounds: [MIN_SETTLER_REWARD = 100_000, MAX_SETTLER_REWARD = 5_000_000].
 const SETTLER_REWARD_FPT = 500_000;
 
-// ─── PDA Derivation Helpers ──────────────────────────────────────────────────
+// ─── RPC Connection with Fallback & Retry Logic ──────────────────────────────
+
+/**
+ * Create an RPC connection with intelligent fallback:
+ * 1. Try primary RPC (Helius)
+ * 2. If 403/429/5xx → fallback to public RPC
+ * 3. Retry with exponential backoff
+ */
+async function createRobustConnection(primaryUrl: string, fallbackUrl: string): Promise<Connection> {
+  const attempts = CONFIG.rpcMaxRetries + 1;
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      // Alternate between primary and fallback URLs
+      const url = attempt % 2 === 0 ? primaryUrl : fallbackUrl;
+      const conn = new Connection(url, "confirmed");
+      
+      // Test the connection with a simple RPC call
+      const latestBlockhash = await Promise.race([
+        conn.getLatestBlockhash(),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("RPC timeout")), CONFIG.rpcTimeoutMs)
+        ),
+      ]);
+      
+      console.log(`✅ Connected to RPC: ${url.substring(0, 50)}…`);
+      return conn;
+    } catch (error) {
+      lastError = error;
+      const msg = error instanceof Error ? error.message : String(error);
+      const urlUsed = attempt % 2 === 0 ? "Helius" : "Public";
+      
+      console.warn(`⚠️  ${urlUsed} RPC failed (attempt ${attempt + 1}/${attempts}): ${msg}`);
+      
+      // Exponential backoff before retry
+      if (attempt < attempts - 1) {
+        const delayMs = CONFIG.rpcRetryDelayMs * Math.pow(2, Math.floor(attempt / 2));
+        console.log(`   ⏳ Waiting ${delayMs}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+
+  throw new Error(
+    `Failed to connect to RPC after ${attempts} attempts. Last error: ${lastError?.message}`
+  );
+}
+
+/**
+ * Fetch latest blockhash with retry logic and exponential backoff.
+ * Handles 403/429/5xx errors gracefully.
+ */
+async function getLatestBlockhashWithRetry(conn: Connection): Promise<string> {
+  const maxAttempts = CONFIG.rpcMaxRetries + 1;
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      const result = await Promise.race([
+        conn.getLatestBlockhash("confirmed"),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("getLatestBlockhash timeout")), CONFIG.rpcTimeoutMs)
+        ),
+      ]);
+      return result.blockhash;
+    } catch (error) {
+      lastError = error;
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn(`⚠️  getLatestBlockhash failed (attempt ${attempt + 1}/${maxAttempts}): ${msg}`);
+      
+      if (attempt < maxAttempts - 1) {
+        const delayMs = CONFIG.rpcRetryDelayMs * Math.pow(2, attempt);
+        console.log(`   ⏳ Waiting ${delayMs}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+
+  throw lastError || new Error("Failed to get latest blockhash after retries");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function vaultPDA(prefix: string, tier: number): PublicKey {
   return PublicKey.findProgramAddressSync(
@@ -262,9 +344,30 @@ async function main(): Promise<void> {
 
   console.log(`🔑  Crank wallet : ${crankKp.publicKey.toBase58()}`);
 
-  // ── Connect ──
-  const connection = new Connection(RPC_URL, "confirmed");
-  const balance    = await connection.getBalance(crankKp.publicKey);
+  // ── Connect with intelligent fallback ──
+  const connection = await createRobustConnection(RPC_URL, CONFIG.rpcFallback);
+  
+  // Test balance with retry
+  let balance = 0;
+  for (let attempt = 0; attempt < CONFIG.rpcMaxRetries + 1; attempt++) {
+    try {
+      balance = await Promise.race([
+        connection.getBalance(crankKp.publicKey),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("getBalance timeout")), CONFIG.rpcTimeoutMs)
+        ),
+      ]);
+      break;
+    } catch (error) {
+      if (attempt === CONFIG.rpcMaxRetries) {
+        console.error("❌ Failed to fetch balance after retries");
+        throw error;
+      }
+      console.warn(`⚠️  Failed to fetch balance (attempt ${attempt + 1}/${CONFIG.rpcMaxRetries + 1}), retrying...`);
+      await new Promise(resolve => setTimeout(resolve, CONFIG.rpcRetryDelayMs * Math.pow(2, attempt)));
+    }
+  }
+  
   console.log(`💰  Balance       : ${(balance / 1e9).toFixed(4)} SOL`);
   if (balance < 0.05e9) {
     console.warn(
@@ -462,7 +565,7 @@ async function doRequestDraw(
     console.log(`${tag}  → SB oracle commit`);
     const randomness    = new sb.Randomness(sbProgram, randomnessAccountPk);
     const commitIx      = await (randomness.commitIx(SB_MAINNET_QUEUE) as Promise<import("@solana/web3.js").TransactionInstruction>);
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
+    const blockhash     = await getLatestBlockhashWithRetry(connection);
     const msg           = new TransactionMessage({
       payerKey:        crankKp.publicKey,
       recentBlockhash: blockhash,

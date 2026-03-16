@@ -42,7 +42,7 @@ let _cache: {
   fptMarketUsd: number | null;
   fetchedAt: number;
 } | null = null;
-const CACHE_TTL_MS = 30_000;
+const CACHE_TTL_MS = 300_000; // Extended from 30s to 5 minutes — saves 1 RPC call per ticket
 
 // ── fetch helpers ───────────────────────────────────────────────────────────────
 async function fetchWithTimeout(url: string, ms = 5000): Promise<Response> {

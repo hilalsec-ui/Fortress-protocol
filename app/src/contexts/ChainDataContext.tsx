@@ -29,7 +29,7 @@ const [SOL_VAULT_PDA] = PublicKey.findProgramAddressSync(
   PROGRAM_PUBKEY
 );
 
-const POLL_MS = 10_000;
+const POLL_MS = 20_000; // Reduced from 10s to 20s — saves 50% RPC load
 
 // ── Retry helper — exponential backoff on 429 ─────────────────────────────────
 async function withRetry<T>(

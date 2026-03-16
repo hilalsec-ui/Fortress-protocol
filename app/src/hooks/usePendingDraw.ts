@@ -22,7 +22,7 @@ const LOTTERY_TYPE_ID: Record<string, number> = {
   MPL: 3,
 };
 
-const POLL_INTERVAL_MS = 1500;
+const POLL_INTERVAL_MS = 2500; // Reduced from 1500ms to 2500ms — saves 40% RPC load
 
 /**
  * @param program  Anchor program (or null while wallet is loading)

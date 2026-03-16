@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useAnchorProgram } from '@/utils/anchor';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Timer, Shield, Sparkles, RefreshCw, Crown, ExternalLink } from 'lucide-react';
@@ -95,12 +96,8 @@ const LPLPage: React.FC = () => {
     }
   };
 
-  const handleConnectWalletClick = () => {
-    const menuButton = document.querySelector('button[aria-label="Open menu"]') as HTMLButtonElement;
-    if (menuButton) {
-      menuButton.click();
-    }
-  };
+  const { setVisible: setWalletModalVisible } = useWalletModal();
+  const handleConnectWalletClick = () => setWalletModalVisible(true);
 
   // Auto-trigger house draw when an LPM tier fills to 100 participants.
   // Retries up to 3× with 2 s pauses. If all fail → 'fallback_needed'.

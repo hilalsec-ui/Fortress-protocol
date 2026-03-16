@@ -752,6 +752,9 @@ const WPLPage: React.FC = () => {
             <p className={`text-sm mt-2 ${isDarkMode ? 'text-indigo-400/70' : 'text-indigo-500/80'}`}>
               Each tier's countdown begins the moment its first ticket is purchased.
             </p>
+          </motion.div>
+
+          <div className="relative mb-12">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(lotteryData?.tiers ?? []).map((tier: any, index: number) => (
               <motion.div

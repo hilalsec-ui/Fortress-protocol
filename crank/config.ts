@@ -44,11 +44,23 @@ export function loadConfig(): CrankConfig {
 
   // ── Validate Helius API Key ────────────────────────────────────────────────
 
-  const heliusApiKey = process.env.HELIUS_API_KEY?.trim();
+  let heliusApiKey = process.env.HELIUS_API_KEY?.trim();
+
+  // If HELIUS_API_KEY not set directly, try to extract it from RPC_URL
+  // e.g. https://mainnet.helius-rpc.com/?api-key=cfb2a320-...
+  if (!heliusApiKey && process.env.RPC_URL) {
+    const match = process.env.RPC_URL.match(/[?&]api-key=([^&]+)/);
+    if (match) {
+      heliusApiKey = match[1].trim();
+      console.log('   ℹ️  HELIUS_API_KEY extracted from RPC_URL');
+    }
+  }
+
   if (!heliusApiKey) {
     errors.push(
       '❌ HELIUS_API_KEY is missing or empty\n' +
       '   Add to crank/.env: HELIUS_API_KEY=your-api-key-from-helius-dashboard\n' +
+      '   Or include the key in RPC_URL: https://mainnet.helius-rpc.com/?api-key=YOUR_KEY\n' +
       '   Get free key: https://dashboard.helius.dev'
     );
   } else if (heliusApiKey.length < 10) {

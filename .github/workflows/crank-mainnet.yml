@@ -36,7 +36,12 @@ jobs:
         working-directory: ./crank
         env:
           CRANK_PRIVATE_KEY: ${{ secrets.mainnet_crank }}
+          HELIUS_API_KEY: ${{ secrets.HELIUS_API_KEY }}
           RPC_URL: ${{ secrets.RPC_URL }}
+          RPC_FALLBACK: https://api.mainnet-beta.solana.com
+          RPC_TIMEOUT_MS: "30000"
+          RPC_MAX_RETRIES: "3"
+          RPC_RETRY_DELAY_MS: "2000"
           LOTTERY_TYPE: ${{ github.event.client_payload.lotteryType || github.event.inputs.lotteryType || '' }}
           TIER: ${{ github.event.client_payload.tier || github.event.inputs.tier || '' }}
         run: npx ts-node --transpile-only index.ts

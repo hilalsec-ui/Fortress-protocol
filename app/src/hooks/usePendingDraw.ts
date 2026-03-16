@@ -6,12 +6,16 @@
  *   'idle'         – no pending draw on-chain
  *   'requested'    – PendingDraw PDA exists, oracle hasn't revealed yet
  *   'oracle_ready' – oracle has committed reveal_slot (reveal_slot > 0)
+ *
+ * Uses smart RPC routing: getFortressConnection('POLLING') with automatic
+ * fallback and polling jitter to prevent synchronized RPC spikes.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { Program } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { derivePendingDrawPDA } from "@/services/lotteryService";
+import { getFortressConnection } from "@/utils/rpcManager";
 
 export type DrawPhase = "idle" | "house_triggering" | "requested" | "oracle_ready";
 
@@ -22,7 +26,9 @@ const LOTTERY_TYPE_ID: Record<string, number> = {
   MPL: 3,
 };
 
-const POLL_INTERVAL_MS = 2500; // Reduced from 1500ms to 2500ms — saves 40% RPC load
+// Base polling interval (ms) — jitter added per request to spread load
+const POLL_BASE_MS = 2500; // 2.5s base — was 1.5s
+const JITTER_MAX_MS = 500; // Random 0-500ms added for jitter
 
 /**
  * @param program  Anchor program (or null while wallet is loading)
@@ -60,13 +66,16 @@ export function usePendingDraws(
   useEffect(() => {
     if (!program) return;
 
-    const connection = program.provider.connection;
     const programId = program.programId;
     const lotteryTypeId = LOTTERY_TYPE_ID[lotteryType];
     if (lotteryTypeId === undefined) return;
 
     let cancelled = false;
     let firstPollDone = false;
+    let pollTimeoutRef: NodeJS.Timeout | null = null;
+
+    // Use smart RPC manager for polling — routes to Helius with automatic fallback
+    const pollingConnection = getFortressConnection("POLLING");
 
     async function pollAll() {
       if (cancelled) return;
@@ -78,7 +87,7 @@ export function usePendingDraws(
         tiers.map(async (tier) => {
           try {
             const pda = derivePendingDrawPDA(programId, lotteryTypeId, tier);
-            const pdaInfo = await connection.getAccountInfo(pda, "confirmed");
+            const pdaInfo = await pollingConnection.getAccountInfo(pda, "confirmed");
 
             if (!pdaInfo) {
               updates[tier] = "idle";
@@ -99,7 +108,7 @@ export function usePendingDraws(
             }
             const rndPk = new PublicKey(pdaInfo.data.slice(10, 42));
 
-            const rndInfo = await connection.getAccountInfo(
+            const rndInfo = await pollingConnection.getAccountInfo(
               rndPk,
               "confirmed",
             );
@@ -196,11 +205,26 @@ export function usePendingDraws(
       }
     }
 
-    pollAll();
-    const interval = setInterval(pollAll, POLL_INTERVAL_MS);
+    // Polling with jitter — recursive setTimeout instead of setInterval
+    // Formula: interval = base_time + (Math.random() * 500)
+    // Purpose: Prevents synchronized RPC spikes when multiple users load the site
+    const schedulePoll = () => {
+      if (cancelled) return;
+      const jitteredInterval = POLL_BASE_MS + Math.random() * JITTER_MAX_MS;
+      pollTimeoutRef = setTimeout(() => {
+        pollAll();
+        schedulePoll(); // Schedule next poll recursively
+      }, jitteredInterval);
+    };
+
+    pollAll(); // Initial poll
+    schedulePoll(); // Start recurring polls with jitter
+
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      if (pollTimeoutRef) {
+        clearTimeout(pollTimeoutRef);
+      }
     };
     // tiers is a constant tuple — eslint exhaustive dep disabled intentionally.
     // eslint-disable-next-line react-hooks/exhaustive-deps

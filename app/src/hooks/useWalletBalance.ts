@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
+import { getFortressConnection } from "@/utils/rpcManager";
 
 /**
  * Custom hook to fetch and monitor wallet balance with refresh capability
+ *
+ * Uses getFortressConnection('FREE') — routes to Solana public RPC to
+ * conserve Helius free tier credits for logic-heavy operations like
+ * transaction signing and draw processing.
+ *
  * @returns Wallet balance and refresh function
  */
 export function useWalletBalance() {
@@ -13,7 +19,7 @@ export function useWalletBalance() {
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Fetch current wallet balance
+   * Fetch current wallet balance using public RPC (saves Helius credits)
    */
   const fetchBalance = async () => {
     if (!connected || !publicKey) {
@@ -25,12 +31,9 @@ export function useWalletBalance() {
       setIsLoading(true);
       setError(null);
 
-      // Use mainnet-beta connection
-      const connection = new Connection(
-        "https://api.mainnet-beta.solana.com",
-        "confirmed",
-      );
-      const balanceInLamports = await connection.getBalance(publicKey);
+      // Use public RPC via smart routing — routes to Solana public for 'FREE' operations
+      const freeConnection = getFortressConnection("FREE");
+      const balanceInLamports = await freeConnection.getBalance(publicKey);
       const balanceInSol = balanceInLamports / 1e9; // Convert lamports to SOL
 
       setBalance(balanceInSol);

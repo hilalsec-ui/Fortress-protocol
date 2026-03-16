@@ -13,6 +13,7 @@ import { PublicKey, LAMPORTS_PER_SOL, SYSVAR_CLOCK_PUBKEY } from "@solana/web3.j
 import { useAnchorProgram } from "@/utils/anchor";
 import { fetchAllLotteryAccounts } from "@/services/lotteryService";
 import { useTimeOffsetStore } from "@/stores/timeOffsetStore";
+import { getFortressConnection, withFortressRpc } from "@/utils/rpcManager";
 import {
   PROGRAM_ID,
   FPT_MINT,
@@ -29,32 +30,9 @@ const [SOL_VAULT_PDA] = PublicKey.findProgramAddressSync(
   PROGRAM_PUBKEY
 );
 
-const POLL_MS = 20_000; // Reduced from 10s to 20s — saves 50% RPC load
-
-// ── Retry helper — exponential backoff on 429 ─────────────────────────────────
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  maxRetries = 4,
-  baseDelayMs = 800
-): Promise<T> {
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (err: any) {
-      const is429 =
-        err?.message?.includes?.("429") ||
-        err?.status === 429 ||
-        err?.toString?.().includes?.("429") ||
-        err?.message?.includes?.("rate") ||
-        err?.message?.includes?.("Rate");
-      if (!is429 || attempt === maxRetries) throw err;
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      console.warn(`[ChainData] 429 rate-limit — retry ${attempt + 1}/${maxRetries} after ${delay}ms`);
-      await new Promise((r) => setTimeout(r, delay));
-    }
-  }
-  throw new Error("withRetry exhausted");
-}
+// Base polling interval (ms) — jitter added per request to prevent synchronized spikes
+const POLL_BASE_MS = 20_000; // 20s — was 10s, now with jitter formula
+const JITTER_MAX_MS = 500; // Random 0-500ms added to base
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -101,6 +79,7 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   const isFetchingRef = useRef(false);
+  const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchAll = useCallback(
     async (silent = false) => {
@@ -109,42 +88,53 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
       if (!silent) setIsLoading(true);
 
       try {
+        // Use smart RPC manager for polling — routes to Helius Standard endpoint
+        // with automatic 429 fallback to public RPC
+        const pollingConnection = getFortressConnection("POLLING");
+
         // All RPC reads fire in parallel — one combined network burst per cycle
-        // Each wrapped in withRetry() for automatic 429 backoff
         // Batch SOL vault balance + Clock sysvar into ONE getMultipleAccountsInfo call
-        // so we get Solana unix_timestamp (exact match with Rust Clock::get()) without
-        // an extra RPC round-trip — total RPC count stays at 3 per poll cycle.
+        // so we get Solana unix_timestamp (exact match with Rust Clock::get())
+        // without an extra RPC round-trip — total RPC count stays at 3 per poll cycle.
         const [accountsResult, vaultInfoResult, fptResult] =
           await Promise.allSettled([
             // 1. All 16 vault accounts — ONE batched getMultipleAccountsInfo call
             program
-              ? withRetry(() => fetchAllLotteryAccounts(program))
+              ? withFortressRpc(
+                  () => fetchAllLotteryAccounts(program),
+                  "POLLING"
+                )
               : Promise.resolve(null),
 
             // 2. sol_vault SOL balance + Clock sysvar — batched into ONE call
-            withRetry(() =>
-              connection.getMultipleAccountsInfo(
-                [SOL_VAULT_PDA, SYSVAR_CLOCK_PUBKEY],
-                "confirmed"
-              )
+            withFortressRpc(
+              () =>
+                pollingConnection.getMultipleAccountsInfo(
+                  [SOL_VAULT_PDA, SYSVAR_CLOCK_PUBKEY],
+                  "confirmed"
+                ),
+              "POLLING"
             ),
 
             // 3. FPT ATA balance (treasury page)
-            withRetry(async () => {
-              const { getAssociatedTokenAddress } = await import(
-                "@solana/spl-token"
-              );
-              const ata = await getAssociatedTokenAddress(
-                new PublicKey(FPT_MINT),
-                SOL_VAULT_PDA,
-                true, // allowOwnerOffCurve — PDA is off-curve
-                new PublicKey(TOKEN_2022_PROGRAM_ID)
-              );
-              const info = await connection.getTokenAccountBalance(ata);
-              return (
-                parseFloat(info.value.amount) / Math.pow(10, FPT_DECIMALS)
-              );
-            }),
+            withFortressRpc(
+              async () => {
+                const { getAssociatedTokenAddress } = await import(
+                  "@solana/spl-token"
+                );
+                const ata = await getAssociatedTokenAddress(
+                  new PublicKey(FPT_MINT),
+                  SOL_VAULT_PDA,
+                  true, // allowOwnerOffCurve — PDA is off-curve
+                  new PublicKey(TOKEN_2022_PROGRAM_ID)
+                );
+                const info = await pollingConnection.getTokenAccountBalance(ata);
+                return (
+                  parseFloat(info.value.amount) / Math.pow(10, FPT_DECIMALS)
+                );
+              },
+              "POLLING"
+            ),
           ]);
 
         // --- Lottery accounts ---
@@ -197,12 +187,27 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
     fetchAll(false);
   }, [fetchAll]);
 
-  // Silent poll every 10 seconds — one batched RPC call fetches all vault data
-  // + Clock sysvar. The Clock read updates timeOffsetStore.timeOffset (and snaps
-  // nowSeconds) so the 10-second on-chain sync automatically corrects all timers.
+  // Polling with jitter — recursive setTimeout instead of setInterval
+  // Formula: interval = base_time + (Math.random() * 500)
+  // Purpose: Prevents synchronized RPC spikes when multiple users load the site
   useEffect(() => {
-    const id = setInterval(() => fetchAll(true), POLL_MS);
-    return () => clearInterval(id);
+    const schedulePoll = () => {
+      // Add random jitter to spread polling across time
+      const jitteredInterval = POLL_BASE_MS + Math.random() * JITTER_MAX_MS;
+      
+      pollTimeoutRef.current = setTimeout(() => {
+        fetchAll(true); // silent fetch
+        schedulePoll(); // Schedule next poll recursively
+      }, jitteredInterval);
+    };
+
+    schedulePoll();
+
+    return () => {
+      if (pollTimeoutRef.current) {
+        clearTimeout(pollTimeoutRef.current);
+      }
+    };
   }, [fetchAll]);
 
   // ── Single global 1-second ticker ────────────────────────────────────────────

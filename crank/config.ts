@@ -46,13 +46,23 @@ export function loadConfig(): CrankConfig {
 
   let heliusApiKey = process.env.HELIUS_API_KEY?.trim();
 
-  // If HELIUS_API_KEY not set directly, try to extract it from RPC_URL
+  // If HELIUS_API_KEY not set directly, extract from RPC_STANDARD, RPC_GATEKEEPER, or RPC_URL
   // e.g. https://mainnet.helius-rpc.com/?api-key=cfb2a320-...
-  if (!heliusApiKey && process.env.RPC_URL) {
-    const match = process.env.RPC_URL.match(/[?&]api-key=([^&]+)/);
-    if (match) {
-      heliusApiKey = match[1].trim();
-      console.log('   ℹ️  HELIUS_API_KEY extracted from RPC_URL');
+  const rpcSources = [
+    ['RPC_STANDARD',   process.env.RPC_STANDARD],
+    ['RPC_GATEKEEPER', process.env.RPC_GATEKEEPER],
+    ['RPC_URL',        process.env.RPC_URL],
+  ];
+  if (!heliusApiKey) {
+    for (const [name, val] of rpcSources) {
+      if (val) {
+        const match = val.match(/[?&]api-key=([^&]+)/);
+        if (match) {
+          heliusApiKey = match[1].trim();
+          console.log(`   ℹ️  HELIUS_API_KEY extracted from ${name}`);
+          break;
+        }
+      }
     }
   }
 

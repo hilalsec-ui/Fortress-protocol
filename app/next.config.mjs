@@ -3,20 +3,23 @@ const nextConfig = {
   // Remap Vercel environment variable names to the NEXT_PUBLIC_* names the app expects.
   // This bridges the gap if variables are set without the NEXT_PUBLIC_ prefix in Vercel.
   env: {
+    // RPC_GATEKEEPER / RPC_STANDARD (without NEXT_PUBLIC_) take priority —
+    // these are the Vercel env var names the user actually set with Helius keys.
+    // NEXT_PUBLIC_RPC_URL is the public Solana RPC so it comes last.
     NEXT_PUBLIC_RPC_GATEKEEPER:
-      process.env.NEXT_PUBLIC_RPC_GATEKEEPER ||
       process.env.RPC_GATEKEEPER ||
-      process.env.NEXT_PUBLIC_RPC_URL ||
+      process.env.NEXT_PUBLIC_RPC_GATEKEEPER ||
+      process.env.RPC_STANDARD ||
       'https://api.mainnet-beta.solana.com',
     NEXT_PUBLIC_RPC_STANDARD:
-      process.env.NEXT_PUBLIC_RPC_STANDARD ||
       process.env.RPC_STANDARD ||
-      process.env.NEXT_PUBLIC_RPC_URL ||
+      process.env.NEXT_PUBLIC_RPC_STANDARD ||
+      process.env.RPC_GATEKEEPER ||
       'https://api.mainnet-beta.solana.com',
     NEXT_PUBLIC_RPC_URL:
-      process.env.NEXT_PUBLIC_RPC_URL ||
       process.env.RPC_STANDARD ||
       process.env.RPC_GATEKEEPER ||
+      process.env.NEXT_PUBLIC_RPC_URL ||
       'https://api.mainnet-beta.solana.com',
   },
   experimental: {

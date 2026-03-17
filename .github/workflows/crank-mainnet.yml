@@ -35,9 +35,11 @@ jobs:
       - name: Run crank
         working-directory: ./crank
         env:
-          CRANK_PRIVATE_KEY: ${{ secrets.mainnet_crank }}
-          HELIUS_API_KEY: ${{ secrets.HELIUS_API_KEY }}
-          RPC_URL: ${{ secrets.RPC_URL }}
+          CRANK_PRIVATE_KEY: ${{ secrets.CRANK_PRIVATE_KEY }}
+          RPC_STANDARD: ${{ secrets.RPC_STANDARD }}
+          RPC_GATEKEEPER: ${{ secrets.RPC_GATEKEEPER }}
+          # RPC_URL is constructed from RPC_STANDARD (secrets.RPC_URL is just 'mainnet-beta')
+          RPC_URL: ${{ secrets.RPC_STANDARD }}
           RPC_FALLBACK: https://api.mainnet-beta.solana.com
           RPC_TIMEOUT_MS: "30000"
           RPC_MAX_RETRIES: "3"

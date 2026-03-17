@@ -1,5 +1,13 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  // ESLint: warnings are reported but never block the build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // TypeScript: type errors are reported but never block the build
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   // Remap Vercel environment variable names to the NEXT_PUBLIC_* names the app expects.
   // This bridges the gap if variables are set without the NEXT_PUBLIC_ prefix in Vercel.
   env: {

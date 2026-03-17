@@ -21,8 +21,8 @@ Thumbs.db
 *~
 
 # Build artifacts
-dist/
-build/
+/build/
+/dist/
 
 # Environment
 .env

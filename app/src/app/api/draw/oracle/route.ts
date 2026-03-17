@@ -25,7 +25,12 @@ import { guardRequest, validateInputs, safeError } from '../../_guard';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 // Server-side RPC: prefer unpublished env var to avoid leaking API keys in client bundle
-const RPC_ENDPOINT    = process.env.SOLANA_RPC_ENDPOINT ?? process.env.NEXT_PUBLIC_RPC_URL ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? 'https://api.mainnet-beta.solana.com';
+const RPC_ENDPOINT    = process.env.SOLANA_RPC_ENDPOINT
+  ?? process.env.NEXT_PUBLIC_RPC_STANDARD
+  ?? process.env.NEXT_PUBLIC_RPC_GATEKEEPER
+  ?? process.env.NEXT_PUBLIC_RPC_URL
+  ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT
+  ?? 'https://api.mainnet-beta.solana.com';
 const SB_MAINNET_QUEUE = new PublicKey('3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1');
 const PROGRAM_ID      = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 

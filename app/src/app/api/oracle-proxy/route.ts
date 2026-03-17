@@ -19,6 +19,8 @@ import {
 import * as sb from '@switchboard-xyz/on-demand';
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT
+  ?? process.env.NEXT_PUBLIC_RPC_STANDARD
+  ?? process.env.NEXT_PUBLIC_RPC_GATEKEEPER
   ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT
   ?? 'https://api.mainnet-beta.solana.com';
 

@@ -10,6 +10,8 @@ export function useTreasuryWarnings(programId?: string) {
   useEffect(() => {
     const rpcEndpoint =
       process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
+      process.env.NEXT_PUBLIC_RPC_STANDARD ||
+      process.env.NEXT_PUBLIC_RPC_GATEKEEPER ||
       process.env.NEXT_PUBLIC_RPC_ENDPOINT ||
       "https://api.mainnet-beta.solana.com";
 

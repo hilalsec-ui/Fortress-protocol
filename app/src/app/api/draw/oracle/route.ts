@@ -26,6 +26,8 @@ import { guardRequest, validateInputs, safeError } from '../../_guard';
 // ─── Constants ───────────────────────────────────────────────────────────────
 // Server-side RPC: prefer unpublished env var to avoid leaking API keys in client bundle
 const RPC_ENDPOINT    = process.env.SOLANA_RPC_ENDPOINT
+  ?? process.env.RPC_STANDARD
+  ?? process.env.RPC_GATEKEEPER
   ?? process.env.NEXT_PUBLIC_RPC_STANDARD
   ?? process.env.NEXT_PUBLIC_RPC_GATEKEEPER
   ?? process.env.NEXT_PUBLIC_RPC_URL

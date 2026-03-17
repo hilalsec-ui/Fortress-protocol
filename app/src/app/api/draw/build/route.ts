@@ -32,6 +32,8 @@ const IDL = require('@/idl/fortress_protocol.json');
 const PROGRAM_ID   = new PublicKey('EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3');
 // Server-side RPC: prefer unpublished env var to avoid leaking API keys in client bundle
 const RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT
+  ?? process.env.RPC_STANDARD
+  ?? process.env.RPC_GATEKEEPER
   ?? process.env.NEXT_PUBLIC_RPC_STANDARD
   ?? process.env.NEXT_PUBLIC_RPC_GATEKEEPER
   ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT

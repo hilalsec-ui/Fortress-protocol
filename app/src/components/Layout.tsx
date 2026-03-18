@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import WalletClientWrapper from './WalletClientWrapper';
 import { Menu, X, Sun, Moon, Home, Zap, Clock, Calendar, CalendarDays, Trophy, Database, Heart, Info, Landmark, ShieldCheck, FileText } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { FloatingSocialIcons } from './FloatingSocialIcons';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
@@ -297,6 +298,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {children}
         </motion.main>
       </div>
+
+      {/* Floating Social Icons */}
+      <FloatingSocialIcons />
     </div>
   );
 };

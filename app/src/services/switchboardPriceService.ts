@@ -145,9 +145,9 @@ async function fetchFptMarketPrice(): Promise<number | null> {
 // ── Public API ──────────────────────────────────────────────────────────────────────
 
 /**
- * Fetch live SOL/USD (for oracle-based ticket pricing) and FPT's DEX market
- * price (from Jupiter) in parallel.  fptMarketUsd is null when FPT has no
- * liquidity yet — callers must handle this case honestly in the UI.
+ * Fetch live prices via our own /api/fpt-price server-side route.
+ * This avoids browser CORS restrictions and keeps external API keys off the client.
+ * Falls back to direct fetching if the API route is unreachable (e.g. local dev without server).
  */
 export async function fetchFptUsdPrice(): Promise<{
   solUsd: number;
@@ -166,8 +166,21 @@ export async function fetchFptUsdPrice(): Promise<{
     };
   }
 
+  // Primary: call our own server-side route (no CORS issues, reliable)
+  try {
+    const res = await fetchWithTimeout('/api/fpt-price', 10_000);
+    if (res.ok) {
+      const data = await res.json();
+      const { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd } = data;
+      if (typeof solUsd === 'number' && typeof fptPerUsd6dec === 'number') {
+        _cache = { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd: fptMarketUsd ?? null, fetchedAt: now };
+        return { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd: fptMarketUsd ?? null };
+      }
+    }
+  } catch { /* fall through to direct fetch */ }
+
+  // Fallback: fetch directly (used in local dev / API route unavailable)
   let solUsd6dec = DEFAULT_SOL_USD_6DEC;
-  // Fetch SOL/USD and FPT DEX market price in parallel
   const [liveSolPrice, fptMarketUsd] = await Promise.all([
     fetchSolUsd(),
     fetchFptMarketPrice(),
@@ -179,13 +192,10 @@ export async function fetchFptUsdPrice(): Promise<{
     console.warn(`[SBPrice] All price sources failed — using fallback $${DEFAULT_SOL_PRICE_USD} SOL`);
   }
 
-  // Exact mirror of oracle.rs compute_fpt_ticket_cost:
-  //   µFPT per $1 = DEFAULT_FPT_PER_SOL × 10^12 / sol_usd_6dec
   const fptPerUsd6dec = Math.max(
     Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / solUsd6dec),
     MIN_FPT_PER_USD,
   );
-  // USD value of 1 FPT = sol_usd_6dec / (DEFAULT_FPT_PER_SOL × 10^6)
   const fptUsd = solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000);
   const solUsd = solUsd6dec / 1_000_000;
 

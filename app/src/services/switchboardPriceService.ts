@@ -192,11 +192,14 @@ export async function fetchFptUsdPrice(): Promise<{
     console.warn(`[SBPrice] All price sources failed — using fallback $${DEFAULT_SOL_PRICE_USD} SOL`);
   }
 
-  const fptPerUsd6dec = Math.max(
-    Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / solUsd6dec),
-    MIN_FPT_PER_USD,
-  );
-  const fptUsd = solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000);
+  // When DEX market price is available, use it (market-price parity).
+  const fptPerUsd6dec = fptMarketUsd != null
+    ? Math.round(1_000_000 / fptMarketUsd)
+    : Math.max(
+        Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / solUsd6dec),
+        MIN_FPT_PER_USD,
+      );
+  const fptUsd = fptMarketUsd ?? (solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000));
   const solUsd = solUsd6dec / 1_000_000;
 
   _cache = { solUsd, fptUsd, fptPerUsd6dec, fptMarketUsd, fetchedAt: now };

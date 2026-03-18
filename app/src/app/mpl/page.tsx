@@ -29,7 +29,13 @@ const MPLPage: React.FC = () => {
   const { connection } = useConnection();
   const program = useAnchorProgram();
   const { isDarkMode } = useTheme();
-  const { fptPerUsd6dec, fptUsd, isLoading: priceLoading } = useFptPrice();
+  const { fptPerUsd6dec, fptUsd, fptMarketUsd, isLoading: priceLoading } = useFptPrice();
+  const fmtFptTier = (tierUsd: number) => {
+    const n = tierUsd * fptPerUsd6dec / 1_000_000;
+    if (n >= 1_000_000) return `~${(n / 1_000_000).toFixed(1)}M FPT`;
+    if (n >= 1_000) return `~${Math.round(n).toLocaleString('en-US')} FPT`;
+    return `~${n.toFixed(2)} FPT`;
+  };
   const isSyncingFromStore = useTimeOffsetStore((state) => state.isSyncing);
   useTreasuryWarnings(PROGRAM_ID);
   
@@ -811,7 +817,7 @@ const MPLPage: React.FC = () => {
                     ${tier.tier}
                   </div>
                   <div className="text-xs font-medium text-cyan-400/80 mb-1">
-                    {priceLoading ? "..." : `~${(tier.tier * fptPerUsd6dec / 1_000_000).toFixed(2)} FPT`}
+                    {priceLoading ? "..." : fmtFptTier(tier.tier)}
                   </div>
                   <div className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Ticket Price</div>
                   

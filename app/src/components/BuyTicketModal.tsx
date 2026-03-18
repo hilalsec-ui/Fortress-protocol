@@ -50,12 +50,17 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
   const { connected, publicKey } = useWallet();
   const { refreshBalance } = useWalletBalance();
   const { fptPerUsd6dec, solUsd, fptMarketUsd, isLoading: pricingLoading } = useFptPrice();
-  // fptPerUsd6dec = FPT per USD in 6-decimal units (e.g. 500_000 = 0.5 FPT per $)
   const exchangeRateHuman = fptPerUsd6dec > 0 ? fptPerUsd6dec / 1_000_000 : null;
-  const calculateFptCost = (tier: number, qty: number): string =>
-    fptPerUsd6dec > 0
-      ? (Math.round(tier * fptPerUsd6dec * qty) / 1_000_000).toFixed(6)
-      : '0.000000';
+  /** Raw FPT amount as a plain number (not rounded to toFixed) */
+  const calcFptCost = (tier: number, qty: number): number =>
+    fptPerUsd6dec > 0 ? Math.round(tier * fptPerUsd6dec * qty) / 1_000_000 : 0;
+  /** Legacy string helper kept for parseFloat() call-sites */
+  const calculateFptCost = (tier: number, qty: number): string => String(calcFptCost(tier, qty));
+  /** Smart display: commas + 0 decimals for large amounts, up to 4 for small */
+  const formatFpt = (fpt: number): string =>
+    fpt >= 1_000
+      ? fpt.toLocaleString('en-US', { maximumFractionDigits: 0 })
+      : fpt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
   const pricingError = null;
   const [selectedTier, setSelectedTier] = useState<number>(initialTier);
   const [quantity, setQuantity] = useState<number>(1); // NEW: Quantity state
@@ -121,7 +126,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
       return;
     }
 
-    const totalCost = Number(calculateFptCost(selectedTier, quantity) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+    const totalCost = formatFpt(calcFptCost(selectedTier, quantity));
 
     setIsLoading(true);
     setError('');
@@ -302,7 +307,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                         </span>
                         {fptMarketUsd != null && tier.fpt > 0 && (
                           <span className="text-[9px] text-green-400/70 leading-none">
-                            ≈ ${(tier.fpt * fptMarketUsd).toFixed(2)}
+                            ≈ ${tier.value.toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -412,12 +417,12 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                       <>
                         <span className="text-base font-bold text-white tracking-tight">
                           {fptMarketUsd == null && <span className="text-gray-400 font-normal">~</span>}
-                          {calculateFptCost(selectedTier, 1)}
+                          {formatFpt(calcFptCost(selectedTier, 1))}
                         </span>
                         <span className="ml-1 text-xs font-medium text-purple-300">FPT</span>
                         <div className="text-[10px] text-gray-500 mt-0.5">
                           {fptMarketUsd != null
-                            ? `≈ $${(parseFloat(calculateFptCost(selectedTier, 1)) * fptMarketUsd).toFixed(2)} · per ticket`
+                            ? `≈ $${selectedTier.toFixed(2)} · per ticket`
                             : 'oracle est. · per ticket'
                           }
                         </div>
@@ -470,7 +475,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                     <div className="text-right">
                       <div className="text-green-400 font-bold tabular-nums leading-tight" style={{ fontSize: '0.95rem', letterSpacing: '-0.01em' }}>
                         {fptMarketUsd == null && <span className="text-green-400/60 font-normal">~</span>}
-                        {Number(calculateFptCost(selectedTier, quantity) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                        {formatFpt(calcFptCost(selectedTier, quantity))}
                       </div>
                       <div className="flex items-center justify-end gap-1 text-green-300 font-bold" style={{ fontSize: '0.831rem' }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -479,7 +484,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                       </div>
                       {fptMarketUsd != null && (
                         <div className="text-[10px] text-green-400/60 mt-0.5">
-                          ≈ ${(parseFloat(calculateFptCost(selectedTier, quantity)) * fptMarketUsd).toFixed(2)}
+                          ≈ ${(selectedTier * quantity).toFixed(2)} USD
                         </div>
                       )}
                     </div>
@@ -544,7 +549,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                         <span className="font-bold">Buy {quantity} Ticket{quantity > 1 ? 's' : ''}</span>
                       </div>
                       <div className="text-xs mt-1 opacity-90">
-                        Pay {Number(calculateFptCost(selectedTier, quantity) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })} FPT · ${selectedTier * quantity} USD
+                        Pay {formatFpt(calcFptCost(selectedTier, quantity))} FPT · ${selectedTier * quantity} USD
                       </div>
                     </div>
                   )}

@@ -14,6 +14,7 @@ const FPT_MINT = '3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj';
 
 const DEFAULT_FPT_PER_SOL = 1_000;
 const DEFAULT_SOL_USD_6DEC = 180_000_000; // $180.00 fallback
+const MIN_FPT_PER_USD = Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / 1_000_000_000); // floor
 
 // short cache: 60s when no DEX price, 5min when price known
 export const revalidate = 60;
@@ -111,14 +112,18 @@ export async function GET(): Promise<NextResponse> {
   const solUsd6dec = liveSolPrice != null
     ? Math.round(liveSolPrice * 1_000_000)
     : DEFAULT_SOL_USD_6DEC;
-
-  const MIN_FPT_PER_USD = Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / 1_000_000_000);
-  const fptPerUsd6dec = Math.max(
-    Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / solUsd6dec),
-    MIN_FPT_PER_USD,
-  );
-  const fptUsd = solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000);
   const solUsd = solUsd6dec / 1_000_000;
+
+  // When a live DEX market price is available, use it directly so that
+  // "buy $5 ticket" = exactly $5 worth of FPT at the current Raydium price.
+  // Fall back to the SOL oracle formula when no liquidity exists.
+  const fptPerUsd6dec = fptMarketUsd != null
+    ? Math.round(1_000_000 / fptMarketUsd)   // µFPT per $1 at market price
+    : Math.max(
+        Math.round((DEFAULT_FPT_PER_SOL * 1_000_000_000_000) / solUsd6dec),
+        MIN_FPT_PER_USD,
+      );
+  const fptUsd = fptMarketUsd ?? (solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000));
 
   // Use shorter cache when no DEX price found yet
   const maxAge = fptMarketUsd != null ? 300 : 60;

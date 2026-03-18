@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
+import { setCachedPrice } from '../services/switchboardPriceService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Ticket, DollarSign, Users, Coins } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -150,6 +151,10 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
       toast.error(`Quantity must be between 1 and ${maxAllowed} ticket${maxAllowed !== 1 ? 's' : ''}`);
       return;
     }
+
+    // Sync the on-chain price service cache with what the modal is displaying
+    // so lotteryService uses the exact same rate the user saw.
+    setCachedPrice({ solUsd, fptPerUsd6dec, fptMarketUsd, fptUsd: fptMarketUsd ?? 0 });
 
     const totalCost = formatFpt(calcFptCost(selectedTier, quantity));
 
@@ -453,22 +458,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                     <span className="text-white font-bold text-lg">${selectedTier * quantity}</span>
                   </div>
 
-                  {/* Base FPT Cost */}
-                  <div className="flex items-center justify-between pb-2 border-b border-blue-400/20">
-                    <span className="text-gray-300 text-sm font-medium">Base FPT Cost</span>
-                    <span className="text-white font-semibold">
-                      {formatFpt(calcFptCost(selectedTier, quantity))} FPT
-                    </span>
-                  </div>
-
-                  {/* Slippage Row */}
-                  <div className="flex items-center justify-between pb-2 border-b border-blue-400/20">
-                    <span className="text-yellow-400/80 text-sm font-medium">+ Slippage (10%)</span>
-                    <span className="text-yellow-400/80 font-semibold">
-                      {formatFpt(calcFptWithSlippage(selectedTier, quantity) - calcFptCost(selectedTier, quantity))} FPT
-                    </span>
-                  </div>
-
                   {/* You Will Pay */}
                   <div className="flex items-center justify-between pt-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-3 border border-green-400/30">
                     <div>
@@ -477,7 +466,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                     </div>
                     <div className="text-right">
                       <div className="text-green-400 font-bold tabular-nums leading-tight" style={{ fontSize: '0.95rem', letterSpacing: '-0.01em' }}>
-                        {formatFpt(calcFptWithSlippage(selectedTier, quantity))}
+                        {formatFpt(calcFptCost(selectedTier, quantity))}
                       </div>
                       <div className="flex items-center justify-end gap-1 text-green-300 font-bold" style={{ fontSize: '0.831rem' }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -547,7 +536,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                         <span className="font-bold">Buy {quantity} Ticket{quantity > 1 ? 's' : ''}</span>
                       </div>
                       <div className="text-xs mt-1 opacity-90">
-                        Max {formatFpt(calcFptWithSlippage(selectedTier, quantity))} FPT · ${selectedTier * quantity} USD
+                        {formatFpt(calcFptCost(selectedTier, quantity))} FPT · ${selectedTier * quantity} USD
                       </div>
                     </div>
                   )}

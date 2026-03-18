@@ -94,19 +94,10 @@ async function fetchSolUsd(): Promise<number | null> {
  * Returns null when no source has a price for the token yet.
  */
 async function fetchFptMarketPrice(): Promise<number | null> {
-  // 1. Jupiter Price API v2
-  try {
-    const res = await fetchWithTimeout(
-      `https://api.jup.ag/price/v2?ids=${FPT_MINT}`,
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const price = parseFloat(data?.data?.[FPT_MINT]?.price);
-      if (isFinite(price) && price > 0) return price;
-    }
-  } catch { /* fall through */ }
+  // NOTE: Jupiter is intentionally skipped here — it can return SOL-denominated
+  // prices which are ~10 000× too high in USD terms and poison the 5-min cache.
 
-  // 2. Raydium API v3 — often indexes new pools before Jupiter does
+  // 1. Raydium API v3 — often indexes new pools before Jupiter does
   try {
     const res = await fetchWithTimeout(
       `https://api-v3.raydium.io/mint/price?mints=${FPT_MINT}`,
@@ -143,6 +134,20 @@ async function fetchFptMarketPrice(): Promise<number | null> {
 }
 
 // ── Public API ──────────────────────────────────────────────────────────────────────
+
+/**
+ * Prime the in-memory cache with a price already fetched externally (e.g. from
+ * FptPriceContext). Call this just before executing a buy so that
+ * fetchFptUsdPrice() won't fall back to a stale or Jupiter-derived value.
+ */
+export function setCachedPrice(p: {
+  solUsd: number;
+  fptUsd: number;
+  fptPerUsd6dec: number;
+  fptMarketUsd: number | null;
+}): void {
+  _cache = { ...p, fetchedAt: Date.now() };
+}
 
 /**
  * Fetch live prices via our own /api/fpt-price server-side route.

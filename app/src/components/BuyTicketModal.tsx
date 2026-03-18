@@ -474,7 +474,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                     <div>
                       <div className="text-gray-300 text-sm font-medium mb-1">Max You Will Pay</div>
                       <div className="text-xs text-gray-400">FPT Token (Token-2022)</div>
-                      <div className="text-[10px] text-green-400/60 mt-0.5">includes 10% slippage buffer</div>
                     </div>
                     <div className="text-right">
                       <div className="text-green-400 font-bold tabular-nums leading-tight" style={{ fontSize: '0.95rem', letterSpacing: '-0.01em' }}>

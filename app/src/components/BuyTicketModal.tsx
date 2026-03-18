@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import { setCachedPrice } from '../services/switchboardPriceService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Ticket, DollarSign, Users, Coins } from 'lucide-react';
+import { X, Ticket, DollarSign, Coins } from 'lucide-react';
 import toast from 'react-hot-toast';
 import TransactionSuccess from './TransactionSuccess';
 import { useWalletBalance } from '../hooks/useWalletBalance';
@@ -53,14 +52,9 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
   const { fptPerUsd6dec, solUsd, fptMarketUsd, isLoading: pricingLoading } = useFptPrice();
   const exchangeRateHuman = fptPerUsd6dec > 0 ? fptPerUsd6dec / 1_000_000 : null;
 
-  /** Raw FPT amount as a plain number */
+  /** Raw FPT amount as a plain number (human-readable, divided by 10^6) */
   const calcFptCost = (tier: number, qty: number): number =>
     fptPerUsd6dec > 0 ? Math.round(tier * fptPerUsd6dec * qty) / 1_000_000 : 0;
-  /** With 10% slippage = what the wallet actually approves */
-  const calcFptWithSlippage = (tier: number, qty: number): number =>
-    Math.ceil(calcFptCost(tier, qty) * 1.10);
-  /** Legacy string helper kept for old call-sites */
-  const calculateFptCost = (tier: number, qty: number): string => String(calcFptCost(tier, qty));
 
   /** Smart FPT display: comma-separated, clean decimals */
   const formatFpt = (fpt: number): string => {
@@ -115,18 +109,18 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
     : 100;
 
   // Different tiers for LPM vs other lotteries with dynamic FPT pricing
-  const tiers = lotteryType === 'LPM' 
+  const tiers = lotteryType === 'LPM'
     ? [
-        { value: 5,  fpt: parseFloat(calculateFptCost(5,  1) || '0'), color: 'from-red-500 to-red-600' },
-        { value: 10, fpt: parseFloat(calculateFptCost(10, 1) || '0'), color: 'from-orange-500 to-orange-600' },
-        { value: 20, fpt: parseFloat(calculateFptCost(20, 1) || '0'), color: 'from-yellow-500 to-yellow-600' },
-        { value: 50, fpt: parseFloat(calculateFptCost(50, 1) || '0'), color: 'from-green-500 to-green-600' },
+        { value: 5,  fpt: calcFptCost(5,  1), color: 'from-red-500 to-red-600' },
+        { value: 10, fpt: calcFptCost(10, 1), color: 'from-orange-500 to-orange-600' },
+        { value: 20, fpt: calcFptCost(20, 1), color: 'from-yellow-500 to-yellow-600' },
+        { value: 50, fpt: calcFptCost(50, 1), color: 'from-green-500 to-green-600' },
       ]
     : [
-        { value: 5,  fpt: parseFloat(calculateFptCost(5,  1) || '0'), color: 'from-red-500 to-red-600' },
-        { value: 10, fpt: parseFloat(calculateFptCost(10, 1) || '0'), color: 'from-orange-500 to-orange-600' },
-        { value: 15, fpt: parseFloat(calculateFptCost(15, 1) || '0'), color: 'from-yellow-500 to-yellow-600' },
-        { value: 20, fpt: parseFloat(calculateFptCost(20, 1) || '0'), color: 'from-green-500 to-green-600' },
+        { value: 5,  fpt: calcFptCost(5,  1), color: 'from-red-500 to-red-600' },
+        { value: 10, fpt: calcFptCost(10, 1), color: 'from-orange-500 to-orange-600' },
+        { value: 15, fpt: calcFptCost(15, 1), color: 'from-yellow-500 to-yellow-600' },
+        { value: 20, fpt: calcFptCost(20, 1), color: 'from-green-500 to-green-600' },
       ];
 
   const handleConnectWallet = () => {
@@ -217,8 +211,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
   const handleCloseSuccess = () => {
     setTransactionResult(null);
   };
-
-  const progress = (currentParticipants / (maxParticipants || 100)) * 100;
 
   return (
     <>
@@ -473,7 +465,6 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                         <img src={FPT_TOKEN_ICON} alt="FPT" className="w-4 h-4 rounded-full" />
                         FPT
                       </div>
-
                     </div>
                   </div>
 

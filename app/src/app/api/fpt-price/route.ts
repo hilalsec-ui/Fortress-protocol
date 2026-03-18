@@ -58,13 +58,12 @@ async function fetchSolUsd(): Promise<number | null> {
 async function fetchFptMarketPrice(): Promise<number | null> {
   // 1. DexScreener — most reliable for new Raydium pools
   try {
-    const res = await fetchWithTimeout(
-      `https://api.dexscreener.com/latest/dex/tokens/${FPT_MINT}`,
-      8000,
-    );
+    const url = `https://api.dexscreener.com/latest/dex/tokens/${FPT_MINT}`;
+    const res = await fetchWithTimeout(url, 10000);
     if (res.ok) {
       const data = await res.json();
-      const pair = (data?.pairs ?? [])
+      const pairs = data?.pairs ?? [];
+      const pair = pairs
         .filter((p: { chainId?: string; priceUsd?: string }) =>
           p.chainId === 'solana' && p.priceUsd,
         )
@@ -72,23 +71,19 @@ async function fetchFptMarketPrice(): Promise<number | null> {
           (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0),
         )[0];
       const price = parseFloat(pair?.priceUsd);
-      if (isFinite(price) && price > 0) return price;
+      if (isFinite(price) && price > 0) {
+        console.log(`[fpt-price] DexScreener price: $${price}`);
+        return price;
+      }
+      console.warn(`[fpt-price] DexScreener returned ${pairs.length} pairs but no valid price`);
+    } else {
+      console.warn(`[fpt-price] DexScreener status ${res.status}`);
     }
-  } catch { /* fall through */ }
+  } catch (e) {
+    console.warn('[fpt-price] DexScreener fetch failed:', (e as Error).message);
+  }
 
-  // 2. Raydium API v3
-  try {
-    const res = await fetchWithTimeout(
-      `https://api-v3.raydium.io/mint/price?mints=${FPT_MINT}`,
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const price = parseFloat(data?.data?.[FPT_MINT]);
-      if (isFinite(price) && price > 0) return price;
-    }
-  } catch { /* fall through */ }
-
-  // 3. GeckoTerminal (CoinGecko's DEX aggregator, no auth required)
+  // 2. GeckoTerminal (CoinGecko's DEX aggregator, no auth required)
   try {
     const res = await fetchWithTimeout(
       `https://api.geckoterminal.com/api/v2/networks/solana/tokens/${FPT_MINT}`,
@@ -96,10 +91,29 @@ async function fetchFptMarketPrice(): Promise<number | null> {
     if (res.ok) {
       const data = await res.json();
       const price = parseFloat(data?.data?.attributes?.price_usd);
-      if (isFinite(price) && price > 0) return price;
+      if (isFinite(price) && price > 0) {
+        console.log(`[fpt-price] GeckoTerminal price: $${price}`);
+        return price;
+      }
     }
   } catch { /* fall through */ }
 
+  // 3. Raydium API v3
+  try {
+    const res = await fetchWithTimeout(
+      `https://api-v3.raydium.io/mint/price?mints=${FPT_MINT}`,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const price = parseFloat(data?.data?.[FPT_MINT]);
+      if (isFinite(price) && price > 0) {
+        console.log(`[fpt-price] Raydium price: $${price}`);
+        return price;
+      }
+    }
+  } catch { /* fall through */ }
+
+  console.warn('[fpt-price] All DEX price sources returned null');
   return null;
 }
 
@@ -124,6 +138,8 @@ export async function GET(): Promise<NextResponse> {
         MIN_FPT_PER_USD,
       );
   const fptUsd = fptMarketUsd ?? (solUsd6dec / (DEFAULT_FPT_PER_SOL * 1_000_000));
+
+  console.log(`[fpt-price] Response: solUsd=${solUsd} fptMarketUsd=${fptMarketUsd} fptPerUsd6dec=${fptPerUsd6dec} fptUsd=${fptUsd}`);
 
   // Use shorter cache when no DEX price found yet
   const maxAge = fptMarketUsd != null ? 300 : 60;

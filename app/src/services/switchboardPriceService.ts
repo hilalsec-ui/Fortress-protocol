@@ -42,7 +42,9 @@ let _cache: {
   fptMarketUsd: number | null;
   fetchedAt: number;
 } | null = null;
-const CACHE_TTL_MS = 300_000; // Extended from 30s to 5 minutes — saves 1 RPC call per ticket
+/** 5 min when a DEX price is known; 60 s when null so we pick up new Raydium pools quickly */
+const CACHE_TTL_PRICE_MS = 300_000;
+const CACHE_TTL_NO_MARKET_MS = 60_000;
 
 // ── fetch helpers ───────────────────────────────────────────────────────────────
 async function fetchWithTimeout(url: string, ms = 5000): Promise<Response> {
@@ -85,10 +87,14 @@ async function fetchSolUsd(): Promise<number | null> {
 }
 
 /**
- * Fetch FPT's live market price from Jupiter Price API v2.
- * Returns null when there is no DEX market / liquidity for the token.
+ * Fetch FPT's live market price from multiple DEX sources in sequence:
+ * 1. Jupiter Price API v2 (best coverage across all Solana DEXes)
+ * 2. Raydium API v3 (direct — catches Raydium pools before Jupiter indexes them)
+ * 3. DexScreener (broad aggregator — picks up new pools within minutes)
+ * Returns null when no source has a price for the token yet.
  */
 async function fetchFptMarketPrice(): Promise<number | null> {
+  // 1. Jupiter Price API v2
   try {
     const res = await fetchWithTimeout(
       `https://api.jup.ag/price/v2?ids=${FPT_MINT}`,
@@ -98,7 +104,41 @@ async function fetchFptMarketPrice(): Promise<number | null> {
       const price = parseFloat(data?.data?.[FPT_MINT]?.price);
       if (isFinite(price) && price > 0) return price;
     }
+  } catch { /* fall through */ }
+
+  // 2. Raydium API v3 — often indexes new pools before Jupiter does
+  try {
+    const res = await fetchWithTimeout(
+      `https://api-v3.raydium.io/mint/price?mints=${FPT_MINT}`,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const price = parseFloat(data?.data?.[FPT_MINT]);
+      if (isFinite(price) && price > 0) return price;
+    }
+  } catch { /* fall through */ }
+
+  // 3. DexScreener — broad aggregator, picks up new pools within minutes
+  try {
+    const res = await fetchWithTimeout(
+      `https://api.dexscreener.com/latest/dex/tokens/${FPT_MINT}`,
+      8000,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      // Pick the most liquid Solana pair with a USD price
+      const pair = (data?.pairs ?? [])
+        .filter((p: { chainId?: string; priceUsd?: string; liquidity?: { usd?: number } }) =>
+          p.chainId === 'solana' && p.priceUsd,
+        )
+        .sort((a: { liquidity?: { usd?: number } }, b: { liquidity?: { usd?: number } }) =>
+          (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0),
+        )[0];
+      const price = parseFloat(pair?.priceUsd);
+      if (isFinite(price) && price > 0) return price;
+    }
   } catch { /* no DEX market yet */ }
+
   return null;
 }
 
@@ -116,7 +156,8 @@ export async function fetchFptUsdPrice(): Promise<{
   fptMarketUsd: number | null;
 }> {
   const now = Date.now();
-  if (_cache && now - _cache.fetchedAt < CACHE_TTL_MS) {
+  const cacheTtl = _cache?.fptMarketUsd != null ? CACHE_TTL_PRICE_MS : CACHE_TTL_NO_MARKET_MS;
+  if (_cache && now - _cache.fetchedAt < cacheTtl) {
     return {
       solUsd: _cache.solUsd,
       fptUsd: _cache.fptUsd,

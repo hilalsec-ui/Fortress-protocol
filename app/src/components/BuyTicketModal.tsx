@@ -61,6 +61,15 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
     fpt >= 1_000
       ? fpt.toLocaleString('en-US', { maximumFractionDigits: 0 })
       : fpt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  /** Format a USD price with enough decimals — handles sub-micro prices like $0.0000002585 */
+  const formatFptPrice = (p: number): string => {
+    if (p === 0) return '0';
+    if (p >= 0.01) return p.toFixed(4);
+    // Find first significant digit then show 4 sig figs
+    const mag = Math.floor(Math.log10(p));      // e.g. -7 for 0.0000002585
+    const decimals = Math.max(-mag + 3, 6);     // at least 6, enough for 4 sig figs
+    return p.toFixed(Math.min(decimals, 12));
+  };
   const pricingError = null;
   const [selectedTier, setSelectedTier] = useState<number>(initialTier);
   const [quantity, setQuantity] = useState<number>(1); // NEW: Quantity state
@@ -390,7 +399,7 @@ const BuyTicketModal: React.FC<BuyTicketModalProps> = ({
                             // Real DEX market price is available
                             <>
                               <span className="text-green-400/90">&#x25cf;&nbsp;DEX live</span>
-                              <span className="text-purple-400/80">&nbsp;&bull;&nbsp;FPT&nbsp;${fptMarketUsd < 0.001 ? fptMarketUsd.toFixed(6) : fptMarketUsd.toFixed(4)}</span>
+                              <span className="text-purple-400/80">&nbsp;&bull;&nbsp;FPT&nbsp;${fptMarketUsd != null ? formatFptPrice(fptMarketUsd) : '0'}</span>
                               {solUsd > 0 && (
                                 <span className="text-gray-600">&nbsp;&bull;&nbsp;SOL&nbsp;${solUsd.toFixed(2)}</span>
                               )}

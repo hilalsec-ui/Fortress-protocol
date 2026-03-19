@@ -19,7 +19,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '../_guard';
 
-const GITHUB_REPO  = 'hilalsec-ui/crank';
+// Configurable via GITHUB_CRANK_REPO env var (set in Vercel + app/.env.local).
+// Format: "owner/repo" — must be the repo where the crank-mainnet.yml workflow lives.
+const GITHUB_REPO  = process.env.GITHUB_CRANK_REPO ?? 'hilalsec-ui/crank';
 const EVENT_TYPE   = 'trigger-mainnet-draw';
 
 const VALID_LOTTERY_TYPES = new Set(['LPM', 'DPL', 'WPL', 'MPL']);
@@ -50,8 +52,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // ── PAT — never reaches the client ──────────────────────────────────────
   const pat = process.env.GITHUB_PAT;
   if (!pat) {
-    // Soft failure: crank runs on its hourly schedule as a fallback
-    console.warn('[trigger-crank] GITHUB_PAT not configured — skipping dispatch');
+    // Hard failure in production — without a PAT the auto-trigger cannot work.
+    // Add GITHUB_PAT=ghp_... to app/.env.local (local) or Vercel env vars (prod).
+    console.error(
+      '[trigger-crank] GITHUB_PAT is not set — auto-trigger is disabled.\n' +
+      '  Fix: add GITHUB_PAT=ghp_... to app/.env.local (scoped to Actions:Write on ' +
+      GITHUB_REPO + ')'
+    );
     return NextResponse.json({ skipped: true, reason: 'GITHUB_PAT not set' }, { status: 200 });
   }
 
@@ -81,11 +88,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   if (githubRes.status === 204) {
-    console.log(`[trigger-crank] Dispatched ${EVENT_TYPE} for ${lotteryType} $${tier}`);
+    console.log(`[trigger-crank] ✅ Dispatched ${EVENT_TYPE} → ${GITHUB_REPO} (${lotteryType} $${tier})`);
     return NextResponse.json({ ok: true }, { status: 200 });
   }
 
   const text = await githubRes.text().catch(() => '');
-  console.error(`[trigger-crank] GitHub returned ${githubRes.status}: ${text.slice(0, 200)}`);
+  console.error(`[trigger-crank] ❌ GitHub returned ${githubRes.status} for repo ${GITHUB_REPO}: ${text.slice(0, 200)}`);
   return NextResponse.json({ ok: false, status: githubRes.status }, { status: 200 });
 }

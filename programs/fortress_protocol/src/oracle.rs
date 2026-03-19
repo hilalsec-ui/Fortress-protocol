@@ -5,8 +5,8 @@ use crate::errors::LotteryError;
 pub const HASH_K1: u64 = 0x9e3779b97f4a7c15;
 pub const HASH_K2: u64 = 0x517cc1b727220a95;
 
-/// Switchboard V3 On-Demand program (mainnet)
-pub const SB_ON_DEMAND_PROGRAM: Pubkey = pubkey!("Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2");
+/// Switchboard On-Demand program — mainnet
+pub const SB_ON_DEMAND_PROGRAM: Pubkey = pubkey!("SBondMDrcV3K4kxZR1HNVT7osZxAHVHgYXL5Ze1oMUv");
 
 /// Server-side crank wallet — auto-triggers draws silently (no user wallet popup).
 /// On-chain reference used to distinguish crank from manual-fallback callers so

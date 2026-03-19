@@ -292,7 +292,7 @@ const MPLPage: React.FC = () => {
         })();
       }
     }
-  }, [lotteryData, nowSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lotteryData, nowSeconds, onChainReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-clear 'fallback_needed' only when the oracle has actually completed (oracle_ready).
   // Do NOT clear on 'requested' — that can mean a failed oracle left a stale PendingDraw on-chain,

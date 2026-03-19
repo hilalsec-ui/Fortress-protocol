@@ -80,7 +80,7 @@ export const PRIZE_TREASURY_PCT = 5;
 
 // Switchboard V3 On-Demand Configuration
 export const SB_ON_DEMAND_PROGRAM = "Aio4gaXjXzJNVLtzwtNVmSqGKpANtXhybbkhtAC94ji2";
-export const SB_MAINNET_QUEUE = "3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1";
+export const SB_MAINNET_QUEUE = "A43DyUGA7s8eXPxqEjJY6EBu1KKbNgfxF8h17VAHn13w";
 // SRS oracle reveal poll timeout (ms) — oracle typically reveals in 1-5 seconds
 export const SRS_POLL_TIMEOUT_MS = 90_000; // 90s — mainnet oracle can be slow
 

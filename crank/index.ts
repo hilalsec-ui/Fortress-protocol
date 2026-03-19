@@ -56,7 +56,7 @@ import * as path from "path";
 const RPC_URL = CONFIG.rpcUrl;
 const PROGRAM_ID = new PublicKey("EB6kkg2sW5rnukjRH7Ljhz78gbfc36XZAuiFn5jdefF3");
 const FPT_MINT   = new PublicKey("3YTnzmFTECtyKDxaghWPQcjzX7g1Cj3NxMq41JdWk2rj");
-const SB_MAINNET_QUEUE = new PublicKey("3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1");
+const SB_MAINNET_QUEUE = new PublicKey("A43DyUGA7s8eXPxqEjJY6EBu1KKbNgfxF8h17VAHn13w");
 
 // ─── Pre-initialised Switchboard RandomnessAccounts ─────────────────────────
 //

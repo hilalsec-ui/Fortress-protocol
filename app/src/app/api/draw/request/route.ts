@@ -41,7 +41,7 @@ const RPC_ENDPOINT  = process.env.SOLANA_RPC_ENDPOINT
   ?? process.env.NEXT_PUBLIC_RPC_URL
   ?? process.env.NEXT_PUBLIC_RPC_ENDPOINT
   ?? 'https://api.mainnet-beta.solana.com';
-const SB_MAINNET_QUEUE = new PublicKey('3u9PpRz7fN8Lp693zPueppQf94v7N2jKj3C18j9o7oG1');
+const SB_MAINNET_QUEUE = new PublicKey('A43DyUGA7s8eXPxqEjJY6EBu1KKbNgfxF8h17VAHn13w');
 const CRANK_AUTHORITY = new PublicKey('BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5');
 
 const LOTTERY_TYPE_ID: Record<string, number> = { LPM: 0, DPL: 1, WPL: 2, MPL: 3 };

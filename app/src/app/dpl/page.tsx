@@ -301,7 +301,7 @@ const DPLPage: React.FC = () => {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lotteryData, nowSeconds]);
+  }, [lotteryData, nowSeconds, onChainReady]);
 
   // Auto-clear local overrides when on-chain catches up
   useEffect(() => {

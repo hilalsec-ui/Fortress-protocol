@@ -18,19 +18,37 @@ import {
 } from "@solana/web3.js";
 import * as sb from "@switchboard-xyz/on-demand";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const bs58 = require("bs58") as { decode: (s: string) => Uint8Array };
+const bs58 = require("bs58") as { decode: (s: string) => Uint8Array; encode: (b: Uint8Array) => string };
 import * as fs from "fs";
 import * as path from "path";
 
-// Load CRANK_PRIVATE_KEY from app/.env.local manually
-const envPath = path.join(__dirname, "../app/.env.local");
-const envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, "utf-8") : "";
-for (const line of envContent.split("\n")) {
-  const m = line.match(/^([^=]+)=(.*)$/);
-  if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
+// Load from crank/.env first, then app/.env.local (lower priority)
+for (const envFile of [
+  path.join(__dirname, "../crank/.env"),
+  path.join(__dirname, "../app/.env.local"),
+]) {
+  const content = fs.existsSync(envFile) ? fs.readFileSync(envFile, "utf-8") : "";
+  for (const line of content.split("\n")) {
+    const m = line.match(/^([^=]+)=(.*)$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
+  }
 }
 
-const RPC_URL = "https://api.mainnet-beta.solana.com";
+// Switchboard On-Demand mainnet queue (verified active on mainnet)
+const SB_MAINNET_QUEUE = new PublicKey("A43DyUGA7s8eXPxqEjJY6EBu1KKbNgfxF8h17VAHn13w");
+
+// Flexible key loader — supports base58 string or JSON byte array [1,2,3,...]
+function keypairFromAny(value: string): Keypair {
+  try { return Keypair.fromSecretKey(bs58.decode(value)); } catch { /* fall through */ }
+  try {
+    const parsed = JSON.parse(value);
+    return Keypair.fromSecretKey(Uint8Array.from(parsed));
+  } catch { /* fall through */ }
+  throw new Error("Key is neither valid base58 nor a JSON byte array.");
+}
+
+const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=" +
+  (process.env.HELIUS_API_KEY ?? "cfb2a320-c0b3-407c-8188-adef19b9da7f");
 
 const LOTTERY_TYPES: Record<string, { id: number; tiers: number[] }> = {
   LPM: { id: 0, tiers: [5, 10, 20, 50] },
@@ -64,15 +82,19 @@ function readOracle(data: Buffer): PublicKey | null {
 async function main() {
   console.log("🎲 Switchboard RandomnessAccount Reinitializer (CRANK authority)\n");
 
-  // Load crank keypair from CRANK_PRIVATE_KEY env
+  // Load crank keypair — supports base58 or JSON array format
   const crankKeyRaw = process.env.CRANK_PRIVATE_KEY;
   if (!crankKeyRaw) {
-    console.error("❌ CRANK_PRIVATE_KEY not found in app/.env.local");
+    console.error("❌ CRANK_PRIVATE_KEY not found. Set it in crank/.env");
     process.exit(1);
   }
-  const crankKp = Keypair.fromSecretKey(
-    Uint8Array.from(bs58.decode(crankKeyRaw)),
-  );
+  let crankKp: Keypair;
+  try {
+    crankKp = keypairFromAny(crankKeyRaw);
+  } catch (e: any) {
+    console.error(`❌ CRANK_PRIVATE_KEY is invalid: ${e.message}`);
+    process.exit(1);
+  }
   console.log(`🔧 Crank wallet: ${crankKp.publicKey.toBase58()}`);
 
   fs.mkdirSync(KEYS_DIR, { recursive: true });
@@ -80,8 +102,8 @@ async function main() {
   const connection = new Connection(RPC_URL, "confirmed");
   const balance = await connection.getBalance(crankKp.publicKey);
   console.log(`💰 Crank balance: ${(balance / 1e9).toFixed(4)} SOL`);
-  if (balance < 0.3e9) {
-    console.error("❌ Crank needs at least 0.3 SOL. Run: solana airdrop 2 BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5 --url devnet");
+  if (balance < 0.05e9) {
+    console.error("❌ Crank needs at least 0.05 SOL to pay for account rent. Please fund: BzsGQccSzoWPiRSKoTNpf7iKxqJRq3CwvSygmzvwMei5");
     process.exit(1);
   }
 
@@ -98,7 +120,7 @@ async function main() {
   );
   console.log(`✅ SB program: ${sbProgram.programId.toBase58()}\n`);
 
-  const queue = sb.ON_DEMAND_DEVNET_QUEUE;
+  const queue = SB_MAINNET_QUEUE;
   console.log(`📋 Queue: ${queue.toBase58()}\n`);
 
   const results: Record<string, Record<number, string>> = {};
